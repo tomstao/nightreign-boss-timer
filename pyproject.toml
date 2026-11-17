@@ -1,0 +1,64 @@
+[project]
+name = "nightreign-boss-timer"
+version = "0.0.0"
+description = "Records boss fight times in ELDEN RING NIGHTREIGN by reading the boss health bar from the screen."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.11"
+keywords = ["nightreign", "elden ring", "overlay", "timer", "ocr"]
+classifiers = [
+    "Development Status :: 1 - Planning",
+    "Environment :: Win32 (MS Windows)",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3",
+    "Topic :: Games/Entertainment",
+]
+# Runtime dependencies are added with the milestone that first needs them.
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "pre-commit>=4.0",
+    "pytest>=8.3",
+    "ruff>=0.8",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/nightreign_boss_timer"]
+
+# Pin the public index so uv.lock never records a local mirror that CI cannot reach.
+[[tool.uv.index]]
+name = "pypi"
+url = "https://pypi.org/simple"
+default = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # import sorting
+    "B",   # bugbear
+    "UP",  # pyupgrade
+    "SIM", # simplifications
+    "C4",  # comprehensions
+    "PTH", # pathlib over os.path
+    "RUF", # ruff-specific
+]
+
+[tool.ruff.format]
+line-ending = "lf"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"

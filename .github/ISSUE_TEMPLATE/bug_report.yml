@@ -1,0 +1,52 @@
+name: Bug or wrong detection
+description: The tool crashed, timed a fight wrongly, or read a boss name wrongly.
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you expected and what the tool did instead.
+    validations:
+      required: true
+  - type: input
+    id: boss
+    attributes:
+      label: Boss
+      description: The boss name as shown in game, if this is about a fight.
+  - type: dropdown
+    id: language
+    attributes:
+      label: Game language
+      options:
+        - English
+        - Simplified Chinese
+        - Traditional Chinese
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: resolution
+    attributes:
+      label: Resolution and window mode
+      placeholder: 2560x1440, borderless
+    validations:
+      required: true
+  - type: dropdown
+    id: hdr
+    attributes:
+      label: HDR
+      options: ["Off", "On", "Not sure"]
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Tool version and Windows version
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Screenshot, clip, or diagnostics
+      description: Detection problems cannot be fixed without the frames that caused them.

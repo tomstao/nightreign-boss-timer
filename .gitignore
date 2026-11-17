@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# Build
+build/
+dist/
+
+# Local data
+*.sqlite
+*.db
+logs/
+diagnostics/
+
+# Recorded footage stays out of git unless moved to LFS
+clips/
+*.mp4
+*.mkv
+
+# Editors / OS
+.vscode/
+.idea/
+Thumbs.db
