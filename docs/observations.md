@@ -137,3 +137,24 @@ arena, game language Simplified Chinese, boss 黄金河马. The boss is killed.
 - A Nightlord kill, to see whether the defeat text differs from GREAT ENEMY FELLED.
 - A fight with two bars at once, and a multi-phase boss.
 - A clip at 3840x2160 or an ultrawide resolution, if any player uses one.
+
+## Second clip: hit flashes
+
+Analysed 2026-11-17: 1920x1080, 160 s, arena, Simplified Chinese, boss 大树守卫, killed. The clip
+ends 0.2 s after the defeat text starts to appear.
+
+- The boss name was read correctly on all 8 attempts.
+- HP was tracked from 99% to 0%. The last hit lands at about 151.5 s.
+- **Hit flashes are the main hazard.** A critical hit fills the screen with a bright orange-gold
+  burst for up to 0.6 s. During it the bar is still drawn, but the detector loses it (34 gaps in
+  this fight, against 7 in the first clip), because the scene around the bar turns red-orange and
+  the empty track no longer looks dark.
+- **The same flash looks like defeat text.** On 20 single samples the defeat text check answered
+  yes, in runs of at most 3 samples. So "bar gone" and "gold text" can be true together in the
+  middle of a fight, which is exactly the signal for a kill.
+- The tracker now guards against this in two ways: the defeat text must hold for 0.8 s, and it
+  only counts if the boss was at 10% HP or less when the bar was last read. Replaying this clip
+  gives no early end.
+- A gap right as the bar appeared made the start time 0.2 s late. A bar being confirmed may now
+  drop out briefly without starting over.
+- Still to do: make the bar detector itself hold through a flash.

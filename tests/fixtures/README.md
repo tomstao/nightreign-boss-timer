@@ -43,3 +43,10 @@ of the width, 45.5% to 52.5% of the height). Every second pixel is kept, so each
 What the two detectors read from the same clip, sampled 10 times per second: 796 rows of time,
 bar present, `hp`, `hp_high`, and defeat text visible. It lets the fight tracker be tested against
 a whole real fight without the video.
+
+## tree_sentinel_readings.csv
+
+The same kind of file from a second clip: a 160 s kill of 大树守卫 at 1920x1080, 1,596 rows. This
+fight has bright hit flashes that hide the bar for up to 0.6 s (34 gaps) and at the same moment
+fill the middle of the screen with gold, which the defeat text check takes for the text on 20
+single samples. The clip ends 0.2 s after the real defeat text starts to appear.

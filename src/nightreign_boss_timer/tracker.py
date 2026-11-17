@@ -8,8 +8,9 @@ ends.
                                                  ^                      |
                                                  +------bar back--------+
 
-While waiting, defeat text makes the fight complete, and the wait window running out makes it
-incomplete. A fight in which the boss HP never moved is dropped as a walk-past.
+While waiting, defeat text that holds makes the fight complete, provided the boss was nearly dead
+when the bar was last read. The wait window running out makes it incomplete. A fight in which
+the boss HP never moved is dropped as a walk-past.
 """
 
 from __future__ import annotations
@@ -24,8 +25,13 @@ from nightreign_boss_timer.records import Status
 CONFIRM_S = 0.3
 # After the bar disappears, how long to wait for the defeat text or for the bar to come back.
 WAIT_WINDOW_S = 8.0
-# The defeat text must be seen on this many samples in a row.
-DEFEAT_SAMPLES = 3
+# A bar that is still being confirmed may drop out for this long without starting over.
+PENDING_GAP_S = 0.3
+# The defeat text must stay visible this long. Hit flashes fill the middle of the screen with
+# gold for up to about 0.3 s, and hide the bar at the same moment.
+DEFEAT_HOLD_S = 0.8
+# Defeat text only counts if the boss was nearly dead when the bar was last read.
+KILL_HP_MAX = 0.10
 # A reading is trusted for HP when its two bounds are this close. See BarReading.
 HP_CERTAIN_GAP = 0.03
 # The bar is empty when the visible red ends below this. A sliver stays lit at the left cap.
@@ -69,7 +75,7 @@ class FightTracker:
         self._above_zero_run = 0
         self._start_hp: float | None = None
         self._hp: float | None = None
-        self._defeat_run = 0
+        self._defeat_since: float | None = None
 
     @property
     def in_fight(self) -> bool:
@@ -97,7 +103,8 @@ class FightTracker:
 
         if self._state is _State.PENDING:
             if not bar.present:
-                self._state = _State.IDLE
+                if now - self._last_seen > PENDING_GAP_S:
+                    self._state = _State.IDLE
                 return None
             self._read_hp(now, bar)
             if now - self._started_at >= CONFIRM_S:
@@ -107,7 +114,7 @@ class FightTracker:
         if bar.present:
             # Covers both fighting and the bar coming back inside the wait window.
             self._state = _State.FIGHTING
-            self._defeat_run = 0
+            self._defeat_since = None
             self._read_hp(now, bar)
             return None
 
@@ -115,8 +122,16 @@ class FightTracker:
             self._state = _State.WAITING
             self._gone_at = now
 
-        self._defeat_run = self._defeat_run + 1 if defeat_visible else 0
-        if self._defeat_run >= DEFEAT_SAMPLES:
+        if not defeat_visible:
+            self._defeat_since = None
+        elif self._defeat_since is None:
+            self._defeat_since = now
+        if (
+            self._defeat_since is not None
+            and now - self._defeat_since >= DEFEAT_HOLD_S
+            and self._hp is not None
+            and self._hp <= KILL_HP_MAX
+        ):
             return self._finish(Status.COMPLETE)
         if now - self._gone_at >= self.wait_window_s:
             return self._finish(Status.INCOMPLETE)
@@ -129,7 +144,7 @@ class FightTracker:
         self._above_zero_run = 0
         self._start_hp = None
         self._hp = None
-        self._defeat_run = 0
+        self._defeat_since = None
 
     def _read_hp(self, now: float, bar: BarReading) -> None:
         self._last_seen = now

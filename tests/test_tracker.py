@@ -7,7 +7,7 @@ from nightreign_boss_timer.detector import BarReading
 from nightreign_boss_timer.records import Status
 from nightreign_boss_timer.tracker import FightOutcome, FightTracker
 
-READINGS = Path(__file__).parent / "fixtures" / "hippo_readings.csv"
+FIXTURES = Path(__file__).parent / "fixtures"
 STEP = 0.1
 GONE = BarReading(present=False, hp=0.0, hp_high=0.0, score=0.0)
 
@@ -136,13 +136,36 @@ def test_one_stray_reading_does_not_restart_the_clock_after_zero() -> None:
     assert run.outcomes[0].duration_s == pytest.approx(10.0, abs=0.11)
 
 
-def test_defeat_text_must_hold_for_several_samples() -> None:
+def test_defeat_text_must_hold() -> None:
     run = Replay()
-    run.fall(1.0, 0.5, 10)
+    run.fall(1.0, 0.02, 10)
     run.feed(GONE, 1)
-    run.feed(GONE, 0.2, defeat=True)  # two samples of gold sparks
+    run.feed(GONE, 0.5, defeat=True)  # a flash of gold, shorter than the hold time
     run.feed(GONE, 9)
     assert [o.status for o in run.outcomes] == [Status.INCOMPLETE]
+
+
+def test_defeat_text_does_not_count_while_the_boss_has_health() -> None:
+    # A hit flash hides the bar and puts gold mid-screen at once. The boss is at half health.
+    run = Replay()
+    run.fall(1.0, 0.5, 10)
+    run.feed(GONE, 2, defeat=True)
+    assert run.outcomes == []
+    run.fall(0.5, 0.4, 5)  # the fight goes on as one record
+    run.feed(GONE, 9)
+    assert [(o.status, o.start_hp_pct, o.end_hp_pct) for o in run.outcomes] == [
+        (Status.INCOMPLETE, 100, 40)
+    ]
+
+
+def test_dropout_while_the_bar_is_being_confirmed_keeps_the_start_time() -> None:
+    run = Replay()
+    run.feed(GONE, 1)
+    run.feed(bar(1.0), 0.1)  # first sight at 1.0 s
+    run.feed(GONE, 0.2)  # one flash
+    run.fall(1.0, 0.5, 10)
+    run.feed(GONE, 9)
+    assert run.outcomes[0].started_at == pytest.approx(1.0)
 
 
 def test_defeat_check_is_only_wanted_while_waiting() -> None:
@@ -154,11 +177,9 @@ def test_defeat_check_is_only_wanted_while_waiting() -> None:
     assert run.tracker.watching_for_defeat
 
 
-def test_real_clip_gives_one_complete_fight() -> None:
-    """Detector readings from an 80 s clip of a kill, 10 per second. See fixtures/README.md."""
-    tracker = FightTracker()
-    outcomes = []
-    with READINGS.open(newline="", encoding="utf-8") as handle:
+def replay_readings(name: str, run: Replay) -> None:
+    """Feed a file of real detector readings, 10 per second. See fixtures/README.md."""
+    with (FIXTURES / name).open(newline="", encoding="utf-8") as handle:
         for row in csv.DictReader(handle):
             reading = BarReading(
                 present=row["present"] == "1",
@@ -166,9 +187,17 @@ def test_real_clip_gives_one_complete_fight() -> None:
                 hp_high=float(row["hp_high"]),
                 score=0.0,
             )
-            outcome = tracker.update(float(row["t"]), reading, row["defeat"] == "1")
+            run.now = float(row["t"])
+            outcome = run.tracker.update(run.now, reading, row["defeat"] == "1")
             if outcome:
-                outcomes.append(outcome)
+                run.outcomes.append(outcome)
+    run.now += STEP
+
+
+def test_real_clip_gives_one_complete_fight() -> None:
+    run = Replay()
+    replay_readings("hippo_readings.csv", run)
+    outcomes = run.outcomes
 
     assert len(outcomes) == 1
     outcome = outcomes[0]
@@ -176,4 +205,26 @@ def test_real_clip_gives_one_complete_fight() -> None:
     # Measured by hand, frame by frame: bar appears at 11.13 s, HP reaches zero at 71.61 s.
     assert outcome.started_at == pytest.approx(11.13, abs=0.1)
     assert outcome.duration_s == pytest.approx(60.5, abs=0.2)
+    assert (outcome.start_hp_pct, outcome.end_hp_pct) == (100, 0)
+
+
+def test_real_clip_with_hit_flashes_is_not_ended_early() -> None:
+    """A 160 s kill of a golden boss. Hit flashes hide the bar and look like defeat text 20 times.
+
+    The clip ends just as the real defeat text appears, so the test supplies what would follow.
+    """
+    run = Replay()
+    replay_readings("tree_sentinel_readings.csv", run)
+    assert run.outcomes == []  # no flash was taken for the defeat text
+    assert run.tracker.in_fight
+    assert run.tracker.hp == pytest.approx(0.0, abs=0.005)
+
+    run.feed(GONE, 2, defeat=True)
+
+    assert len(run.outcomes) == 1
+    outcome = run.outcomes[0]
+    assert outcome.status is Status.COMPLETE
+    # The bar appears at 9.3 s and the last hit lands at about 151.5 s.
+    assert outcome.started_at == pytest.approx(9.3, abs=0.15)
+    assert outcome.duration_s == pytest.approx(142.2, abs=0.5)
     assert (outcome.start_hp_pct, outcome.end_hp_pct) == (100, 0)

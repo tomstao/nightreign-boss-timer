@@ -17,3 +17,4 @@ All notable changes are listed here. The format follows
 - Screen capture for Windows that copies only the watched regions, and a benchmark script.
 - Command-line version: watches the game, prints each fight and appends it to the records file.
 - Installation manual and user guide, written ahead of the first release.
+- Fight tracker no longer mistakes hit flashes for the defeat text.
