@@ -3,8 +3,9 @@
 Records how long each boss fight takes in ELDEN RING NIGHTREIGN by reading the boss health bar
 from the screen. Built to cost no measurable game FPS.
 
-> **Status: planning.** The repository holds the plan, the research and the project tooling.
-> There is nothing to run yet. See the [plan](docs/PLAN.md) for milestones.
+> **Status: early development.** A command-line version records fights with default regions.
+> The overlay, the settings window, region calibration and boss name reading are not built yet.
+> See the [plan](docs/PLAN.md) for milestones.
 
 ## What it will do
 
@@ -60,6 +61,20 @@ uv run ruff check .
 uv run ruff format --check .
 uv run pytest
 ```
+
+## Try the command-line version
+
+An early version without overlay or settings window. It uses default regions for a 16:9 game
+image and records the boss as `unknown`, because reading the name is not built yet.
+
+```powershell
+uv run python -m nightreign_boss_timer --table Arena
+```
+
+Start the game in windowed or borderless windowed mode, then fight a boss. Each finished fight is
+printed and appended to `Documents\nightreign-boss-timer\records.csv`. Stop with Ctrl+C.
+
+To measure what it costs on your PC, run `uv run python tools/bench_capture.py` with the game open.
 
 ## Documentation
 

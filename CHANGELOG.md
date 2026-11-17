@@ -15,3 +15,4 @@ All notable changes are listed here. The format follows
 - Defeat text check: recognises the gold defeat text by its shape, without reading it.
 - Fight tracker: turns detector readings into complete or incomplete fights, following the recording rules.
 - Screen capture for Windows that copies only the watched regions, and a benchmark script.
+- Command-line version: watches the game, prints each fight and appends it to the records file.
