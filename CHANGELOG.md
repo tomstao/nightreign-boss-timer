@@ -21,3 +21,4 @@ All notable changes are listed here. The format follows
 - Boss name reader: reads the name above the bar with a small text recognition model on the CPU.
 - Records now carry the boss name, read at the start of each fight.
 - Boss bar detector holds through most hit flashes.
+- Settings file with tables, regions, hotkeys and timing options.
