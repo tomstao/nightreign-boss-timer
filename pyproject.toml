@@ -15,7 +15,9 @@ classifiers = [
     "Topic :: Games/Entertainment",
 ]
 # Runtime dependencies are added with the milestone that first needs them.
-dependencies = []
+dependencies = [
+    "numpy>=2.0",
+]
 
 [dependency-groups]
 dev = [

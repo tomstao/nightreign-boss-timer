@@ -11,3 +11,4 @@ All notable changes are listed here. The format follows
 - Project plan, research notes, and recording rules.
 - Project tooling: Ruff linting and formatting, pytest, pre-commit hooks, GitHub Actions CI.
 - CSV record store that opens in Excel and holds rows while the file is locked.
+- Boss bar detector: finds the bar in a strip of pixels and reads how full it is.
