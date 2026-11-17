@@ -58,6 +58,8 @@ select = [
     "PTH", # pathlib over os.path
     "RUF", # ruff-specific
 ]
+# Chinese text uses full-width punctuation on purpose.
+ignore = ["RUF001", "RUF002", "RUF003"]
 
 [tool.ruff.format]
 line-ending = "lf"

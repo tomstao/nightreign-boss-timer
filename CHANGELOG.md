@@ -22,3 +22,4 @@ All notable changes are listed here. The format follows
 - Records now carry the boss name, read at the start of each fight.
 - Boss bar detector holds through most hit flashes.
 - Settings file with tables, regions, hotkeys and timing options.
+- Translation files for English, Simplified Chinese and Traditional Chinese.
