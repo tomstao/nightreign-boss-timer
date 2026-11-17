@@ -293,6 +293,12 @@ Done when: a play session produces correct records with no manual input and the 
 
 - PyInstaller build, settings in the user data folder, diagnostics export, README with the
   safety statement.
+- The [installation manual](INSTALL.md) and the [user guide](USER_GUIDE.md) match the release:
+  every step in them is followed once on a clean Windows account, and the "planned" markers are
+  removed.
+
+The two documents exist from the start and are written ahead of the code. Any change that alters
+what a user sees or does updates them in the same pull request.
 
 ## Open decisions
 

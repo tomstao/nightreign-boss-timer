@@ -78,6 +78,8 @@ To measure what it costs on your PC, run `uv run python tools/bench_capture.py` 
 
 ## Documentation
 
+- [Installation](docs/INSTALL.md): requirements, install, update, uninstall, running from source
+- [User guide](docs/USER_GUIDE.md): setup, everyday use, records, tables, hotkeys, troubleshooting
 - [Plan](docs/PLAN.md): goal, recording rules, design, milestones, open decisions
 - [UI design](docs/UI.md): tray, overlay, main window, calibration, first-run setup
 - [Observations](docs/observations.md): measurements of the boss bar from real screenshots
