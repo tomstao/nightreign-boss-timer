@@ -105,9 +105,18 @@ arena, game language Simplified Chinese, boss 黄金河马. The boss is killed.
   gold, centred, on a dark band across the middle of the screen (about 26% to 74% of the width,
   at about 49% of the height). If this holds for Traditional Chinese too, the defeat text needs no
   per-language handling.
-- **The defeat text may not need text recognition at all.** A plain count of gold pixels in that
-  band was 0.00% for the entire fight and a steady 10.2 to 10.4% from 78.0 s until the clip ended.
-  That is a much cheaper and stronger signal than reading the words. To be confirmed on more clips.
+- **The defeat text does not need text recognition, but gold alone is not enough.** The share of
+  gold pixels in that band is a steady 10.2 to 10.4% from 78.0 s until the clip ends. An earlier
+  version of this note said it was zero for the entire fight. That was wrong: it had only been
+  measured around the start and the end. Over the whole fight, hit sparks and weapon effects in
+  the middle of the screen put gold in the band during 12 short spans, once reaching more gold
+  than the text itself (at 55.1 s).
+- **Shape separates the text from the sparks.** The text is many separate letters spread along a
+  line, on a dark band: 18 to 24 separate gold strokes spanning over half the box. The sparks are
+  a few blobs: at most 8 strokes in the frames with the most gold. With gold share, span, stroke
+  count and band darkness together, a scan of the whole clip at 20 samples per second gave no
+  false positive and no miss, for both a tight and a loose box. The text holds steady for seconds
+  while sparks flicker, so requiring several agreeing samples adds a second safeguard.
 - **A HUD popup covers the left end of the bar.** When the player uses a weapon skill, a box with
   the skill name (血刃 in this clip) appears at the left and overlaps the bar's left end for about
   a second. It happened about nine times in this fight. A detector that requires the red to start

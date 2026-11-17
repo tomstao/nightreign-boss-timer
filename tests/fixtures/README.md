@@ -22,3 +22,18 @@ bar box grown by twice its height above and below: 35 rows by 990 columns, RGB.
 
 The expected values in the tests were read from the clip by eye and by an independent scan
 (docs/observations.md). The clip itself is not in the repository.
+
+## defeat_regions.npz
+
+Six regions from the same clip, covering the box where the defeat text appears (about 24% to 76%
+of the width, 45.5% to 52.5% of the height). Every second pixel is kept, so each is 38 rows by
+499 columns, RGB.
+
+| Name | Clip time | What it shows |
+|---|---|---|
+| fight_start | 12.0 s | fight under way, nothing gold |
+| hit_sparks | 55.14 s | hit sparks in the middle of the screen, more gold than the text has |
+| sparks_long | 62.0 s | scattered sparks |
+| boss_dissolving | 76.5 s | after the kill, before the text |
+| text_fading_in | 77.95 s | defeat text fading in |
+| text_full | 78.5 s | defeat text fully visible |
