@@ -157,4 +157,10 @@ ends 0.2 s after the defeat text starts to appear.
   gives no early end.
 - A gap right as the bar appeared made the start time 0.2 s late. A bar being confirmed may now
   drop out briefly without starting over.
-- Still to do: make the bar detector itself hold through a flash.
+- The bar detector was then changed to hold through most of a flash. Two things were going
+  wrong. The empty track is see-through, so over a bright flash it turns brownish and no longer
+  passed as "dark and colourless". And when the scene around the bar turned red-orange, the red
+  fill was rejected as a red object in the scene. The track is now also accepted when it is much
+  darker and less colourful than what is around it, and the fill when it is clearly darker than
+  a red scene. Gaps in this clip went from 34 to 16 and the longest from 0.6 s to 0.3 s. In the
+  first clip they went from 7 to 5. The remaining gaps are one or two samples long.

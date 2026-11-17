@@ -63,3 +63,14 @@ Four strips holding the boss name, cut from just above the left end of the bar.
 | screenshot_1440p_partly_hidden | a 2560x1440 screenshot, player character in front of the name | 卡利亚禁卫骑士 |
 
 All four are Simplified Chinese. English and Traditional Chinese are not covered yet.
+
+## bar_flash_regions.npz
+
+Four bar regions from the second clip (大树守卫), the same size as those in `bar_regions.npz`.
+
+| Name | Clip time | What it shows |
+|---|---|---|
+| before_flash | 58.0 s | normal frame, about 55% |
+| flash_bright | 59.2 s | hit flash: bright orange behind the bar, which tints the empty track |
+| flash_red_scene | 59.5 s | the flash fading: the scene around the bar is red-orange |
+| flash_low_hp | 108.4 s | another flash, about 31% |

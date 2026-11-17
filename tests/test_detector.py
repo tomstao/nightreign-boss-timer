@@ -6,6 +6,7 @@ import pytest
 from nightreign_boss_timer.detector import MARGIN_HEIGHTS, grow_box, measure_bar
 
 FIXTURES = Path(__file__).parent / "fixtures" / "bar_regions.npz"
+FLASH_FIXTURES = Path(__file__).parent / "fixtures" / "bar_flash_regions.npz"
 
 # Synthetic colours, taken from docs/observations.md.
 FILL = (110, 53, 24)
@@ -113,3 +114,45 @@ def test_real_frames_with_a_bar(
     assert reading.present
     assert reading.hp == pytest.approx(expected_hp, abs=0.01)
     assert reading.hp <= reading.hp_high <= reading.hp + 0.03
+
+
+@pytest.fixture(scope="module")
+def flashes() -> dict[str, np.ndarray]:
+    """Bar regions during hit flashes, from a second clip. See tests/fixtures/README.md."""
+    with np.load(FLASH_FIXTURES) as data:
+        return {name: data[name] for name in data.files}
+
+
+@pytest.mark.parametrize(
+    ("name", "expected_hp"),
+    [
+        ("before_flash", 0.546),
+        ("flash_bright", 0.546),  # bright burst behind the bar tints the empty track
+        ("flash_red_scene", 0.546),  # the scene around the bar is red-orange too
+        ("flash_low_hp", 0.307),
+    ],
+)
+def test_bar_is_read_through_a_hit_flash(
+    flashes: dict[str, np.ndarray], name: str, expected_hp: float
+) -> None:
+    reading = measure_bar(flashes[name])
+    assert reading.present
+    assert reading.hp == pytest.approx(expected_hp, abs=0.015)
+
+
+def test_tinted_track_over_a_bright_flash_is_still_track() -> None:
+    flash = (215, 175, 125)
+    region = make_region(0.4, scene=flash)
+    top = BAR_HEIGHT * MARGIN_HEIGHTS
+    end = round(WIDTH * 0.4)
+    region[top : top + BAR_HEIGHT, end:] = (102, 84, 60)  # the see-through track over the flash
+    reading = measure_bar(region)
+    assert reading.present
+    assert reading.hp == pytest.approx(0.4, abs=0.005)
+
+
+def test_bar_over_a_red_scene_is_still_a_bar() -> None:
+    # Red-orange all around, and the bar a darker red strip in it.
+    reading = measure_bar(make_region(0.7, scene=(145, 90, 60)))
+    assert reading.present
+    assert reading.hp == pytest.approx(0.7, abs=0.005)

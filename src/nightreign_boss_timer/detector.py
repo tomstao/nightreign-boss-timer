@@ -5,8 +5,8 @@ column is classified as one of:
 
 - fill:  the red part of the bar. Red inside the box, and not red just above and below it, which
          is what separates a thin bar from a red object in the scene.
-- track: the empty part of the bar. A dark, colourless strip that is darker than the scene just
-         above and below it.
+- track: the empty part of the bar. A see-through dark strip, so it is darker than the scene
+         just above and below it.
 - other: anything else, such as a popup or an effect drawn over the bar.
 
 A bar that is ``p`` full is fill up to ``p`` and track after it. The detector finds the split
@@ -32,13 +32,21 @@ RED_OVER_BLUE = 1.9
 
 # A column counts as fill when this share of its rows inside the box is red...
 FILL_ROWS_MIN = 0.6
-# ...and at most this share of its rows outside the box is red.
+# ...and at most this share of its rows outside the box is red...
 OUTSIDE_RED_MAX = 0.34
+# ...or, when the scene around the bar is red too, the box is this much darker than the scene.
+# A hit flash turns the whole screen orange-red, and the bar stays a darker strip inside it.
+FILL_CONTRAST_MAX = 0.75
 
-# Track: darker than this, nearly colourless, and darker than its surroundings by this ratio.
+# Track: the empty part of the bar is a see-through dark strip. It is darker than its
+# surroundings by this ratio...
+TRACK_CONTRAST_MAX = 0.8
+# ...and either dark and nearly colourless, as over a normal scene...
 TRACK_BRIGHTNESS_MAX = 110
 TRACK_COLOUR_SPREAD_MAX = 30
-TRACK_CONTRAST_MAX = 0.8
+# ...or, over a bright flash that tints it, much darker than the flash and less colourful.
+TRACK_STRONG_CONTRAST_MAX = 0.65
+TRACK_SPREAD_OF_OUTSIDE_MAX = 0.75
 
 # A bar is present when the best split explains at least this share of the columns.
 PRESENT_SCORE_MIN = 0.6
@@ -91,19 +99,21 @@ def measure_bar(region: NDArray[np.uint8]) -> BarReading:
     gap = max(1, round(height * 0.7))
     outside = np.concatenate([pixels[: top - gap], pixels[top + height + gap :]])
 
-    fill = (_red(box).mean(axis=0) >= FILL_ROWS_MIN) & (
-        _red(outside).mean(axis=0) <= OUTSIDE_RED_MAX
-    )
-
     box_brightness = box.mean(axis=(0, 2))
     outside_brightness = outside.mean(axis=(0, 2))
     spread = (box.max(axis=2) - box.min(axis=2)).mean(axis=0)
-    track = (
-        ~fill
-        & (box_brightness < TRACK_BRIGHTNESS_MAX)
-        & (spread < TRACK_COLOUR_SPREAD_MAX)
-        & (box_brightness < outside_brightness * TRACK_CONTRAST_MAX)
+    outside_spread = (outside.max(axis=2) - outside.min(axis=2)).mean(axis=0)
+
+    fill = (_red(box).mean(axis=0) >= FILL_ROWS_MIN) & (
+        (_red(outside).mean(axis=0) <= OUTSIDE_RED_MAX)
+        | (box_brightness < outside_brightness * FILL_CONTRAST_MAX)
     )
+
+    plain = (box_brightness < TRACK_BRIGHTNESS_MAX) & (spread < TRACK_COLOUR_SPREAD_MAX)
+    tinted = (box_brightness < outside_brightness * TRACK_STRONG_CONTRAST_MAX) & (
+        spread < outside_spread * TRACK_SPREAD_OF_OUTSIDE_MAX
+    )
+    track = ~fill & (plain | tinted) & (box_brightness < outside_brightness * TRACK_CONTRAST_MAX)
 
     # vote[i] is +1 if column i says "the bar is full here" and -1 if it says "empty here".
     vote = fill.astype(np.int32) - track.astype(np.int32)

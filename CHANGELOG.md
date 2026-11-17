@@ -20,3 +20,4 @@ All notable changes are listed here. The format follows
 - Fight tracker no longer mistakes hit flashes for the defeat text.
 - Boss name reader: reads the name above the bar with a small text recognition model on the CPU.
 - Records now carry the boss name, read at the start of each fight.
+- Boss bar detector holds through most hit flashes.
