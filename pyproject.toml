@@ -17,6 +17,7 @@ classifiers = [
 # Runtime dependencies are added with the milestone that first needs them.
 dependencies = [
     "numpy>=2.0",
+    "onnxruntime>=1.20",
 ]
 
 [dependency-groups]

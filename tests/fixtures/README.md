@@ -50,3 +50,16 @@ The same kind of file from a second clip: a 160 s kill of 大树守卫 at 1920x1
 fight has bright hit flashes that hide the bar for up to 0.6 s (34 gaps) and at the same moment
 fill the middle of the screen with gold, which the defeat text check takes for the text on 20
 single samples. The clip ends 0.2 s after the real defeat text starts to appear.
+
+## name_regions.npz
+
+Four strips holding the boss name, cut from just above the left end of the bar.
+
+| Name | Source | Text |
+|---|---|---|
+| clip_1080p_bar_appears | the clip, 11.2 s | 黄金河马 |
+| clip_1080p_mid_fight | the clip, 56.8 s, skill popup next to the name | 黄金河马 |
+| screenshot_1440p | a 2560x1440 screenshot | 神谕众使者 |
+| screenshot_1440p_partly_hidden | a 2560x1440 screenshot, player character in front of the name | 卡利亚禁卫骑士 |
+
+All four are Simplified Chinese. English and Traditional Chinese are not covered yet.

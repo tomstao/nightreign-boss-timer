@@ -45,4 +45,16 @@ jobs:
           enable-cache: true
           python-version: ${{ matrix.python }}
       - run: uv sync --locked --dev
+      - name: Cache the OCR model
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/nbt-models
+          # The checksum lives in ocr.py, so a model change makes a new cache entry.
+          key: ocr-model-${{ hashFiles('src/nightreign_boss_timer/ocr.py') }}
+      - name: Fetch the OCR model
+        run: uv run python tools/fetch_model.py
+        env:
+          NBT_MODEL_DIR: ${{ runner.temp }}/nbt-models
       - run: uv run pytest
+        env:
+          NBT_MODEL_DIR: ${{ runner.temp }}/nbt-models

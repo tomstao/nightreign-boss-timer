@@ -18,3 +18,4 @@ All notable changes are listed here. The format follows
 - Command-line version: watches the game, prints each fight and appends it to the records file.
 - Installation manual and user guide, written ahead of the first release.
 - Fight tracker no longer mistakes hit flashes for the defeat text.
+- Boss name reader: reads the name above the bar with a small text recognition model on the CPU.
