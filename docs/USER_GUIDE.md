@@ -106,7 +106,7 @@ Excel or any spreadsheet program.
 | `started_at` | date and time the fight began |
 | `table` | the table that was active (see below) |
 | `boss` | boss name as shown in game, or `unknown` if it could not be read |
-| `language` | game language the name was read in |
+| `language` | language the name was read in: `en`, or `zh` for Chinese. Simplified and Traditional are not told apart yet. |
 | `status` | `complete` or `incomplete` |
 | `duration` | fight time as minutes:seconds |
 | `duration_s` | the same in seconds, for sorting and charts |

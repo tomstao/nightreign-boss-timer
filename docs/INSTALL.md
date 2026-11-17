@@ -68,7 +68,16 @@ This works today and is the only way to run the tool until there is a release.
    uv sync --dev
    ```
 
-3. Start the game in windowed or borderless windowed mode, then run the command-line version:
+3. Download the text recognition model used to read boss names (21 MB, once). It is checked
+   against a known checksum and saved under `%LOCALAPPDATA%\nightreign-boss-timer\models`:
+
+   ```powershell
+   uv run python tools/fetch_model.py
+   ```
+
+   Without the model the tool still times fights, and records the boss as `unknown`.
+
+4. Start the game in windowed or borderless windowed mode, then run the command-line version:
 
    ```powershell
    uv run python -m nightreign_boss_timer --table Arena
@@ -84,7 +93,7 @@ This works today and is the only way to run the tool until there is a release.
 | `--title TEXT` | title of the game window, if it is not found | `ELDEN RING NIGHTREIGN` |
 
 What the command-line version does not do yet: there is no overlay, no settings window and no
-calibration. It assumes a 16:9 game image, and it records the boss as `unknown`.
+calibration. It assumes a 16:9 game image.
 
 To measure what the tool costs on your PC, run this with the game open:
 

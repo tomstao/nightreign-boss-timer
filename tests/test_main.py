@@ -2,7 +2,7 @@ from datetime import datetime
 
 from nightreign_boss_timer.__main__ import describe, to_record
 from nightreign_boss_timer.records import Status
-from nightreign_boss_timer.regions import Box, bar_region, defeat_text_region
+from nightreign_boss_timer.regions import Box, bar_region, defeat_text_region, name_region
 from nightreign_boss_timer.tracker import FightOutcome
 
 
@@ -45,7 +45,7 @@ def test_outcome_becomes_a_record_with_the_wall_clock_start() -> None:
 
     assert record.started_at == datetime(2026, 11, 17, 21, 4, 33)
     assert record.table == "Arena"
-    assert record.boss == "unknown"
+    assert (record.boss, record.language) == ("unknown", "")
     assert record.duration_s == 60.3
     assert (record.status, record.start_hp_pct, record.end_hp_pct) == (Status.COMPLETE, 100, 0)
 
@@ -53,4 +53,27 @@ def test_outcome_becomes_a_record_with_the_wall_clock_start() -> None:
 def test_describe_is_one_readable_line() -> None:
     outcome = FightOutcome(1000.0, 161.3, Status.INCOMPLETE, 100, 62)
     record = to_record(outcome, "Arena", 1170.0, datetime(2026, 11, 17, 21, 7, 23))
-    assert describe(record) == "21:04:33  incomplete  02:41.3  HP 100% -> 62%"
+    assert describe(record) == "21:04:33  incomplete  02:41.3  HP 100% -> 62%  unknown"
+
+
+def test_record_carries_the_boss_name_and_its_language() -> None:
+    outcome = FightOutcome(1000.0, 60.0, Status.COMPLETE, 100, 0)
+    record = to_record(outcome, "Arena", 1067.0, datetime(2026, 11, 17, 21, 5, 40), "黄金河马")
+    assert (record.boss, record.language) == ("黄金河马", "zh")
+
+
+def test_name_region_covers_the_measured_name_at_1440p() -> None:
+    # Measured on a 1440p screenshot: text rows 1096..1124, starting at column 618.
+    region = name_region(Box(0, 0, 2560, 1440))
+    assert region.left <= 618
+    assert region.top <= 1096
+    assert region.top + region.height >= 1124
+    assert region.top + region.height <= 1142  # stays above the bar itself
+
+
+def test_name_region_at_1080p_is_a_thin_strip_above_the_bar() -> None:
+    region = name_region(Box(0, 0, 1920, 1080))
+    bar = bar_region(Box(0, 0, 1920, 1080))
+    assert region.left <= bar.left
+    assert 25 <= region.height <= 35
+    assert region.top + region.height <= 857  # the fill starts at row 857

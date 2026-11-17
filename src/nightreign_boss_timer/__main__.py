@@ -3,8 +3,7 @@
     uv run python -m nightreign_boss_timer
 
 This is the first runnable form, before the overlay and settings window exist. It uses the
-default regions for a 16:9 game image, does not read the boss name yet, and is stopped with
-Ctrl+C.
+default regions for a 16:9 game image and is stopped with Ctrl+C.
 """
 
 from __future__ import annotations
@@ -14,8 +13,9 @@ import time
 from datetime import datetime, timedelta
 from pathlib import Path
 
+from nightreign_boss_timer.names import UNKNOWN, NameVote, language_of
 from nightreign_boss_timer.records import FightRecord, RecordStore, format_duration
-from nightreign_boss_timer.regions import Box, bar_region, defeat_text_region
+from nightreign_boss_timer.regions import Box, bar_region, defeat_text_region, name_region
 from nightreign_boss_timer.tracker import FightOutcome, FightTracker
 
 GAME_TITLE = "ELDEN RING NIGHTREIGN"
@@ -28,14 +28,16 @@ def default_records_path() -> Path:
     return Path.home() / "Documents" / "nightreign-boss-timer" / "records.csv"
 
 
-def to_record(outcome: FightOutcome, table: str, now: float, wall_now: datetime) -> FightRecord:
+def to_record(
+    outcome: FightOutcome, table: str, now: float, wall_now: datetime, boss: str = UNKNOWN
+) -> FightRecord:
     """Turn a tracker outcome into a row. ``now`` is the tracker's clock at ``wall_now``."""
     started = wall_now - timedelta(seconds=now - outcome.started_at)
     return FightRecord(
         started_at=started.replace(microsecond=0),
         table=table,
-        boss="unknown",  # reading the boss name comes in a later version
-        language="",
+        boss=boss,
+        language=language_of(boss),
         status=outcome.status,
         duration_s=round(outcome.duration_s, 1),
         start_hp_pct=outcome.start_hp_pct,
@@ -47,6 +49,7 @@ def describe(record: FightRecord) -> str:
     return (
         f"{record.started_at:%H:%M:%S}  {record.status.value:<10}  "
         f"{format_duration(record.duration_s)}  HP {record.start_hp_pct}% -> {record.end_hp_pct}%"
+        f"  {record.boss}"
     )
 
 
@@ -55,17 +58,24 @@ def run(title: str, table: str, records: Path) -> None:
     from nightreign_boss_timer.capture import ScreenGrabber, enable_dpi_awareness, find_window
     from nightreign_boss_timer.defeat_text import measure_defeat_text
     from nightreign_boss_timer.detector import measure_bar
+    from nightreign_boss_timer.ocr import NameReader
 
     enable_dpi_awareness()
+    try:
+        reader = NameReader()
+    except FileNotFoundError as error:
+        reader = None
+        print(f"Boss names will not be read. {error}")
     store = RecordStore(records)
     tracker = FightTracker()
     print(f"Table: {table}    Records: {records}")
     print("Waiting for the game window. Press Ctrl+C to stop.")
 
     window: Box | None = None
-    bar_box = defeat_box = None
-    bar_grabber = defeat_grabber = None
+    bar_box = defeat_box = name_box = None
+    bar_grabber = defeat_grabber = name_grabber = None
     was_in_fight = False
+    vote = NameVote()
     try:
         while True:
             found = find_window(title)
@@ -79,11 +89,13 @@ def run(title: str, table: str, records: Path) -> None:
             if current != window:
                 window = current
                 bar_box, defeat_box = bar_region(window), defeat_text_region(window)
-                for grabber in (bar_grabber, defeat_grabber):
+                name_box = name_region(window)
+                for grabber in (bar_grabber, defeat_grabber, name_grabber):
                     if grabber:
                         grabber.close()
                 bar_grabber = ScreenGrabber(bar_box.width, bar_box.height)
                 defeat_grabber = ScreenGrabber(defeat_box.width, defeat_box.height)
+                name_grabber = ScreenGrabber(name_box.width, name_box.height)
                 print(f"Watching the game at {window.width}x{window.height}.")
 
             now = time.monotonic()
@@ -95,9 +107,16 @@ def run(title: str, table: str, records: Path) -> None:
 
             if tracker.in_fight and not was_in_fight:
                 print("Boss bar seen, timing.")
+                vote = NameVote()
+            # Read the name on a few samples early in the fight, then leave the model alone.
+            if reader and tracker.in_fight and bar.present and not vote.settled:
+                reading = reader.read(name_grabber.grab(name_box.left, name_box.top))
+                vote.add(reading.text, reading.confidence)
+                if vote.settled:
+                    print(f"Boss: {vote.name}")
             was_in_fight = tracker.in_fight
             if outcome:
-                record = to_record(outcome, table, now, datetime.now())
+                record = to_record(outcome, table, now, datetime.now(), vote.name)
                 saved = store.append(record)
                 note = "" if saved else "  (file is open elsewhere, held for later)"
                 print(describe(record) + note)
@@ -107,7 +126,7 @@ def run(title: str, table: str, records: Path) -> None:
     except KeyboardInterrupt:
         print("Stopped.")
     finally:
-        for grabber in (bar_grabber, defeat_grabber):
+        for grabber in (bar_grabber, defeat_grabber, name_grabber):
             if grabber:
                 grabber.close()
 

@@ -50,6 +50,31 @@ def bar_region(window: Box, bar: Fractions = DEFAULT_BAR) -> Box:
     )
 
 
+# The boss name sits above the left end of the bar. Measured at 1440p, where the bar is 1320
+# pixels wide: the text starts level with the left edge of the bar and spans 46 to 18 pixels
+# above its top. The box is a little larger, and is sized by bar width so it follows any
+# calibration.
+_NAME_ABOVE_FAR = 52 / 1320
+_NAME_ABOVE_NEAR = 12 / 1320
+_NAME_LEFT_PAD = 4 / 1320
+_NAME_WIDTH = 0.45
+
+
+def name_region(window: Box, bar: Fractions = DEFAULT_BAR) -> Box:
+    """Screen pixels holding the boss name, worked out from where the bar is."""
+    bar_left = round(bar.left * window.width)
+    bar_width = max(1, round(bar.right * window.width) - bar_left)
+    bar_top = round(bar.top * window.height)
+    top = bar_top - round(_NAME_ABOVE_FAR * bar_width)
+    bottom = bar_top - round(_NAME_ABOVE_NEAR * bar_width)
+    return Box(
+        left=window.left + bar_left - round(_NAME_LEFT_PAD * bar_width),
+        top=window.top + top,
+        width=max(1, round(_NAME_WIDTH * bar_width)),
+        height=max(1, bottom - top),
+    )
+
+
 def defeat_text_region(window: Box, text: Fractions = DEFAULT_DEFEAT_TEXT) -> Box:
     """Screen pixels to grab for the defeat text check."""
     left = round(text.left * window.width)

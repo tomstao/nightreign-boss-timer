@@ -285,6 +285,11 @@ Done when: every boss in the clips is identified correctly in all three language
 - Live loop against the running game, CSV record store, tray icon, overlay.
 - Main window pages from UI.md: Records, Tables, Hotkeys, Regions, Settings, About.
 - Keyboard hotkeys. Controller bindings follow in a later release.
+- **Localization** (required by the project owner, 2026-11-17): every piece of UI text is
+  available in English, 简体中文 and 繁體中文 from the first UI release. No text is written
+  directly in UI code: it goes through translation files, one per language, and a test fails if
+  a key is missing from any of them. The UI language is a setting, independent of the game
+  language.
 - Re-measure the performance budget in a real session.
 
 Done when: a play session produces correct records with no manual input and the budget holds.
