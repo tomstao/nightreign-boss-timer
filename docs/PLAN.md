@@ -242,6 +242,20 @@ Done when: clips, lexicon and regions are in the repo (clips via Git LFS or kept
 
 Done when: a default backend is chosen from measured numbers and the budget table has real values.
 
+Status, 2026-11-17: the GDI backend is written (`capture.py`) with a benchmark script
+(`tools/bench_capture.py`). Measured on the desktop of the development PC (2560x1440, 12 logical
+cores), **without the game running**:
+
+| Mode | Time per sample | CPU used by the process |
+|---|---|---|
+| Fight: bar region, 10 per second | 4.6 ms grab, 1.4 ms detect | 2.2% of one core (0.18% of the whole CPU) |
+| Just after the bar disappears: bar and defeat text, 10 per second | 10.7 ms grab, 2.5 ms detect | 3.8% of one core (0.31%) |
+| Idle: bar region, 2 per second | 6.1 ms grab, 1.3 ms detect | too small to measure |
+
+Most of a grab is waiting on Windows, not computing, which is why the CPU share is far below what
+the times suggest. Still to do: the same run with the game open, the game's frame rate with the
+tool on and off, and a comparison against the other backends if these numbers do not hold.
+
 ### M2 Bar detector and HP ratio
 
 - Offline detector working on the M0 clips, with tests that replay frames.
@@ -302,6 +316,10 @@ Done when: a play session produces correct records with no manual input and the 
    colour and never read as text.
 9. **Pass-by records**: settled. Records where the boss HP never changed are skipped (recording
    rule 9).
+
+10. **Nightlord defeat text**: it may differ from the text for other bosses. The project owner
+    will check. Development is based on the general-boss clip for now, so until this is checked a
+    Nightlord kill may be recorded as `incomplete`.
 
 ## Risks
 
