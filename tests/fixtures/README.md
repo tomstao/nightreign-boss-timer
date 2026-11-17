@@ -37,3 +37,9 @@ of the width, 45.5% to 52.5% of the height). Every second pixel is kept, so each
 | boss_dissolving | 76.5 s | after the kill, before the text |
 | text_fading_in | 77.95 s | defeat text fading in |
 | text_full | 78.5 s | defeat text fully visible |
+
+## hippo_readings.csv
+
+What the two detectors read from the same clip, sampled 10 times per second: 796 rows of time,
+bar present, `hp`, `hp_high`, and defeat text visible. It lets the fight tracker be tested against
+a whole real fight without the video.
