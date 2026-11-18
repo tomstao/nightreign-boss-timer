@@ -28,6 +28,7 @@ COLUMNS = (
     "language_2",
     "boss_3",
     "language_3",
+    "character",
 )
 
 _TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
@@ -67,6 +68,9 @@ class FightRecord:
     language_2: str = ""
     boss_3: str = ""
     language_3: str = ""
+    # The character the fight was played with, in the language the program was set to then.
+    # Empty if none was set, and for fights saved before this was recorded.
+    character: str = ""
 
     def to_row(self) -> list[str]:
         return [
@@ -84,6 +88,7 @@ class FightRecord:
             self.language_2,
             self.boss_3,
             self.language_3,
+            self.character,
         ]
 
     @classmethod
@@ -103,6 +108,7 @@ class FightRecord:
             language_2=row.get("language_2") or "",
             boss_3=row.get("boss_3") or "",
             language_3=row.get("language_3") or "",
+            character=row.get("character") or "",
         )
 
 

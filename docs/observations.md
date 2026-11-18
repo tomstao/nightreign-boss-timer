@@ -263,6 +263,13 @@ Collected 2026-11-18.
 - Checked against other sources: the eight Simplified names read from footage are all in the
   list as written, and Steam's achievement text has the same eight Nightlord names in all three
   languages.
+- `src/nightreign_boss_timer/characters.json` lists the ten playable characters the same way:
+  entries 100000, 100010 and 100030 to 100090 of `NpcName` except 100080, and 110000 and 110010
+  of `NpcName_dlc01` (Scholar and Undertaker, from The Forsaken Hollows), read from the same
+  project's copy as it was on 2026-06-05. Which entries are playable, and their order, follow
+  that project's own character list. The neighbouring entries (Priestess, Witch of the Wheel,
+  Iron Menial, the merchants) are not playable and are left out. Not yet compared with the
+  character names shown in the running game.
 - **Not every entry is a boss with a health bar.** The list is every name the game has for a
   non-player character, so some entries may never appear above a boss bar. That does no harm:
   the list is only used to recognise a name that was read.

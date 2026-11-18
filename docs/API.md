@@ -80,6 +80,18 @@ lookup that finds a reading in them.
 | `BossMatch` | `name` (as the game writes it), `language`, `en`, `zh_cn`, `zh_tw`. A translation is empty when the list has more than one. |
 | `LANGUAGES`, `CHINESE` | The values of `BossMatch.language`: `en`, `zh_CN`, `zh_TW`, and `zh` for a name written the same in both kinds of Chinese. |
 
+### `nightreign_boss_timer.characters`
+
+The characters a player can choose, in English, Simplified Chinese and Traditional Chinese.
+Nothing here reads the screen.
+
+| Name | What it is |
+|---|---|
+| `all_keys()` | Every character by its English name, in the game's order (`characters.json`). Settings and code use these. |
+| `key_of(name)` | The English name of the character a name in any of the three languages stands for, or an empty string. |
+| `label_of(name, language)` | The character in `en`, `zh_CN` or `zh_TW`. A name that is no character comes back as it was. |
+| `LANGUAGES` | The languages the list has. |
+
 ### `nightreign_boss_timer.level`
 
 Finds the player's level digits in the emblem at the top left, and settles on a level from
@@ -179,7 +191,7 @@ Fight records and the CSV file they are stored in.
 
 | Name | What it is |
 |---|---|
-| `FightRecord` | One fight: `started_at`, `table`, `boss`, `language`, `status`, `duration_s`, `start_hp_pct`, `end_hp_pct`, `level` (`None` if unread), and `boss_2`, `language_2`, `boss_3`, `language_3` for the same boss in a second and third language (empty if not asked for). |
+| `FightRecord` | One fight: `started_at`, `table`, `boss`, `language`, `status`, `duration_s`, `start_hp_pct`, `end_hp_pct`, `level` (`None` if unread), and `boss_2`, `language_2`, `boss_3`, `language_3` for the same boss in a second and third language (empty if not asked for), and `character` (the character played, as saved; empty if not set). |
 | `Status` | `COMPLETE` or `INCOMPLETE`. |
 | `RecordStore(path)` | The CSV file. |
 | `RecordStore.append(record)` | Save a record. Returns `False` if it had to be held because the file is locked. |

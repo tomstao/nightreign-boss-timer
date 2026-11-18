@@ -26,9 +26,10 @@ own builds of the same libraries. The source code of Qt is available from
 The model file `PP-OCRv6_rec_small.onnx` is included unmodified. It is checked against a known
 checksum when it is downloaded for packaging (`tools/fetch_model.py`).
 
-## Boss names
+## Boss and character names
 
-`boss_names.json` holds the names of the game's bosses in three languages. The names are the
+`boss_names.json` holds the names of the game's bosses in three languages, and
+`characters.json` those of its playable characters. The names are the
 game's own text, which belongs to FromSoftware and Bandai Namco. They were taken from the copy
 in [Elden-Ring-Nightreign-Save-Editor](https://github.com/alfizari/Elden-Ring-Nightreign-Save-Editor)
 (MIT). No other part of that project is used.
