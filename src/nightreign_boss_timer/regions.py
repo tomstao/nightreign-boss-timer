@@ -34,6 +34,10 @@ class Fractions:
 
 DEFAULT_BAR = Fractions(left=0.2406, right=0.7559, top=0.7931, bottom=0.7993)
 DEFAULT_DEFEAT_TEXT = Fractions(left=0.24, right=0.76, top=0.455, bottom=0.525)
+# The middle of the level emblem in the top-left corner: 54 by 43 pixels at 1080p. The digits are
+# found inside it, so it has room to spare, but a box 4 pixels larger on each side takes in
+# bright parts of the emblem and the reading goes wrong (docs/observations.md).
+DEFAULT_LEVEL = Fractions(left=0.0406, right=0.0688, top=0.0306, bottom=0.0704)
 
 
 def bar_region(window: Box, bar: Fractions = DEFAULT_BAR) -> Box:
@@ -84,4 +88,16 @@ def defeat_text_region(window: Box, text: Fractions = DEFAULT_DEFEAT_TEXT) -> Bo
         top=window.top + top,
         width=max(1, round(text.right * window.width) - left),
         height=max(1, round(text.bottom * window.height) - top),
+    )
+
+
+def level_region(window: Box, level: Fractions = DEFAULT_LEVEL) -> Box:
+    """Screen pixels holding the player's level, in the emblem at the top left."""
+    left = round(level.left * window.width)
+    top = round(level.top * window.height)
+    return Box(
+        left=window.left + left,
+        top=window.top + top,
+        width=max(1, round(level.right * window.width) - left),
+        height=max(1, round(level.bottom * window.height) - top),
     )

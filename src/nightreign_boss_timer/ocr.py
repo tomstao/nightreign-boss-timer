@@ -99,9 +99,15 @@ class NameReader:
         characters = self._session.get_modelmeta().custom_metadata_map["character"].splitlines()
         # Index 0 is the "nothing here" class, and the model's last class is a space.
         self._characters = ["", *characters, " "]
+        self._digits = np.array([ch.isascii() and ch.isdecimal() for ch in self._characters])
+        self._digits[0] = True  # "nothing here" stays allowed
 
-    def read(self, region: NDArray[np.uint8]) -> TextReading:
-        """Read an RGB region of shape (rows, columns, 3) holding one line of text."""
+    def read(self, region: NDArray[np.uint8], *, digits_only: bool = False) -> TextReading:
+        """Read an RGB region of shape (rows, columns, 3) holding one line of text.
+
+        With ``digits_only`` the model may only answer with the digits 0 to 9, for a region that
+        is known to hold a number.
+        """
         if region.size == 0:
             return TextReading("", 0.0)
         # The model was trained on blue-green-red images scaled to -1..1.
@@ -109,7 +115,10 @@ class NameReader:
         image = _resize_to_height(image, _INPUT_HEIGHT)
         batch = np.ascontiguousarray(image.transpose(2, 0, 1)[None])
         (output,) = self._session.run(None, {self._input: batch})
-        return self._decode(output[0])
+        steps = output[0]
+        if digits_only:
+            steps = np.where(self._digits, steps, -1.0)
+        return self._decode(steps)
 
     def _decode(self, steps: NDArray[np.float32]) -> TextReading:
         """Each step votes for a character. Drop repeats and "nothing here", keep the rest."""

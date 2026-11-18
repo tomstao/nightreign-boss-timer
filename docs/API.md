@@ -67,6 +67,19 @@ The recording rules as a state machine. Fed one sample at a time, it says when a
 | `FightOutcome` | `status`, `started_at`, `duration_s`, `start_hp_pct`, `end_hp_pct`. |
 | `FULL_HP` | A reading at or above this is written as 100%. |
 
+### `nightreign_boss_timer.level`
+
+Finds the player's level digits in the emblem at the top left, and settles on a level from
+several readings.
+
+| Name | What it is |
+|---|---|
+| `find_digits(region)` | A tight crop around the white digits in the level box, or `None` if there are none. |
+| `parse_level(text)` | The level a reading stands for, `MIN_LEVEL` to `MAX_LEVEL`, or `None`. |
+| `LevelVote` | Collects readings for one fight: `add(text)`, `settled`, `level`. |
+| `MIN_LEVEL`, `MAX_LEVEL` | The levels the game has. |
+| `AGREE`, `MAX_READS` | When the vote stops asking for readings. |
+
 ### `nightreign_boss_timer.ocr`
 
 Reads one line of text, the boss name, with a small ONNX model on the CPU.
@@ -74,7 +87,7 @@ Reads one line of text, the boss name, with a small ONNX model on the CPU.
 | Name | What it is |
 |---|---|
 | `NameReader(model_path)` | Loads the model. Raises `FileNotFoundError` if it was not downloaded. |
-| `NameReader.read(region)` | Returns a `TextReading`. |
+| `NameReader.read(region, digits_only=False)` | Returns a `TextReading`. With `digits_only` the answer can only hold the digits 0 to 9. |
 | `TextReading` | `text` and `confidence`. |
 | `default_model_path()` | Where the model file is: `NBT_MODEL_DIR` if set, else the copy packed into the packaged program, else the user's local app data. |
 | `bundled_model_path()` | The copy packed into the packaged program, or `None` when running from source. |
@@ -109,6 +122,8 @@ Where the watched regions are inside the game image.
 | `bar_region(window, bar)` | Screen pixels to grab for the bar detector. |
 | `name_region(window, bar)` | Screen pixels holding the boss name, worked out from the bar. |
 | `defeat_text_region(window, text)` | Screen pixels to grab for the defeat text check. |
+| `DEFAULT_LEVEL` | The middle of the level emblem on a 16:9 image. |
+| `level_region(window, level)` | Screen pixels holding the player's level. |
 
 ### `nightreign_boss_timer.capture`
 

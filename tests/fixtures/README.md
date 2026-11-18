@@ -91,3 +91,20 @@ Detector readings from a fourth clip, like `hippo_readings.csv`: a 75 s kill of 
 (铃珠猎人) at 1920x1080, 751 rows, one every 0.1 s. The banner after this kill is the silver
 NIGHT REPULSED, so the defeat column is 0 through the kill. The bar empties at 61.4 s and goes
 away at 64.5 s. Made with the detector that reads through a skill popup.
+
+## level_regions.npz
+
+Seven crops of the box that holds the player's level, in the emblem at the top left. Six are
+from 1920x1080 clips and are 43 rows by 54 columns. One is from a 2560x1440 clip, 57 by 72.
+
+| Name | What it shows |
+|---|---|
+| level_2 | level 2 |
+| level_7 | level 7 |
+| level_7_bright_scene | level 7 over a pale floor |
+| level_8 | level 8 |
+| level_15 | level 15 |
+| level_15_at_1440p | level 15, cut from a 2560x1440 frame |
+| no_emblem | the same box 2 s into a clip, before the emblem and the level are drawn |
+
+The levels were read by eye. No footage shows levels 1, 3 to 6 or 9 to 14.

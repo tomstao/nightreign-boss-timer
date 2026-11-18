@@ -221,3 +221,27 @@ forum posts and have not been checked in the game. Their colours are not known.
 The check goes by how the text looks and never reads it, so a new wording in gold needs no
 change. A banner in another colour is covered by the empty bar, as long as the bar is readable
 when the boss dies.
+
+## The player's level
+
+Analysed 2026-11-18: 21 clips, one frame every 2 s, 1,228 frames. 20 clips are 1920x1080 and one
+is 2560x1440. The levels in them are 2, 7, 8 and 15, read by eye.
+
+- The level is one or two white digits in the middle of a round blue emblem at the top left.
+  At 1080p the digits are about 16 pixels high, centred near (104, 54).
+- **The text model reads the box badly as it is.** With a fixed box around the digits it gave
+  the right level in 43% to 85% of the frames, depending on the box, and the rest were letters,
+  Chinese characters or other digits. The bright lines of the emblem are the cause.
+- **Limiting the answer to digits helps, but the box edges still matter.** Moving the top or the
+  bottom edge by one or two pixels moved the share of wrong readings between none and one in six,
+  with no steady pattern. A box that depends on single pixels would not survive another resolution.
+- **Finding the digits first makes it steady.** The digits are the only solid white shapes in
+  the box: the lines are thin and bluer. Cutting a tight crop around them and reading that gave
+  the same result for boxes from 50 by 40 to 58 by 46 pixels. A box 66 by 50 or larger takes in
+  bright parts of the emblem and fails, so the default box is 54 by 43, in the middle of the
+  range that works.
+- Result with the default box: 1,166 frames right, 2 wrong (15 read as 2, both in one clip), and
+  60 with no digits found, about 3 per clip, where the emblem is not drawn yet or the screen is
+  fading. The 2560x1440 frame reads correctly with the same fractions.
+- Not covered: levels 1, 3 to 6 and 9 to 14, other resolutions and ultrawide, and a level that
+  changes during a fight.
