@@ -1,5 +1,6 @@
 import os
 import sys
+from pathlib import Path
 
 import pytest
 
@@ -154,3 +155,27 @@ def test_overlay_position_can_be_set_and_reset(application: "QApplication") -> N
     assert (overlay.x(), overlay.y()) == (-1200, 50)
     overlay.set_position(None)
     assert (overlay.x(), overlay.y()) == DEFAULT_POSITION
+
+
+def test_saved_choice_to_show_in_captures_is_applied_at_start(
+    application: "QApplication", tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from nightreign_boss_timer import settings as settings_file
+    from nightreign_boss_timer.ui.app import App
+
+    asked: list[bool] = []
+
+    def fake(handle: int, exclude: bool = True) -> bool:
+        asked.append(exclude)
+        return True
+
+    monkeypatch.setattr("nightreign_boss_timer.ui.overlay.exclude_from_capture", fake)
+    path = tmp_path / "settings.json"
+    settings_file.save(settings_file.Settings(setup_done=True, overlay_in_captures=True), path)
+
+    app = App(application, "no such window", tmp_path / "records.csv", settings_path=path)
+    try:
+        assert asked[-1] is False
+        assert app.overlay.hidden_from_capture is False
+    finally:
+        app.close()

@@ -8,6 +8,7 @@ All notable changes are listed here. The format follows
 
 ### Fixed
 
+- The setting to show the overlay in screenshots and recordings now still holds after the program is restarted.
 - A kill is now saved as `complete` when the boss bar empties and then goes away, even if no gold defeat text follows. Night bosses show a silver banner, and some bosses show none.
 - One wrong HP reading no longer sticks: a record no longer starts at 0% because the bar was fading in.
 - The boss bar is no longer read as empty while a skill popup covers the red part of it at low HP.

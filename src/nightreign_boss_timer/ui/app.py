@@ -79,6 +79,7 @@ class App:
         self.controller.probe = self.engine.probe
         self.overlay = Overlay()
         self.overlay.set_position(self.settings.overlay_position)
+        self.overlay.set_in_captures(self.settings.overlay_in_captures)
         self.overlay.moved.connect(lambda x, y: self.controller.set_overlay_position((x, y)))
         self.controller.window_shown.connect(self._window_shown)
         self.result: FightRecord | None = None
