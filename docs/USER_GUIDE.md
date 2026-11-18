@@ -1,6 +1,6 @@
 # User guide
 
-> Everything in this guide works in release 0.1.0 (see [INSTALL.md](INSTALL.md)), except what
+> Everything in this guide works in release 0.2.0 (see [INSTALL.md](INSTALL.md)), except what
 > is marked as planned. The author uses it with the game
 > at 2560x1440 in Simplified Chinese, and detection is tested against recorded fights. Other
 > resolutions, the game in English or Traditional Chinese, and the cost in frame rate are still
