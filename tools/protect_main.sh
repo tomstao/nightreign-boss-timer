@@ -7,7 +7,7 @@
 # GitHub refuses most of these on a private repository of a free account.
 set -euo pipefail
 
-REPO="${REPO:-sunfish-LittleKight/nightreign-boss-timer}"
+REPO="${REPO:-tomstao/nightreign-boss-timer}"
 
 echo "Protecting main of $REPO"
 gh api -X PUT "repos/$REPO/branches/main/protection" --input - >/dev/null <<'JSON'
@@ -47,12 +47,11 @@ fi
 
 echo "Turning on secret scanning, push protection and private vulnerability reports"
 gh api -X PATCH "repos/$REPO" --input - >/dev/null <<'JSON'
-{
-  "security_and_analysis": {
-    "secret_scanning": {"status": "enabled"},
-    "secret_scanning_push_protection": {"status": "enabled"}
-  }
-}
+{"security_and_analysis": {"secret_scanning": {"status": "enabled"}}}
+JSON
+# Push protection is only accepted once scanning is on, so it is a request of its own.
+gh api -X PATCH "repos/$REPO" --input - >/dev/null <<'JSON'
+{"security_and_analysis": {"secret_scanning_push_protection": {"status": "enabled"}}}
 JSON
 gh api -X PUT "repos/$REPO/private-vulnerability-reporting" >/dev/null
 gh api -X PUT "repos/$REPO/vulnerability-alerts" >/dev/null

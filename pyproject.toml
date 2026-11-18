@@ -22,9 +22,9 @@ dependencies = [
 ]
 
 [project.urls]
-Repository = "https://github.com/sunfish-LittleKight/nightreign-boss-timer"
-Issues = "https://github.com/sunfish-LittleKight/nightreign-boss-timer/issues"
-Changelog = "https://github.com/sunfish-LittleKight/nightreign-boss-timer/blob/main/CHANGELOG.md"
+Repository = "https://github.com/tomstao/nightreign-boss-timer"
+Issues = "https://github.com/tomstao/nightreign-boss-timer/issues"
+Changelog = "https://github.com/tomstao/nightreign-boss-timer/blob/main/CHANGELOG.md"
 
 [dependency-groups]
 dev = [

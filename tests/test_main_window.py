@@ -129,7 +129,7 @@ def test_about_page(application: "QApplication", tmp_path: Path) -> None:
     window.show_page("about")
     about = window.stack.currentWidget()
     assert about.version.text() == f"Version {__version__}"
-    assert "github.com/sunfish-LittleKight/nightreign-boss-timer" in about.link.text()
+    assert "github.com/tomstao/nightreign-boss-timer" in about.link.text()
     assert "screen pixels" in about.safety.text()
 
 

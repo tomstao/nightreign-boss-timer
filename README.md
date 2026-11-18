@@ -122,7 +122,7 @@ You need [Git](https://git-scm.com/) and [uv](https://docs.astral.sh/uv/). uv do
 right Python by itself.
 
 ```powershell
-git clone https://github.com/sunfish-LittleKight/nightreign-boss-timer.git
+git clone https://github.com/tomstao/nightreign-boss-timer.git
 cd nightreign-boss-timer
 uv sync --dev
 uv run python tools/fetch_model.py
