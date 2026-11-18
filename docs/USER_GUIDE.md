@@ -10,9 +10,9 @@
 > [INSTALL.md](INSTALL.md#running-from-source). It follows the recording rules under
 > [Everyday use](#everyday-use) and writes the file described under [Your records](#your-records).
 > Region calibration works as described under [First-run setup](#first-run-setup), from the tray
-> menu. Until you calibrate, the tool uses the usual positions for a 16:9 game image. The
-> calibration hotkey, picking a recent frame, the main window, tables beyond one name, hotkeys
-> and settings are not built yet.
+> menu or with `Ctrl+Alt+C`. Until you calibrate, the tool uses the usual positions for a 16:9
+> game image. Picking a recent frame for the defeat text, changing hotkeys in the program,
+> first-run setup and moving the overlay are not built yet.
 
 To install the tool, see [INSTALL.md](INSTALL.md).
 
@@ -38,7 +38,7 @@ resolution. You mark two areas once.
 ### 1. Health bar
 
 1. Start a fight so that a boss health bar is on screen.
-2. Choose **Calibrate regions** from the tray icon (a hotkey, default `Ctrl+Alt+C`, is planned).
+2. Press `Ctrl+Alt+C`, or choose **Calibrate regions** from the tray icon.
    A window opens with a screenshot of the game, taken at that moment.
 3. A box is already drawn where the bar sits on a 16:9 game image. If it is not exactly on the
    bar, drag a box around the **whole bar, from its left end to its right end**, just the bar
@@ -200,7 +200,13 @@ All tables are saved in the same file. Use the `table` column to filter in Excel
 
 ## Hotkeys
 
-Set them under **Hotkeys** in the main window: click a shortcut, press the keys, press Enter.
+The defaults below work as soon as the tool runs, wherever the keyboard focus is.
+
+Changing them on a **Hotkeys** page in the main window is planned. Until then they are in
+`%APPDATA%
+ightreign-boss-timer\settings.json`, under `hotkeys` and under each table's
+`hotkey`, written like `Ctrl+Alt+P`. Quit the tool before editing the file. If two actions have
+the same shortcut, or another program already uses it, that hotkey does not work.
 
 | Action | Default |
 |---|---|
@@ -209,9 +215,9 @@ Set them under **Hotkeys** in the main window: click a shortcut, press the keys,
 | Switch to Arena / Normal | `Ctrl+Alt+1` / `Ctrl+Alt+2` |
 | Show or hide the overlay | `Ctrl+Alt+O` |
 | Open region calibration | `Ctrl+Alt+C` |
-| End the current fight now | not set |
-| Discard the last record | not set |
 | Open the main window | not set |
+| End the current fight now | not set (planned) |
+| Discard the last record | not set (planned) |
 
 A hotkey works everywhere in Windows and takes that key combination away from the game while the
 tool runs, so avoid keys you use to play.

@@ -33,6 +33,7 @@ from nightreign_boss_timer.ocr import NameReader
 from nightreign_boss_timer.records import FightRecord, RecordStore
 from nightreign_boss_timer.ui.calibration_window import CalibrationWindow
 from nightreign_boss_timer.ui.controller import Controller
+from nightreign_boss_timer.ui.global_hotkeys import GlobalHotkeys
 from nightreign_boss_timer.ui.main_window import MainWindow
 from nightreign_boss_timer.ui.overlay import Overlay
 from nightreign_boss_timer.ui.presenter import best_time, overlay_text
@@ -70,6 +71,9 @@ class App:
         self.controller.window_requested.connect(self.window.show_page)
         self.tray = Tray(self.controller, application.quit)
         self.tray.icon.show()
+        self.hotkeys = GlobalHotkeys()
+        self.hotkeys.triggered.connect(self.controller.run_action)
+        self.hotkeys.apply(self.settings)
         self.controller.changed.connect(self._apply)
         self.controller.notice.connect(self._show_notice)
         self.controller.calibration_requested.connect(self.calibration.start)
@@ -84,6 +88,7 @@ class App:
         """Bring the engine and the overlay in line with what the user chose."""
         self.engine.paused = not self.controller.tracking
         self.overlay.set_enabled(self.controller.overlay_visible)
+        self.hotkeys.apply(self.settings)  # a table or a shortcut may have changed
         self._step()
 
     def _show_notice(self, text: str) -> None:
@@ -136,6 +141,7 @@ class App:
 
     def close(self) -> None:
         self.timer.stop()
+        self.hotkeys.close()
         self.calibration.close()
         self.window.close()
         self.screen.close()

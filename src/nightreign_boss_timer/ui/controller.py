@@ -15,6 +15,7 @@ from PySide6.QtCore import QObject, Signal
 
 from nightreign_boss_timer import settings as settings_file
 from nightreign_boss_timer.engine import Probe, State, records_path
+from nightreign_boss_timer.hotkeys import TABLE_PREFIX
 from nightreign_boss_timer.i18n import LANGUAGES, Translator
 from nightreign_boss_timer.records import RecordStore
 from nightreign_boss_timer.settings import Settings, TableError
@@ -62,6 +63,30 @@ class Controller(QObject):
 
     def save(self) -> None:
         settings_file.save(self.settings, self._settings_path)
+
+    # --- hotkeys --------------------------------------------------------------------------------
+
+    def run_action(self, action: str) -> bool:
+        """Do what a hotkey stands for. ``action`` is a name from ``settings.hotkeys``, or
+        ``table:<name>``. Returns False if there is no such action."""
+        if action.startswith(TABLE_PREFIX):
+            name = action[len(TABLE_PREFIX) :]
+            if name not in self.settings.table_names():
+                return False
+            self.set_table(name)
+            return True
+        handlers: dict[str, Callable[[], None]] = {
+            "toggle_tracking": self.toggle_tracking,
+            "next_table": self.next_table,
+            "toggle_overlay": self.toggle_overlay,
+            "calibrate": self.calibrate,
+            "open_window": self.show_window,
+        }
+        handler = handlers.get(action)
+        if handler is None:
+            return False
+        handler()
+        return True
 
     # --- settings -------------------------------------------------------------------------------
 

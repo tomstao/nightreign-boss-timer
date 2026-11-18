@@ -193,6 +193,28 @@ The user's settings, kept in one JSON file. Loading never fails.
 | `DEFAULT_HOTKEYS` | Action name to default shortcut. |
 | `UI_LANGUAGES` | The supported UI languages. |
 
+### `nightreign_boss_timer.hotkeys`
+
+Shortcuts such as `Ctrl+Alt+P`: reading them, checking them, keeping them registered. No Qt and
+no Windows calls of its own.
+
+| Name | What it is |
+|---|---|
+| `normalise(shortcut)` | The shortcut in its standard spelling, or an empty string if it is not one. |
+| `parse(shortcut)` | A `Hotkey`, or `None`. |
+| `Hotkey` | `modifiers` and `key`, as Windows wants them. |
+| `has_modifier(shortcut)` | False for a single key such as `F5`. |
+| `bindings(settings)` | Action to shortcut for every action that has one. Table actions are `table:<name>`. |
+| `conflict(settings, action, shortcut)` | The other action already using this shortcut, or an empty string. |
+| `HotkeyManager(register, unregister)` | Keeps registered hotkeys equal to a set of bindings. |
+| `HotkeyManager.apply(wanted)` | Register what is new or changed, release what is gone. |
+| `HotkeyManager.action_for(hotkey_id)` | The action a pressed hotkey stands for. |
+| `HotkeyManager.release_all()` | Give every hotkey back. |
+| `HotkeyManager.failed` | Actions whose shortcut Windows refused. |
+| `KEYS` | Key name to virtual-key code. |
+| `MODIFIERS` | Modifier name to flag, in writing order. |
+| `TABLE_PREFIX` | `table:`, the start of a table action's name. |
+
 ### `nightreign_boss_timer.i18n`
 
 Text shown to the user, in every supported language.
@@ -263,6 +285,7 @@ Every action the user can take, shared by the tray, the windows and the hotkeys.
 | `Controller.set_overlay_visible(on)` | Show or hide the overlay. Also `toggle_overlay()`. |
 | `Controller.set_table(name)` | Switch the active table and save. Also `next_table()`. |
 | `Controller.add_table(name)` | Add a table. Returns an error message in the user's language, or an empty string. Also `rename_table(old, new)` and `delete_table(name)`. |
+| `Controller.run_action(action)` | Do what a hotkey stands for. Returns False for an unknown action. |
 | `Controller.set_language(language)` | Switch the UI language. Everything is redrawn at once. |
 | `Controller.set_records_folder(folder)` | Save records elsewhere from now on. Empty means the default folder. |
 | `Controller.set_option(name, value)` | Change `wait_window_s`, `skip_walk_pasts` or `fight_rate`. |
@@ -310,6 +333,19 @@ The tray icon and its menu.
 | `Tray.rebuild()` | Rebuild the menu from the settings. |
 | `IconState` | `TRACKING`, `FIGHT`, `PAUSED`, `ATTENTION`. |
 | `make_icon(state)` | The icon picture for a state. |
+
+### `nightreign_boss_timer.ui.global_hotkeys`
+
+Registers hotkeys with Windows (`RegisterHotKey`) and announces presses.
+
+| Name | What it is |
+|---|---|
+| `GlobalHotkeys` | Owns a hidden window for hotkey messages and a `HotkeyManager`. |
+| `GlobalHotkeys.apply(settings)` | Make the registered hotkeys match the settings. |
+| `GlobalHotkeys.triggered` | Signal carrying the action of a pressed hotkey. |
+| `GlobalHotkeys.failed` | Actions whose shortcut Windows refused. |
+| `GlobalHotkeys.pressed(hotkey_id)` | Called when Windows reports a press. |
+| `GlobalHotkeys.close()` | Release every hotkey. |
 
 ### `nightreign_boss_timer.ui.main_window`
 
