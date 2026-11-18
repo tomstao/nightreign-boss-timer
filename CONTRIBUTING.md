@@ -55,6 +55,28 @@ CI runs the same commands and must pass.
 - Add a line to `CHANGELOG.md` under "Unreleased" for anything a user would notice.
 - Update `docs/API.md` when you add or change a module or a public function. A test checks it.
 
+## Making a release
+
+For maintainers. A release is a ZIP of the packaged program, built by CI.
+
+1. Set the version in `pyproject.toml`, run `uv lock`, and in `CHANGELOG.md` rename "Unreleased"
+   to the version and date. Merge that as a normal pull request.
+2. Tag the merge commit with the same version and push the tag:
+
+   ```powershell
+   git tag v0.1.0
+   git push origin v0.1.0
+   ```
+
+3. The **Build** workflow builds the program, runs its self-test, and attaches
+   `nightreign-boss-timer-<version>-windows.zip` to a draft release. It fails if the tag and
+   the version in `pyproject.toml` differ.
+4. Download the ZIP from the draft, extract it on a PC and run it against the game. Then
+   publish the draft.
+
+To build locally instead: `uv run python tools/fetch_model.py`, then
+`uv run python tools/build_exe.py`. The result is in `dist/`.
+
 ## Reporting detection problems
 
 Wrong or missed detections can only be fixed with the frames that caused them. Attach a
