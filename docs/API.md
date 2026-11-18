@@ -158,6 +158,7 @@ Fight records and the CSV file they are stored in.
 | `RecordStore.read_all()` | All saved records, oldest first. |
 | `RecordStore.flush_pending()` | Try to write held rows. |
 | `RecordStore.remove_last()` | Take the most recent record out and return it. Raises `PermissionError` if the file is locked. |
+| `RecordStore.remove(records)` | Take these records out of the file. Returns how many were removed. Raises `PermissionError` if the file is locked. |
 | `RecordStore.pending_count()` | How many rows are held. |
 | `RecordStore.set_path(path)` | Save to another file from now on. |
 | `RecordStore.ensure_file()` | Create the file with its header row if it is missing. |
@@ -308,6 +309,7 @@ Every action the user can take, shared by the tray, the windows and the hotkeys.
 | `Controller.set_overlay_position(position)` | Remember where the overlay was put. `None` resets it. |
 | `Controller.window_shown` | Signal: the main window was shown (True) or hidden (False). |
 | `Controller.set_option(name, value)` | Change `wait_window_s`, `skip_walk_pasts`, `fight_rate` or `overlay_in_captures`. |
+| `Controller.delete_records(records)` | Delete these records for good. Returns an error message, or `""`. |
 | `Controller.open_records_file()` | Open `records.csv` in the program Windows uses for it. |
 | `Controller.open_records_folder()` | Open the folder that holds it. |
 | `Controller.calibrate(region)` | Ask for the calibration window, at `bar`, `defeat_text` or the first step. |
@@ -416,6 +418,8 @@ The Records page: every saved fight with filters, sorting and a per-boss summary
 |---|---|
 | `RecordsPage` | The page. Reads the records file on `refresh()`. |
 | `RecordsPage.shown_records()` | The records that pass the filters as they are set now. |
+| `RecordsPage.selected_records()` | The records of the selected rows. |
+| `RecordsPage.delete_selected()` | Delete the selected records, after asking. `ask` in the constructor replaces the question window. |
 | `COLUMNS` | The table's columns, in order. |
 
 ### `nightreign_boss_timer.ui.regions_page`

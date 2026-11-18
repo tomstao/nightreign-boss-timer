@@ -139,3 +139,71 @@ def test_page_is_translated(application: "QApplication", tmp_path: Path, languag
     choose(english.boss_filter, "Tree Sentinel")
     choose(other.boss_filter, "Tree Sentinel")
     assert other.summary.text() != english.summary.text()
+
+
+def make_asking(folder: Path, answer: bool) -> tuple["Recorder", "RecordsPage", list[str]]:
+    recorder = Recorder(folder)
+    for record in RECORDS:
+        recorder.store.append(record)
+    asked: list[str] = []
+
+    def ask(parent: object, title: str, question: str) -> bool:
+        asked.append(question)
+        return answer
+
+    page = RecordsPage(recorder.controller, ask=ask)
+    page.refresh()
+    return recorder, page, asked
+
+
+def test_delete_needs_a_selection(application: "QApplication", tmp_path: Path) -> None:
+    recorder, page, asked = make_asking(tmp_path, answer=True)
+    assert page.delete_button.text() == "Delete selected"
+    assert not page.delete_button.isEnabled()
+    page.delete_selected()
+    assert asked == []
+    assert len(recorder.store.read_all()) == len(RECORDS)
+
+
+def test_delete_removes_the_selected_rows_after_asking(
+    application: "QApplication", tmp_path: Path
+) -> None:
+    recorder, page, asked = make_asking(tmp_path, answer=True)
+    page.table.sortByColumn(6, Qt.SortOrder.AscendingOrder)  # the rows are not in file order
+    page.table.selectRow(0)
+    assert page.delete_button.isEnabled()
+    (chosen,) = page.selected_records()
+    assert chosen.duration_s == min(record.duration_s for record in RECORDS)
+
+    QTest.mouseClick(page.delete_button, Qt.MouseButton.LeftButton)
+
+    assert asked == ["Delete the selected records (1)? This cannot be undone."]
+    left = recorder.store.read_all()
+    assert len(left) == len(RECORDS) - 1
+    assert chosen not in left
+    assert page.table.rowCount() == len(RECORDS) - 1
+    assert page.message.text() == ""
+    assert not page.delete_button.isEnabled()
+
+
+def test_answering_no_deletes_nothing(application: "QApplication", tmp_path: Path) -> None:
+    recorder, page, asked = make_asking(tmp_path, answer=False)
+    page.table.selectAll()
+    page.delete_selected()
+    assert len(asked) == 1
+    assert len(recorder.store.read_all()) == len(RECORDS)
+
+
+def test_delete_says_so_when_the_file_is_open_elsewhere(
+    application: "QApplication", tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    recorder, page, _ = make_asking(tmp_path, answer=True)
+
+    def locked(records: object) -> int:
+        raise PermissionError
+
+    monkeypatch.setattr(recorder.store, "remove", locked)
+    page.table.selectRow(0)
+    page.delete_selected()
+    assert page.message.text() == "Records file is open in another program"
+    assert page.table.rowCount() == len(RECORDS)

@@ -321,6 +321,16 @@ class Controller(QObject):
         self.notice.emit(text)
         self.records_changed.emit()
 
+    def delete_records(self, records: list[FightRecord]) -> str:
+        """Delete these records for good. Returns an error message, or "" when it worked."""
+        try:
+            self.store.remove(records)
+        except PermissionError:
+            return self.translate("overlay.records_locked")
+        finally:
+            self.records_changed.emit()
+        return ""
+
     def open_records_file(self) -> None:
         """Open the records file in the program Windows uses for CSV files, normally Excel."""
         self.store.ensure_file()

@@ -190,6 +190,9 @@ menu with **Open records**.
 - Filter by table, boss and status, or type in the search box to match a boss, a table or a
   date.
 - Click a column heading to sort by it.
+- To delete records, select one or more rows (Ctrl or Shift for several) and press **Delete
+  selected** or the Delete key, or right-click the selection. The tool asks first. Deleted rows
+  are gone from `records.csv` for good, and it cannot be done while the file is open in Excel.
 - Choose one boss to see a summary line: attempts, completes, your best time and your average.
   Best and average count only complete fights that began with the boss at full health.
 - `incomplete` fights are shown in a different colour.

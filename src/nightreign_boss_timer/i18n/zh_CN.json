@@ -101,6 +101,8 @@
   "records.search": "搜索 Boss、表格或日期",
   "records.open_file": "用 Excel 打开",
   "records.open_folder": "打开文件夹",
+  "records.delete": "删除所选",
+  "records.delete_ask": "删除所选的 {count} 条记录？此操作无法撤销。",
   "records.summary": "共 {attempts} 次，完成 {completes} 次，最佳 {best}，平均 {average}",
   "records.summary_no_time": "共 {attempts} 次，完成 {completes} 次",
   "records.file_locked": "记录文件正被其他程序打开。有 {count} 场战斗等待保存。",

@@ -194,3 +194,16 @@ def test_remove_last_changes_nothing_when_the_file_is_locked(
     monkeypatch.undo()
     assert len(store.read_all()) == 1
     assert not store.path.with_name("records.csv.tmp").exists()
+
+
+def test_remove_takes_out_the_given_records_and_keeps_the_rest(tmp_path: Path) -> None:
+    store = RecordStore(tmp_path / "records.csv")
+    first, second, third = make_record(), make_record(boss="Second"), make_record(boss="Third")
+    for record in (first, second, third, second):
+        store.append(record)
+
+    assert store.remove([second, make_record(boss="Never saved")]) == 1
+    assert store.read_all() == [first, third, second]  # of two identical rows one stays
+    assert store.remove([first, third, second]) == 3
+    assert store.read_all() == []
+    assert store.remove([first]) == 0

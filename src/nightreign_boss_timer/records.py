@@ -180,6 +180,27 @@ class RecordStore:
         _write_rows(self.path, rows)
         return FightRecord.from_row(last)
 
+    def remove(self, records: list[FightRecord]) -> int:
+        """Take these records out of the file. Returns how many were found and removed.
+
+        Each record removes one row that matches it in every column, so of two identical rows
+        one stays. Rows still pending are not looked at. Raises PermissionError if the file is
+        open in another program. Nothing is changed then.
+        """
+        rows = _read_rows(self.path)
+        unwanted = [record.to_row() for record in records]
+        kept = []
+        for row in rows:
+            values = [row[column] for column in COLUMNS]
+            if values in unwanted:
+                unwanted.remove(values)
+            else:
+                kept.append(row)
+        removed = len(rows) - len(kept)
+        if removed:
+            _write_rows(self.path, kept)
+        return removed
+
     def pending_count(self) -> int:
         return len(_read_rows(self.pending_path))
 

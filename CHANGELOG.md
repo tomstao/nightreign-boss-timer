@@ -48,3 +48,4 @@ All notable changes are listed here. The format follows
 - A packaged Windows program: `tools/build_exe.py` builds a folder with `nightreign-boss-timer.exe`, its own Python and the text model, and a ZIP of it.
 - A log file at `%LOCALAPPDATA%\nightreign-boss-timer\logs\app.log`.
 - Setting to show the overlay in screenshots and recordings, for making videos of the tool. Off by default.
+- Records can be deleted on the Records page: select rows, then **Delete selected**, the Delete key or the right-click menu. It asks first.

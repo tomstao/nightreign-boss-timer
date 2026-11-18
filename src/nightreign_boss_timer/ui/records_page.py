@@ -2,18 +2,23 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
+
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QColor
+from PySide6.QtGui import QColor, QKeySequence, QShortcut
 from PySide6.QtWidgets import (
     QAbstractItemView,
     QComboBox,
     QHBoxLayout,
     QLabel,
     QLineEdit,
+    QMenu,
+    QMessageBox,
     QPushButton,
     QTableWidget,
     QTableWidgetItem,
     QVBoxLayout,
+    QWidget,
 )
 
 from nightreign_boss_timer.names import UNKNOWN
@@ -24,6 +29,14 @@ from nightreign_boss_timer.ui.pages import Page
 
 COLUMNS = ("started_at", "table", "boss", "status", "start_hp", "end_hp", "duration")
 _INCOMPLETE = QColor(200, 129, 26)
+_ERROR = "color: #c8811a;"
+
+
+def _ask(parent: QWidget, title: str, question: str) -> bool:
+    """Ask a yes-or-no question in a small window. No is the button under Enter."""
+    buttons = QMessageBox.StandardButton
+    answer = QMessageBox.question(parent, title, question, buttons.Yes | buttons.No, buttons.No)
+    return answer == buttons.Yes
 
 
 class _Cell(QTableWidgetItem):
@@ -32,6 +45,7 @@ class _Cell(QTableWidgetItem):
     def __init__(self, text: str, key: object) -> None:
         super().__init__(text)
         self.key = key
+        self.index = -1
         self.setFlags(Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled)
 
     def __lt__(self, other: QTableWidgetItem) -> bool:
@@ -41,9 +55,13 @@ class _Cell(QTableWidgetItem):
 class RecordsPage(Page):
     key = "records"
 
-    def __init__(self, controller: Controller) -> None:
+    def __init__(
+        self, controller: Controller, ask: Callable[[QWidget, str, str], bool] = _ask
+    ) -> None:
         super().__init__(controller)
+        self._ask = ask
         self._records: list[FightRecord] = []
+        self._shown: list[FightRecord] = []
         self.table_filter = QComboBox()
         self.boss_filter = QComboBox()
         self.status_filter = QComboBox()
@@ -69,7 +87,18 @@ class RecordsPage(Page):
         self.table.verticalHeader().setVisible(False)
         self.table.horizontalHeader().setStretchLastSection(True)
         self.table.setSortingEnabled(True)
+        self.table.itemSelectionChanged.connect(self._selection_changed)
+        self.table.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.table.customContextMenuRequested.connect(self._menu)
+        delete_key = QShortcut(QKeySequence(QKeySequence.StandardKey.Delete), self.table)
+        delete_key.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
+        delete_key.activated.connect(self.delete_selected)
 
+        self.message = QLabel()
+        self.message.setStyleSheet(_ERROR)
+        self.delete_button = QPushButton()
+        self.delete_button.setEnabled(False)
+        self.delete_button.clicked.connect(self.delete_selected)
         self.summary = QLabel()
         self.count = QLabel()
         self.open_file = QPushButton()
@@ -78,7 +107,9 @@ class RecordsPage(Page):
         self.open_folder.clicked.connect(controller.open_records_folder)
         bottom = QHBoxLayout()
         bottom.addWidget(self.count)
+        bottom.addWidget(self.message)
         bottom.addStretch(1)
+        bottom.addWidget(self.delete_button)
         bottom.addWidget(self.open_file)
         bottom.addWidget(self.open_folder)
 
@@ -92,6 +123,34 @@ class RecordsPage(Page):
     def _records_changed(self) -> None:
         if self.isVisible():
             self.refresh()
+
+    def selected_records(self) -> list[FightRecord]:
+        """The records of the rows that are selected now."""
+        rows = sorted({index.row() for index in self.table.selectedIndexes()})
+        return [self._shown[self.table.item(row, 0).index] for row in rows]  # type: ignore[union-attr]
+
+    def _selection_changed(self) -> None:
+        self.delete_button.setEnabled(bool(self.table.selectedIndexes()))
+
+    def _menu(self, position: object) -> None:
+        if not self.table.selectedIndexes():
+            return
+        menu = QMenu(self.table)
+        menu.addAction(self.delete_button.text(), self.delete_selected)
+        menu.exec(self.table.viewport().mapToGlobal(position))  # type: ignore[arg-type]
+
+    def delete_selected(self) -> None:
+        """Delete the selected records from the file, after asking."""
+        records = self.selected_records()
+        if not records:
+            return
+        translate = self.controller.translate
+        question = translate("records.delete_ask", count=len(records))
+        if not self._ask(self, translate("records.delete"), question):
+            return
+        error = self.controller.delete_records(records)
+        self.refresh()
+        self.message.setText(error)
 
     def _boss_name(self, name: str) -> str:
         return self.controller.translate("records.unknown_boss") if name == UNKNOWN else name
@@ -127,6 +186,8 @@ class RecordsPage(Page):
         self.table.setHorizontalHeaderLabels(
             [translate(f"records.column.{column}") for column in COLUMNS]
         )
+        self.delete_button.setText(translate("records.delete"))
+        self.message.setText("")
         self.open_file.setText(translate("records.open_file"))
         self.open_folder.setText(translate("records.open_folder"))
         self._show()
@@ -143,7 +204,8 @@ class RecordsPage(Page):
     def _show(self) -> None:
         """Fill the table and the summary from the records already read, for the filters as set."""
         translate = self.controller.translate
-        records = self.shown_records()
+        records = self._shown = self.shown_records()
+        self.table.clearSelection()  # the rows are about to show other records
         self.table.setSortingEnabled(False)  # or rows move while they are being filled
         self.table.setRowCount(len(records))
         for row, record in enumerate(records):
@@ -156,6 +218,7 @@ class RecordsPage(Page):
                 _Cell(f"{record.end_hp_pct}%", record.end_hp_pct),
                 _Cell(format_duration(record.duration_s), record.duration_s),
             )
+            cells[0].index = row  # which record this row shows, wherever sorting puts it
             for column, cell in enumerate(cells):
                 if record.status is Status.INCOMPLETE:
                     cell.setForeground(_INCOMPLETE)

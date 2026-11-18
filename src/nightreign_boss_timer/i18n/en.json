@@ -101,6 +101,8 @@
   "records.search": "Search boss, table or date",
   "records.open_file": "Open in Excel",
   "records.open_folder": "Open folder",
+  "records.delete": "Delete selected",
+  "records.delete_ask": "Delete the selected records ({count})? This cannot be undone.",
   "records.summary": "{attempts} attempts, {completes} complete, best {best}, average {average}",
   "records.summary_no_time": "{attempts} attempts, {completes} complete",
   "records.file_locked": "Records file is open elsewhere. {count} fights waiting to be saved.",
