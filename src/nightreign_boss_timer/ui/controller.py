@@ -29,6 +29,8 @@ class Controller(QObject):
     changed = Signal()
     # A short message for the overlay, such as the table just switched to.
     notice = Signal(str)
+    # A fight was saved, or records were changed by hand: lists of records are out of date.
+    records_changed = Signal()
     # The user asked for the calibration window.
     calibration_requested = Signal()
     # The user asked for the main window, at the page with this key (empty: the page it is on).

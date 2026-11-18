@@ -108,8 +108,8 @@ stop the tool: it keeps running in the tray, and **Quit** in the tray menu ends 
 The bar at the bottom shows whether tracking is on, the active table, whether the game was
 found and whether the regions are calibrated. Click **Tracking on** to pause or resume.
 
-So far the window has only the **About** page. Records, Tables, Hotkeys, Regions and Settings
-are being added.
+So far the window has the **Records** and **About** pages. Tables, Hotkeys, Regions and
+Settings are being added.
 
 ## The overlay
 
@@ -150,7 +150,21 @@ Excel or any spreadsheet program, or choose **Open records file in Excel** from 
 it. The tool keeps the new rows in `records.pending.csv` next to it and adds them, in order, the
 next time it can write. No fight is lost. Close and reopen the file in Excel to see new rows.
 
-The main window's **Records** page shows the same data with filters by table, boss and status.
+The main window's **Records** page shows the same data, newest first. Open it from the tray
+menu with **Open records**.
+
+- Filter by table, boss and status, or type in the search box to match a boss, a table or a
+  date.
+- Click a column heading to sort by it.
+- Choose one boss to see a summary line: attempts, completes, your best time and your average.
+  Best and average count only complete fights that began with the boss at full health.
+- `incomplete` fights are shown in a different colour.
+- A fight that ends while the page is open appears at once.
+- **Open in Excel** and **Open folder** take you to the file.
+
+Fights waiting in `records.pending.csv` are not listed until they have been written to
+`records.csv`. Changing a row (moving it to another table, correcting the boss name, deleting
+it) is planned; for now edit the file in Excel with the tool closed.
 
 ## Tables
 

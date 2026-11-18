@@ -68,6 +68,7 @@ def test_menu_lists_everything_in_order(application: "QApplication", tmp_path: P
         "Tracking",
         "Table: Arena",
         "Show overlay",
+        "Open records",
         "Open records file in Excel",
         "Calibrate regions...",
         "Open main window",
@@ -158,9 +159,10 @@ def test_clicking_the_icon_or_the_menu_entry_asks_for_the_main_window(
     asked: list[str] = []
     harness.controller.window_requested.connect(asked.append)
     harness.entry("Open main window").trigger()
+    harness.entry("Open records").trigger()
     harness.tray.icon.activated.emit(QSystemTrayIcon.ActivationReason.Trigger)
     harness.tray.icon.activated.emit(QSystemTrayIcon.ActivationReason.Context)  # a right click
-    assert asked == ["", ""]
+    assert asked == ["", "records", ""]
 
 
 def test_calibrate_and_quit(application: "QApplication", tmp_path: Path) -> None:

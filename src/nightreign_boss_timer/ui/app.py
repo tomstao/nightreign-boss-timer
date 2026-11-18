@@ -110,6 +110,7 @@ class App:
             self.best = best_time(earlier, result.record.boss, result.record.table)
             self.result, self.result_at = result.record, time.monotonic()
             self.rows_held = not result.saved
+            self.controller.records_changed.emit()
         now = time.monotonic()
         self.overlay.show_text(
             overlay_text(

@@ -57,6 +57,12 @@
   "records.column.duration": "用時",
   "records.count": "共 {count} 筆記錄",
   "records.unknown_boss": "未知",
+  "records.filter_all": "全部",
+  "records.search": "搜尋 Boss、表格或日期",
+  "records.open_file": "用 Excel 開啟",
+  "records.open_folder": "開啟資料夾",
+  "records.summary": "共 {attempts} 次，完成 {completes} 次，最佳 {best}，平均 {average}",
+  "records.summary_no_time": "共 {attempts} 次，完成 {completes} 次",
   "records.file_locked": "記錄檔正被其他程式開啟。有 {count} 場戰鬥等待儲存。",
 
   "tables.new": "新增表格",

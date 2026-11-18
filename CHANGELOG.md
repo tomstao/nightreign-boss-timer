@@ -28,3 +28,4 @@ All notable changes are listed here. The format follows
 - Region calibration window, opened from the tray menu: mark the health bar and the defeat text on a screenshot of the game, with the detector's reading shown as the box moves.
 - Tray menu: switch the active table, open the records file, and an icon that shows tracking, fight, paused or needs attention.
 - Main window with a status bar and an About page, opened by clicking the tray icon.
+- Records page: all fights with filters, search, sorting and a per-boss summary.

@@ -159,6 +159,18 @@ Fight records and the CSV file they are stored in.
 | `format_duration(seconds)` | `mm:ss.s`. |
 | `COLUMNS` | The CSV columns, in order. |
 
+### `nightreign_boss_timer.record_view`
+
+Chooses which records to show and sums them up. No drawing.
+
+| Name | What it is |
+|---|---|
+| `filter_records(records, table, boss, status, search)` | The records that pass every filter, newest first. |
+| `summarise(records)` | A `Summary` of a set of fights. |
+| `Summary` | `attempts`, `completes`, `best_s`, `average_s`. The times count only complete fights that began at full health. |
+| `names_in(records)` | The table names and boss names that appear, each sorted. |
+| `ALL` | The filter value that lets everything through. |
+
 ### `nightreign_boss_timer.settings`
 
 The user's settings, kept in one JSON file. Loading never fails.
@@ -243,6 +255,7 @@ Every action the user can take, shared by the tray, the windows and the hotkeys.
 | `Controller.changed` | Signal: something shown in a menu or window is now different. |
 | `Controller.notice` | Signal with a short message for the overlay. |
 | `Controller.calibration_requested` | Signal: open the calibration window. |
+| `Controller.records_changed` | Signal: a fight was saved or records were edited. |
 | `Controller.set_tracking(on)` | Pause or resume. Also `toggle_tracking()`. |
 | `Controller.set_overlay_visible(on)` | Show or hide the overlay. Also `toggle_overlay()`. |
 | `Controller.set_table(name)` | Switch the active table and save. Also `next_table()`. |
@@ -311,6 +324,16 @@ What every page has in common, and the About page.
 | `Page.refresh()` | Redraw from the settings. Called when the page is shown and on every controller change. |
 | `AboutPage` | Version, licence, repository link and the safety statement. |
 | `REPOSITORY_URL` | Where the project lives. |
+
+### `nightreign_boss_timer.ui.records_page`
+
+The Records page: every saved fight with filters, sorting and a per-boss summary.
+
+| Name | What it is |
+|---|---|
+| `RecordsPage` | The page. Reads the records file on `refresh()`. |
+| `RecordsPage.shown_records()` | The records that pass the filters as they are set now. |
+| `COLUMNS` | The table's columns, in order. |
 
 ### `nightreign_boss_timer.ui.region_canvas`
 

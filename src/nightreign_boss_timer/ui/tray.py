@@ -104,6 +104,7 @@ class Tray:
             controller.overlay_visible,
             controller.set_overlay_visible,
         )
+        menu.addAction(translate("tray.open_records"), lambda: controller.show_window("records"))
         menu.addAction(translate("tray.open_records_file"), controller.open_records_file)
         menu.addSeparator()
         menu.addAction(translate("tray.calibrate"), controller.calibrate)

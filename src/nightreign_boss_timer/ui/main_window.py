@@ -18,11 +18,12 @@ from PySide6.QtWidgets import (
 from nightreign_boss_timer.engine import State
 from nightreign_boss_timer.ui.controller import Controller
 from nightreign_boss_timer.ui.pages import AboutPage, Page
+from nightreign_boss_timer.ui.records_page import RecordsPage
 
 
 def default_pages(controller: Controller) -> list[Page]:
     """The pages in sidebar order."""
-    return [AboutPage(controller)]
+    return [RecordsPage(controller), AboutPage(controller)]
 
 
 class MainWindow(QWidget):
