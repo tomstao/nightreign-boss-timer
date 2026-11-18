@@ -23,3 +23,4 @@ All notable changes are listed here. The format follows
 - Boss bar detector holds through most hit flashes.
 - Settings file with tables, regions, hotkeys and timing options.
 - Translation files for English, Simplified Chinese and Traditional Chinese.
+- The command-line version now reads the settings file (tables, regions, timing options).

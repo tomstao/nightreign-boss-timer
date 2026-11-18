@@ -1,6 +1,7 @@
 from datetime import datetime
 
-from nightreign_boss_timer.__main__ import describe, to_record
+from nightreign_boss_timer.__main__ import describe
+from nightreign_boss_timer.engine import to_record
 from nightreign_boss_timer.records import Status
 from nightreign_boss_timer.regions import Box, bar_region, defeat_text_region, name_region
 from nightreign_boss_timer.tracker import FightOutcome

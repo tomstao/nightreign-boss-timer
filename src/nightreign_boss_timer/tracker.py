@@ -65,8 +65,11 @@ class FightOutcome:
 class FightTracker:
     """Feed it samples in time order with :meth:`update`."""
 
-    def __init__(self, wait_window_s: float = WAIT_WINDOW_S) -> None:
+    def __init__(
+        self, wait_window_s: float = WAIT_WINDOW_S, *, skip_walk_pasts: bool = True
+    ) -> None:
         self.wait_window_s = wait_window_s
+        self.skip_walk_pasts = skip_walk_pasts
         self._state = _State.IDLE
         self._started_at = 0.0
         self._last_seen = 0.0
@@ -80,6 +83,11 @@ class FightTracker:
     @property
     def in_fight(self) -> bool:
         return self._state in (_State.FIGHTING, _State.WAITING)
+
+    @property
+    def started_at(self) -> float:
+        """When the bar of the current fight was first seen. Only meaningful while in a fight."""
+        return self._started_at
 
     @property
     def watching_for_defeat(self) -> bool:
@@ -175,7 +183,7 @@ class FightTracker:
             ended_at = self._zero_at if self._zero_at is not None else self._last_seen
         else:
             ended_at = self._last_seen
-            if start_hp - end_hp < MIN_HP_CHANGE:
+            if self.skip_walk_pasts and start_hp - end_hp < MIN_HP_CHANGE:
                 return None  # walked past the boss without damaging it
         return FightOutcome(
             started_at=self._started_at,

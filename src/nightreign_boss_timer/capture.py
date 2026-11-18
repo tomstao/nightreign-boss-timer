@@ -190,3 +190,32 @@ class ScreenGrabber:
 
     def __exit__(self, *exc: object) -> None:
         self.close()
+
+
+class WindowsScreen:
+    """The real screen, in the shape the engine expects. Keeps one grabber per region size."""
+
+    def __init__(self) -> None:
+        self._grabbers: dict[tuple[int, int], ScreenGrabber] = {}
+
+    def find_window(self, title: str) -> Region | None:
+        return find_window(title)
+
+    def grab(self, box: object) -> NDArray[np.uint8]:
+        """Copy a rectangle given as anything with left, top, width and height."""
+        size = (box.width, box.height)  # type: ignore[attr-defined]
+        grabber = self._grabbers.get(size)
+        if grabber is None:
+            grabber = self._grabbers[size] = ScreenGrabber(*size)
+        return grabber.grab(box.left, box.top)  # type: ignore[attr-defined]
+
+    def close(self) -> None:
+        for grabber in self._grabbers.values():
+            grabber.close()
+        self._grabbers.clear()
+
+    def __enter__(self) -> WindowsScreen:
+        return self
+
+    def __exit__(self, *exc: object) -> None:
+        self.close()
