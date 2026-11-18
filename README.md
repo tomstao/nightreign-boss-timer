@@ -1,5 +1,7 @@
 # nightreign-boss-timer
 
+**English** | [简体中文](README.zh-CN.md) | [繁體中文](README.zh-TW.md)
+
 Records how long each boss fight takes in ELDEN RING NIGHTREIGN by reading the boss health bar
 from the screen. Built to cost no measurable game FPS.
 
@@ -8,7 +10,23 @@ from the screen. Built to cost no measurable game FPS.
 > and 繁體中文. The author uses it with the game at 2560x1440 in Simplified Chinese, and
 > detection is tested against 21 recorded fights at 1920x1080 and 2560x1440. Other resolutions,
 > ultrawide, and the game in English or Traditional Chinese are untested, and the cost in frame
-> rate has not been measured yet. No release has been published: see [Install](#install).
+> rate has not been measured yet.
+
+## Quick start
+
+You do not need Python, and you do not need to download the source code.
+
+1. Open the [Releases page](https://github.com/tomstao/nightreign-boss-timer/releases/latest)
+   and download `nightreign-boss-timer-<version>-windows.zip`.
+2. Extract the whole ZIP to a folder you can write to, for example
+   `C:\Tools\nightreign-boss-timer`.
+3. Run `nightreign-boss-timer.exe` from that folder. Windows may show a SmartScreen warning,
+   because the program is not signed: choose **More info**, then **Run anyway**.
+4. Set the game to **windowed** or **borderless windowed** mode and fight a boss. Recording is
+   automatic.
+
+The program lives in the system tray, near the clock, possibly behind the **^** arrow. Click
+its icon for the main window. [Install](#install) has the details.
 
 ## What it does
 
@@ -42,14 +60,8 @@ Nothing else needs to be installed. The program brings its own Python and everyt
 
 ### Download and run
 
-1. Open this repository's **Releases** page and download the latest
-   `nightreign-boss-timer-<version>-windows.zip`.
-
-   > No release has been published yet. Until the first one, either
-   > [build the program yourself](#build-it-yourself) with two commands, or open the **Actions**
-   > tab, choose the latest **Build** run, and download the `nightreign-boss-timer-windows`
-   > artifact, which holds the same ZIP.
-
+1. Open the [Releases page](https://github.com/tomstao/nightreign-boss-timer/releases/latest)
+   and download `nightreign-boss-timer-<version>-windows.zip`. It is listed under **Assets**.
 2. Extract the whole ZIP to a folder you can write to, for example
    `C:\Tools\nightreign-boss-timer`. Keep all the files together, and do not run the program
    from inside the ZIP.
@@ -197,8 +209,8 @@ What that means for you:
   misbehaves.
 - No AI runs in the program itself, and nothing is sent anywhere. Boss names are read by a
   small text recognition model that runs on your own PC.
-- The Chinese texts of the interface were written with AI and have not been reviewed by a
-  native speaker yet.
+- The Chinese texts of the interface and the Chinese versions of this page were written with
+  AI and have not been reviewed by a native speaker yet.
 
 As the [licence](LICENSE) says, the software comes with no warranty.
 
