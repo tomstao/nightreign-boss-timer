@@ -106,8 +106,7 @@ class RecordStore:
     """Appends fight records to a CSV file and reads them back."""
 
     def __init__(self, path: Path) -> None:
-        self.path = path
-        self.pending_path = path.with_name(f"{path.stem}.pending{path.suffix}")
+        self.set_path(path)
 
     def append(self, record: FightRecord) -> bool:
         """Save a record. Returns False if it had to be held in the pending file."""
@@ -135,6 +134,11 @@ class RecordStore:
             return False
         self.pending_path.unlink()
         return True
+
+    def set_path(self, path: Path) -> None:
+        """Save to another file from now on. Rows already written stay where they are."""
+        self.path = path
+        self.pending_path = path.with_name(f"{path.stem}.pending{path.suffix}")
 
     def ensure_file(self) -> None:
         """Create the file with its header row if it is not there yet, so it can be opened."""

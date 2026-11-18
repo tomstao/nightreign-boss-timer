@@ -108,8 +108,8 @@ stop the tool: it keeps running in the tray, and **Quit** in the tray menu ends 
 The bar at the bottom shows whether tracking is on, the active table, whether the game was
 found and whether the regions are calibrated. Click **Tracking on** to pause or resume.
 
-So far the window has the **Records**, **Tables** and **About** pages. Hotkeys, Regions and
-Settings are being added.
+So far the window has the **Records**, **Tables**, **Settings** and **About** pages. Hotkeys
+and Regions are being added.
 
 ## The overlay
 
@@ -206,14 +206,20 @@ tool runs, so avoid keys you use to play.
 
 ## Settings worth knowing
 
+Open **Settings** in the main window, or **Settings** in the tray menu. A change takes effect
+and is saved as soon as you make it. There is no Save button.
+
 | Setting | What it changes |
 |---|---|
-| Wait window | how long the bar may be gone before a fight is closed (default 8 s) |
-| Skip walk-pasts | whether fights with no damage dealt are dropped (default on) |
-| Records folder | where `records.csv` is saved |
-| Detection rate | how often the screen is checked during a fight; lower uses less CPU |
-| Overlay | visibility, opacity, size, what it shows |
-| UI language | English, 简体中文 or 繁體中文, independent of the game language |
+| Language | English, 简体中文 or 繁體中文, independent of the game language. The whole program switches at once. |
+| Folder for records.csv | where fights are saved from now on. Records already saved stay in the old folder: move `records.csv` yourself to keep one file. **Use default** goes back to `Documents
+ightreign-boss-timer`. |
+| Seconds to wait after the bar disappears | how long the bar may be gone before a fight is closed (default 8, from 1 to 120) |
+| Skip fights in which the boss lost no HP | whether walking past a boss is left out of the records (default on) |
+| Screen checks per second during a fight | default 10, from 1 to 30; lower uses less CPU, higher times the end of a fight more exactly |
+
+Planned and not there yet: starting with Windows, overlay opacity, size and position, the
+capture method, and HDR compensation.
 
 ## Troubleshooting
 

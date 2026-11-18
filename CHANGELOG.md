@@ -30,3 +30,4 @@ All notable changes are listed here. The format follows
 - Main window with a status bar and an About page, opened by clicking the tray icon.
 - Records page: all fights with filters, search, sorting and a per-boss summary.
 - Tables page: add, rename and delete tables and choose the active one.
+- Settings page: UI language (switches at once), records folder, wait time, walk-past skipping and detection rate.

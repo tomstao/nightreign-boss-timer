@@ -72,6 +72,7 @@ def test_menu_lists_everything_in_order(application: "QApplication", tmp_path: P
         "Open records",
         "Open records file in Excel",
         "Calibrate regions...",
+        "Settings...",
         "Open main window",
         "Quit",
     ]

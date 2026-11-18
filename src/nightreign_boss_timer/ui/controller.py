@@ -14,8 +14,8 @@ from pathlib import Path
 from PySide6.QtCore import QObject, Signal
 
 from nightreign_boss_timer import settings as settings_file
-from nightreign_boss_timer.engine import State
-from nightreign_boss_timer.i18n import Translator
+from nightreign_boss_timer.engine import State, records_path
+from nightreign_boss_timer.i18n import LANGUAGES, Translator
 from nightreign_boss_timer.records import RecordStore
 from nightreign_boss_timer.settings import Settings, TableError
 
@@ -59,6 +59,41 @@ class Controller(QObject):
 
     def save(self) -> None:
         settings_file.save(self.settings, self._settings_path)
+
+    # --- settings -------------------------------------------------------------------------------
+
+    def set_language(self, language: str) -> None:
+        """Switch the UI language. Everything on screen is redrawn in it at once."""
+        if language not in LANGUAGES or language == self.settings.ui_language:
+            return
+        self.settings.ui_language = language
+        self.translate.language = language
+        self.save()
+        self.changed.emit()
+
+    def set_records_folder(self, folder: str) -> None:
+        """Save records in another folder from now on. Empty means the default folder.
+
+        Records already saved are not moved.
+        """
+        if folder == self.settings.records_folder:
+            return
+        self.settings.records_folder = folder
+        self.store.set_path(records_path(self.settings))
+        self.save()
+        self.records_changed.emit()
+        self.changed.emit()
+
+    def set_option(self, name: str, value: float | bool) -> None:
+        """Change one of the timing options: ``wait_window_s``, ``skip_walk_pasts``,
+        ``fight_rate``. The engine reads them from the settings on its next step."""
+        if name not in ("wait_window_s", "skip_walk_pasts", "fight_rate"):
+            raise ValueError(f"not an option: {name}")
+        if getattr(self.settings, name) == value:
+            return
+        setattr(self.settings, name, value)
+        self.save()
+        self.changed.emit()
 
     # --- tracking and overlay -------------------------------------------------------------------
 

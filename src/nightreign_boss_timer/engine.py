@@ -151,6 +151,10 @@ class Engine:
         if window is None or window.width < MIN_WINDOW or window.height < MIN_WINDOW:
             return self._result(State.NO_GAME, delay=WINDOW_RETRY_S)
 
+        # Timing options can be changed while the tool runs. They apply from the next sample.
+        self._tracker.wait_window_s = settings.wait_window_s
+        self._tracker.skip_walk_pasts = settings.skip_walk_pasts
+
         now = self._clock()
         bar_fractions = settings.bar_region or DEFAULT_BAR
         bar = measure_bar(self._screen.grab(bar_region(window, bar_fractions)))

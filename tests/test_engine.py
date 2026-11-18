@@ -175,3 +175,13 @@ def test_wait_window_setting_is_honoured(tmp_path: Path) -> None:
 def test_records_path_follows_the_setting(tmp_path: Path) -> None:
     assert records_path(Settings(records_folder=str(tmp_path))) == tmp_path / "records.csv"
     assert records_path(Settings()).name == "records.csv"
+
+
+def test_timing_options_changed_while_running_apply_to_the_next_fight(tmp_path: Path) -> None:
+    settings = Settings()
+    harness = Harness(tmp_path, settings)
+    settings.wait_window_s = 20.0
+    settings.skip_walk_pasts = False
+    harness.engine.step()
+    assert harness.engine._tracker.wait_window_s == 20.0
+    assert harness.engine._tracker.skip_walk_pasts is False

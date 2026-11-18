@@ -155,6 +155,7 @@ Fight records and the CSV file they are stored in.
 | `RecordStore.read_all()` | All saved records, oldest first. |
 | `RecordStore.flush_pending()` | Try to write held rows. |
 | `RecordStore.pending_count()` | How many rows are held. |
+| `RecordStore.set_path(path)` | Save to another file from now on. |
 | `RecordStore.ensure_file()` | Create the file with its header row if it is missing. |
 | `format_duration(seconds)` | `mm:ss.s`. |
 | `COLUMNS` | The CSV columns, in order. |
@@ -260,6 +261,9 @@ Every action the user can take, shared by the tray, the windows and the hotkeys.
 | `Controller.set_overlay_visible(on)` | Show or hide the overlay. Also `toggle_overlay()`. |
 | `Controller.set_table(name)` | Switch the active table and save. Also `next_table()`. |
 | `Controller.add_table(name)` | Add a table. Returns an error message in the user's language, or an empty string. Also `rename_table(old, new)` and `delete_table(name)`. |
+| `Controller.set_language(language)` | Switch the UI language. Everything is redrawn at once. |
+| `Controller.set_records_folder(folder)` | Save records elsewhere from now on. Empty means the default folder. |
+| `Controller.set_option(name, value)` | Change `wait_window_s`, `skip_walk_pasts` or `fight_rate`. |
 | `Controller.open_records_file()` | Open `records.csv` in the program Windows uses for it. |
 | `Controller.open_records_folder()` | Open the folder that holds it. |
 | `Controller.calibrate()` | Ask for the calibration window. |
@@ -335,6 +339,14 @@ The Records page: every saved fight with filters, sorting and a per-boss summary
 | `RecordsPage` | The page. Reads the records file on `refresh()`. |
 | `RecordsPage.shown_records()` | The records that pass the filters as they are set now. |
 | `COLUMNS` | The table's columns, in order. |
+
+### `nightreign_boss_timer.ui.settings_page`
+
+The Settings page. Every change is applied and saved at once.
+
+| Name | What it is |
+|---|---|
+| `SettingsPage(controller, choose_folder)` | The page. `choose_folder` shows the folder dialog and can be replaced for tests. |
 
 ### `nightreign_boss_timer.ui.tables_page`
 

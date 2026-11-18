@@ -54,7 +54,6 @@ class CalibrationWindow(QWidget):
         self._picture: NDArray[np.uint8] | None = None
         self._step = 0
 
-        self.setWindowTitle(translate("calibration.title"))
         self.resize(1280, 800)
         self.heading = QLabel()
         self.heading.setStyleSheet("font-size: 15pt; font-weight: bold;")
@@ -63,9 +62,9 @@ class CalibrationWindow(QWidget):
         self.canvas = RegionCanvas()
         self.canvas.selection_changed.connect(self._check)
         self.readout = QLabel()
-        self.retake_button = QPushButton(translate("calibration.retake"))
-        self.cancel_button = QPushButton(translate("button.cancel"))
-        self.skip_button = QPushButton(translate("button.skip"))
+        self.retake_button = QPushButton()
+        self.cancel_button = QPushButton()
+        self.skip_button = QPushButton()
         self.save_button = QPushButton()
         self.save_button.setDefault(True)
         self.retake_button.clicked.connect(self.retake)
@@ -129,6 +128,12 @@ class CalibrationWindow(QWidget):
     def _show_step(self, box: Selection | None = None) -> None:
         """Fill the window for the current step. ``box`` keeps a box already being worked on."""
         translate = self._translate
+        # Every text is set here, not when the window is built, so a change of language is
+        # picked up the next time the window opens.
+        self.setWindowTitle(translate("calibration.title"))
+        self.retake_button.setText(translate("calibration.retake"))
+        self.cancel_button.setText(translate("button.cancel"))
+        self.skip_button.setText(translate("button.skip"))
         bar = self.kind is RegionKind.BAR
         region = translate("regions.bar" if bar else "regions.defeat_text")
         self.heading.setText(
