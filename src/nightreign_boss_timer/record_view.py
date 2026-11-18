@@ -105,6 +105,11 @@ def filter_records(
     return sorted(chosen, key=lambda record: record.started_at, reverse=True)
 
 
+def incompletes(records: Iterable[FightRecord]) -> list[FightRecord]:
+    """The records among these whose fight was not completed, in the order given."""
+    return [record for record in records if record.status is Status.INCOMPLETE]
+
+
 def summarise(records: Iterable[FightRecord]) -> Summary:
     records = list(records)
     completes = [record for record in records if record.status is Status.COMPLETE]

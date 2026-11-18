@@ -5,6 +5,7 @@ from nightreign_boss_timer.record_view import (
     boss_label,
     character_names,
     filter_records,
+    incompletes,
     key_of,
     names_in,
     summarise,
@@ -131,3 +132,8 @@ def test_search_finds_a_character_by_its_name_in_any_language() -> None:
     own = fight(4, character="My build")
     assert character_names(own) == ("My build",)
     assert filter_records([*played, own], search="my b") == [own]
+
+
+def test_incompletes_keeps_only_unfinished_fights_in_order() -> None:
+    assert incompletes(RECORDS) == [RECORDS[0], RECORDS[-1]]
+    assert incompletes(RECORDS[1:5]) == []
