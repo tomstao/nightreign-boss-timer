@@ -225,12 +225,19 @@ menu with **Open records**.
 - The **Character** column shows the character a record was saved with, in the language the
   program is set to, whatever language it was saved in. It is empty for records made before
   you chose a character on the Settings page.
+- **Choosing records.** Tick the box in front of a record to choose it, and tick more boxes to
+  choose several. The box in the heading ticks every record in the list as it is shown, so set
+  a filter first to choose, for example, all records of one table. A second click on it
+  unticks them all. A ticked row is also highlighted, and the usual ways still work: Ctrl or
+  Shift with a click anywhere else in a row, and Ctrl+A. The line under the list says how many
+  records are ticked. Changing a filter or the search unticks everything, so nothing hidden is
+  ever changed or deleted. A fight saved while the page is open leaves your ticks alone.
 - To give records a character or correct it, select one or more rows, press **Set character**
   (or right-click the selection) and choose from the list. **None** takes the character away.
   The name is written to `records.csv` in the language the program is set to. It cannot be
   done while the file is open in Excel.
-- To delete records, select one or more rows (Ctrl or Shift for several) and press **Delete
-  selected** or the Delete key, or right-click the selection. The tool asks first. Deleted rows
+- To delete records, tick them and press **Delete selected**, which shows their number, or
+  the Delete key, or right-click the selection. The tool asks first. Deleted rows
   are gone from `records.csv` for good, and it cannot be done while the file is open in Excel.
 - **Delete incomplete** removes every `incomplete` record in the list as it is shown, and its
   button says how many that is. With no filter and an empty search box, that is every
