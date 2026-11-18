@@ -185,3 +185,12 @@ def test_name_languages_survive_the_file_and_bad_values_do_not() -> None:
     loaded = Settings.from_json({"name_languages": ["zh_TW", "xx", 3, "en", "zh_TW"]})
     assert loaded.name_languages == ["en", "zh_TW"]
     assert Settings.from_json({"name_languages": "en"}).name_languages == []
+
+
+def test_default_character_is_unset_at_first_and_survives_the_file() -> None:
+    assert Settings().default_character == ""
+    kept = Settings.from_json(Settings(default_character="Ironeye").to_json())
+    assert kept.default_character == "Ironeye"
+    # Only the English name of a real character is taken from the file.
+    for bad in ("Priestess", "铁之眼", 3, None, ["Ironeye"]):
+        assert Settings.from_json({"default_character": bad}).default_character == ""

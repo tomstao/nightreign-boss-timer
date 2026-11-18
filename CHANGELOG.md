@@ -8,7 +8,8 @@ All notable changes are listed here. The format follows
 
 ### Added
 
-- A `character` column in `records.csv` for the character a fight was played with, and the list of the game's ten characters in three languages. The column stays empty for now: choosing a character comes next. A file made by an older version gets the column the next time a fight is saved.
+- A `character` column in `records.csv` for the character a fight was played with, and the list of the game's ten characters in three languages. A file made by an older version gets the column the next time a fight is saved.
+- A **Character** setting on the Settings page. Every new record is saved with the character chosen there, named in the language of the program. Until one is chosen, the column stays empty.
 
 ## 0.1.0 - 2026-11-18
 

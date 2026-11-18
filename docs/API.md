@@ -228,6 +228,7 @@ The user's settings, kept in one JSON file. Loading never fails.
 | Name | What it is |
 |---|---|
 | `Settings` | All settings: language, tables, active table, records folder, timing, regions, hotkeys. |
+| `Settings.default_character` | The character new records get, by its English name from `characters.all_keys()`. Empty until the user chooses. |
 | `Settings.record_languages()` | The languages a boss name is saved in: the user's choice, or the UI language until they choose. |
 | `Settings.set_name_language(language, on)` | Start or stop saving the name in a language. `False` if it would leave none or exceed `MAX_NAMES`. |
 | `NAME_LANGUAGES`, `MAX_NAMES` | The languages a name can be saved in, and how many one record holds. |
@@ -287,7 +288,7 @@ Joins capture, detectors, tracker, name reading and the record store, one step a
 | Name | What it is |
 |---|---|
 | `Engine(settings, screen, store, reader)` | The watch loop logic. `title`, `clock` and `wall_clock` can be replaced for tests. |
-| `Engine.step()` | Look at the screen once. Returns a `StepResult`. |
+| `Engine.step()` | Look at the screen once. Returns a `StepResult`. A fight that ends gets its character from the private `Engine._character()`, the one place that decides it: today the default from the settings, named in the UI language. |
 | `Engine.paused` | Set to `True` to stop looking. |
 | `Engine.end_fight()` | Ask for the fight in progress to be ended as incomplete. The next step does it. |
 | `Engine.probe()` | Read both regions once, outside the watch loop. Returns a `Probe`, or `None` if the game is not found. |
@@ -298,7 +299,7 @@ Joins capture, detectors, tracker, name reading and the record store, one step a
 | `Screen` | The interface the engine needs from the screen: `find_window(title)` and `grab(box)`. |
 | `NameSource` | The interface for reading a name: `read(region)`. |
 | `records_path(settings)` | Where `records.csv` is for these settings. |
-| `to_record(outcome, table, now, wall_now, boss, level, languages)` | Turn a tracker outcome into a `FightRecord`. A known boss gets its name in each of `languages`, up to three; any other keeps the text as read. |
+| `to_record(outcome, table, now, wall_now, boss, level, languages, character)` | Turn a tracker outcome into a `FightRecord`. A known boss gets its name in each of `languages`, up to three; any other keeps the text as read. `character` is written as given. |
 | `GAME_TITLE` | The game window title looked for by default. |
 
 ### `nightreign_boss_timer.__main__`
@@ -352,6 +353,7 @@ Every action the user can take, shared by the tray, the windows and the hotkeys.
 | `Controller.end_fight()` | Ask for the fight in progress to be ended now. Emits `end_fight_requested`. |
 | `Controller.discard_last()` | Remove the most recent record. Again within `UNDO_SECONDS` puts it back. |
 | `Controller.set_language(language)` | Switch the UI language. Everything is redrawn at once. |
+| `Controller.set_default_character(character)` | Choose the character new records get, by its English name. Empty means none. |
 | `Controller.set_records_folder(folder)` | Save records elsewhere from now on. Empty means the default folder. |
 | `Controller.set_overlay_position(position)` | Remember where the overlay was put. `None` resets it. |
 | `Controller.window_shown` | Signal: the main window was shown (True) or hidden (False). |

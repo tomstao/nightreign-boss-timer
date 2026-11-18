@@ -12,6 +12,7 @@ import os
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from nightreign_boss_timer import characters
 from nightreign_boss_timer.regions import Fractions
 
 FILE_VERSION = 1
@@ -86,6 +87,9 @@ class Settings:
     # The languages the boss name is saved in, at most MAX_NAMES. Empty until the user chooses:
     # the name is then saved in the language of the UI.
     name_languages: list[str] = field(default_factory=list)
+    # The character every new record gets, by its English name (see characters.py). Empty
+    # until the user chooses one: records then have no character.
+    default_character: str = ""
     hotkeys: dict[str, str] = field(default_factory=lambda: dict(DEFAULT_HOTKEYS))
 
     # --- boss name languages ------------------------------------------------------------------
@@ -187,6 +191,7 @@ class Settings:
             "overlay_position": list(self.overlay_position) if self.overlay_position else None,
             "overlay_in_captures": self.overlay_in_captures,
             "name_languages": list(self.name_languages),
+            "default_character": self.default_character,
             "hotkeys": dict(self.hotkeys),
         }
 
@@ -243,6 +248,10 @@ class Settings:
         if isinstance(languages, list):
             chosen = [code for code in NAME_LANGUAGES if code in languages]
             settings.name_languages = chosen[:MAX_NAMES]
+
+        character = data.get("default_character")
+        if isinstance(character, str) and character in characters.all_keys():
+            settings.default_character = character
 
         hotkeys = data.get("hotkeys")
         if isinstance(hotkeys, dict):

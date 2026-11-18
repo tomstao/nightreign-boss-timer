@@ -183,7 +183,7 @@ Excel or any spreadsheet program, or choose **Open records file in Excel** from 
 
 | `boss_2`, `language_2` | the same boss in the second language you chose, and that language; empty if you chose one |
 | `boss_3`, `language_3` | the same for a third language |
-| `character` | the character you played. Planned: it is empty until a later version lets you choose one |
+| `character` | the character you set on the Settings page (see below), named in the language the program was set to when the fight was saved; empty if none was set |
 
 **Which language the boss name is saved in.** The tool knows the names of the game's bosses in
 English, Simplified Chinese and Traditional Chinese, so it can save a name in a language other
@@ -196,6 +196,14 @@ Traditional. A change applies to the fights still to come.
 When the name read from the screen is not a known boss, for example one added by a later
 update, `boss` holds the text as it was read and the other name columns stay empty. A reading
 one or two characters off a known name is corrected to it.
+
+**Which character a record gets.** The tool does not yet see which character you play. On the
+Settings page, under **Records**, choose it at **Character**: every fight saved from then on
+gets that character, until you choose another or **Not set**. The list has the game's ten
+characters, the two of The Forsaken Hollows included. The name is written in the language the
+program is set to, so after you switch the program's language, new records hold the name in
+the new language and older ones keep theirs. Fights saved before you chose a character have
+none. Reading the character from the screen is planned.
 
 The `level`, `boss_2`, `boss_3` and `character` columns are new. A `records.csv` made by an older version
 gets them the next time a fight is saved, left empty for the fights already in it.

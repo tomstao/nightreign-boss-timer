@@ -256,3 +256,25 @@ def test_boss_name_is_saved_in_the_languages_chosen_in_the_settings(tmp_path: Pa
     assert (record.boss, record.language) == ("Tree Sentinel", "en")
     assert (record.boss_2, record.language_2) == ("大树守卫", "zh_CN")
     assert (record.boss_3, record.language_3) == ("", "")
+
+
+def test_record_gets_the_default_character_in_the_language_of_the_program(tmp_path: Path) -> None:
+    settings = Settings(ui_language="zh_CN")
+    h = Harness(tmp_path, settings)
+    h.run(3, 0.8)
+    h.run(1, 0.5)
+    h.run(9, None)
+    assert h.records[0].character == ""  # none is set at first
+
+    settings.default_character = "Wylder"
+    h.run(3, 0.5)
+    h.run(1, 0.2)
+    h.run(9, None)
+    assert h.records[1].character == "追踪者"
+
+    settings.ui_language = "en"
+    h.run(3, 0.5)
+    h.run(1, 0.2)
+    h.run(9, None)
+    assert h.records[2].character == "Wylder"
+    assert [record.character for record in h.store.read_all()] == ["", "追踪者", "Wylder"]

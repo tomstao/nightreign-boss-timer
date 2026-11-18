@@ -32,7 +32,8 @@ its icon for the main window. [Install](#install) has the details.
 
 - Starts a timer when a boss health bar appears and stops it when the boss's HP reaches zero.
 - Saves every fight as a row in a CSV file that opens in Excel: date and time, table, boss
-  name, duration, the boss HP % at the start and at the end, and your level.
+  name, duration, the boss HP % at the start and at the end, your level, and the character
+  you set.
 - Marks a fight `complete` when the boss bar empties or the defeat text appears, and
   `incomplete` when the bar disappears while the boss still has HP.
 - Treats a return to a damaged boss as a new record that starts at that boss's current HP %.
