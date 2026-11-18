@@ -25,7 +25,7 @@ To uninstall, quit the program and delete this folder. Your records and settings
 
 Full guide, source code and problem reports
 -------------------------------------------
-https://github.com/sunfish-LittleKight/nightreign-boss-timer
+https://github.com/tomstao/nightreign-boss-timer
 
 Safety
 ------

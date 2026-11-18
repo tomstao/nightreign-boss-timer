@@ -73,7 +73,7 @@ nothing to the game's folder.
 2. Get the code, the text model, and build:
 
    ```powershell
-   git clone https://github.com/sunfish-LittleKight/nightreign-boss-timer.git
+   git clone https://github.com/tomstao/nightreign-boss-timer.git
    cd nightreign-boss-timer
    uv sync --dev
    uv run python tools/fetch_model.py
@@ -97,7 +97,7 @@ the same places as for the packaged program.
 2. Get the code and its dependencies:
 
    ```powershell
-   git clone https://github.com/sunfish-LittleKight/nightreign-boss-timer.git
+   git clone https://github.com/tomstao/nightreign-boss-timer.git
    cd nightreign-boss-timer
    uv sync --dev
    ```

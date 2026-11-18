@@ -8,7 +8,7 @@ from PySide6.QtWidgets import QLabel, QVBoxLayout, QWidget
 from nightreign_boss_timer import __version__
 from nightreign_boss_timer.ui.controller import Controller
 
-REPOSITORY_URL = "https://github.com/sunfish-LittleKight/nightreign-boss-timer"
+REPOSITORY_URL = "https://github.com/tomstao/nightreign-boss-timer"
 
 
 class Page(QWidget):
