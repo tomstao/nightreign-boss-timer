@@ -77,6 +77,7 @@ class App:
         self.controller.changed.connect(self._apply)
         self.controller.notice.connect(self._show_notice)
         self.controller.calibration_requested.connect(self.calibration.start)
+        self.controller.end_fight_requested.connect(self._end_fight)
 
         self.timer = QTimer()
         self.timer.setSingleShot(True)
@@ -89,6 +90,10 @@ class App:
         self.engine.paused = not self.controller.tracking
         self.overlay.set_enabled(self.controller.overlay_visible)
         self.hotkeys.apply(self.settings)  # a table or a shortcut may have changed
+        self._step()
+
+    def _end_fight(self) -> None:
+        self.engine.end_fight()
         self._step()
 
     def _show_notice(self, text: str) -> None:

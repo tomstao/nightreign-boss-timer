@@ -148,6 +148,11 @@ class Engine:
         self._tracker = self._new_tracker()
         self._vote = NameVote()
         self._fight_table = settings.active_table
+        self._end_requested = False
+
+    def end_fight(self) -> None:
+        """Ask for the current fight to be ended as incomplete. The next step does it."""
+        self._end_requested = True
 
     def _new_tracker(self) -> FightTracker:
         return FightTracker(
@@ -178,7 +183,11 @@ class Engine:
             defeat = measure_defeat_text(self._screen.grab(box)).visible
 
         was_in_fight = self._tracker.in_fight
-        outcome = self._tracker.update(now, bar, defeat)
+        if self._end_requested:
+            self._end_requested = False
+            outcome = self._tracker.end_now()
+        else:
+            outcome = self._tracker.update(now, bar, defeat)
         if self._tracker.in_fight and not was_in_fight:
             # The table is fixed when the fight starts, whatever is switched to during it.
             self._vote = NameVote()

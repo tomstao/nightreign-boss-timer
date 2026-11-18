@@ -185,3 +185,18 @@ def test_timing_options_changed_while_running_apply_to_the_next_fight(tmp_path: 
     harness.engine.step()
     assert harness.engine._tracker.wait_window_s == 20.0
     assert harness.engine._tracker.skip_walk_pasts is False
+
+
+def test_end_fight_saves_the_fight_in_progress_on_the_next_step(tmp_path: Path) -> None:
+    h = Harness(tmp_path)
+    h.run(4, 1.0)
+    h.run(4, 0.5)
+    h.engine.end_fight()
+    h.run(0.1, 0.5)
+    assert len(h.records) == 1
+    assert (h.records[0].status, h.records[0].end_hp_pct) == (Status.INCOMPLETE, 50)
+    assert h.store.read_all() == h.records
+
+    h.engine.end_fight()  # nothing in progress that lost HP: nothing more is written
+    h.run(1, 0.5)
+    assert len(h.records) == 1

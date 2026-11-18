@@ -28,7 +28,10 @@
   "overlay.game_not_found": "Game not found",
   "overlay.window_changed": "Window changed - recalibrate",
   "overlay.table_switched": "Table: {table}",
-  "overlay.record_discarded": "Record discarded",
+  "overlay.record_discarded": "Record discarded. Press again to undo.",
+  "overlay.record_restored": "Record restored",
+  "overlay.nothing_to_discard": "No record to discard",
+  "overlay.records_locked": "Records file is open in another program",
 
   "page.records": "Records",
   "page.tables": "Tables",

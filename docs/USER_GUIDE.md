@@ -216,8 +216,15 @@ the same shortcut, or another program already uses it, that hotkey does not work
 | Show or hide the overlay | `Ctrl+Alt+O` |
 | Open region calibration | `Ctrl+Alt+C` |
 | Open the main window | not set |
-| End the current fight now | not set (planned) |
-| Discard the last record | not set (planned) |
+| End the current fight now | not set |
+| Discard the last record | not set |
+
+**End the current fight now** saves the fight in progress as `incomplete` at that moment,
+without waiting for the bar to go away. If the bar is still on screen afterwards, a new record
+starts from the boss's current HP, and is dropped again if the boss loses no more.
+
+**Discard the last record** removes the newest row from the file. Press it again within five
+seconds to put the row back. It cannot remove a row while the file is open in Excel.
 
 A hotkey works everywhere in Windows and takes that key combination away from the game while the
 tool runs, so avoid keys you use to play.

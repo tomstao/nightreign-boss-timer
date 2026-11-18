@@ -33,3 +33,4 @@ All notable changes are listed here. The format follows
 - Settings page: UI language (switches at once), records folder, wait time, walk-past skipping and detection rate.
 - Regions page: calibration status for each region and a live preview of what the tool reads there.
 - Global hotkeys: pause or resume, next table, switch to a table, show or hide the overlay, open calibration.
+- Two more hotkey actions, not set by default: end the current fight now, and discard the last record (press again to undo).

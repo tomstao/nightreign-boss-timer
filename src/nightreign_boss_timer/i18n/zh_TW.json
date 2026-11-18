@@ -28,7 +28,10 @@
   "overlay.game_not_found": "找不到遊戲",
   "overlay.window_changed": "視窗已變更 - 請重新標定",
   "overlay.table_switched": "表格：{table}",
-  "overlay.record_discarded": "已捨棄記錄",
+  "overlay.record_discarded": "已捨棄記錄，再按一次可復原。",
+  "overlay.record_restored": "已復原記錄",
+  "overlay.nothing_to_discard": "沒有可捨棄的記錄",
+  "overlay.records_locked": "記錄檔正被其他程式開啟",
 
   "page.records": "記錄",
   "page.tables": "表格",

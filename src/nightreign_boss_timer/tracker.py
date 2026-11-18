@@ -145,6 +145,17 @@ class FightTracker:
             return self._finish(Status.INCOMPLETE)
         return None
 
+    def end_now(self) -> FightOutcome | None:
+        """End the current fight as incomplete, because the user asked. None if there is none.
+
+        Like any incomplete fight it runs to the last moment the bar was seen, and it is dropped
+        if the boss lost no HP. A bar still on screen afterwards starts a new record.
+        """
+        if not self.in_fight:
+            self._state = _State.IDLE
+            return None
+        return self._finish(Status.INCOMPLETE)
+
     def _begin(self, now: float) -> None:
         self._state = _State.PENDING
         self._started_at = now

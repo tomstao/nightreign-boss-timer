@@ -95,6 +95,20 @@ def _append_rows(path: Path, rows: list[list[str]]) -> None:
         writer.writerows(rows)
 
 
+def _write_rows(path: Path, rows: list[dict[str, str]]) -> None:
+    """Replace the whole file with these rows. The swap is one step, so no half file is left."""
+    partial = path.with_name(path.name + ".tmp")
+    with partial.open("w", newline="", encoding="utf-8-sig") as handle:
+        writer = csv.writer(handle)
+        writer.writerow(COLUMNS)
+        writer.writerows([row[column] for column in COLUMNS] for row in rows)
+    try:
+        partial.replace(path)
+    except PermissionError:
+        partial.unlink()
+        raise
+
+
 def _read_rows(path: Path) -> list[dict[str, str]]:
     if not path.exists():
         return []
@@ -145,6 +159,26 @@ class RecordStore:
         self.path.parent.mkdir(parents=True, exist_ok=True)
         if not self.path.exists():
             _append_rows(self.path, [])
+
+    def remove_last(self) -> FightRecord | None:
+        """Take the most recent record out of the store and return it. None if there is none.
+
+        Raises PermissionError if the file is open in another program. Nothing is changed then.
+        """
+        waiting = _read_rows(self.pending_path)
+        if waiting:
+            last = waiting.pop()
+            if waiting:
+                _write_rows(self.pending_path, waiting)
+            else:
+                self.pending_path.unlink()
+            return FightRecord.from_row(last)
+        rows = _read_rows(self.path)
+        if not rows:
+            return None
+        last = rows.pop()
+        _write_rows(self.path, rows)
+        return FightRecord.from_row(last)
 
     def pending_count(self) -> int:
         return len(_read_rows(self.pending_path))

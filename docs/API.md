@@ -59,6 +59,7 @@ The recording rules as a state machine. Fed one sample at a time, it says when a
 |---|---|
 | `FightTracker(wait_window_s, skip_walk_pasts)` | The state machine for one stream of readings. |
 | `FightTracker.update(now, bar, defeat_text)` | Feed one sample. Returns a `FightOutcome` on the sample that ends a fight, else `None`. |
+| `FightTracker.end_now()` | End the current fight as incomplete, on the user's request. |
 | `FightTracker.in_fight` | True from the confirmed start until the outcome. |
 | `FightTracker.started_at` | The tracker-clock time the current fight began. |
 | `FightTracker.hp` | The current smoothed HP, or `None`. |
@@ -154,6 +155,7 @@ Fight records and the CSV file they are stored in.
 | `RecordStore.append(record)` | Save a record. Returns `False` if it had to be held because the file is locked. |
 | `RecordStore.read_all()` | All saved records, oldest first. |
 | `RecordStore.flush_pending()` | Try to write held rows. |
+| `RecordStore.remove_last()` | Take the most recent record out and return it. Raises `PermissionError` if the file is locked. |
 | `RecordStore.pending_count()` | How many rows are held. |
 | `RecordStore.set_path(path)` | Save to another file from now on. |
 | `RecordStore.ensure_file()` | Create the file with its header row if it is missing. |
@@ -237,6 +239,7 @@ Joins capture, detectors, tracker, name reading and the record store, one step a
 | `Engine(settings, screen, store, reader)` | The watch loop logic. `title`, `clock` and `wall_clock` can be replaced for tests. |
 | `Engine.step()` | Look at the screen once. Returns a `StepResult`. |
 | `Engine.paused` | Set to `True` to stop looking. |
+| `Engine.end_fight()` | Ask for the fight in progress to be ended as incomplete. The next step does it. |
 | `Engine.probe()` | Read both regions once, outside the watch loop. Returns a `Probe`, or `None` if the game is not found. |
 | `Probe` | `window` size, `bar_image`, `bar`, `text_image`, `defeat`, `name`. |
 | `StepResult` | `snapshot`, `record` (set when a fight just ended), `saved`, `delay_s` (how long to wait before the next step). |
@@ -286,6 +289,8 @@ Every action the user can take, shared by the tray, the windows and the hotkeys.
 | `Controller.set_table(name)` | Switch the active table and save. Also `next_table()`. |
 | `Controller.add_table(name)` | Add a table. Returns an error message in the user's language, or an empty string. Also `rename_table(old, new)` and `delete_table(name)`. |
 | `Controller.run_action(action)` | Do what a hotkey stands for. Returns False for an unknown action. |
+| `Controller.end_fight()` | Ask for the fight in progress to be ended now. Emits `end_fight_requested`. |
+| `Controller.discard_last()` | Remove the most recent record. Again within `UNDO_SECONDS` puts it back. |
 | `Controller.set_language(language)` | Switch the UI language. Everything is redrawn at once. |
 | `Controller.set_records_folder(folder)` | Save records elsewhere from now on. Empty means the default folder. |
 | `Controller.set_option(name, value)` | Change `wait_window_s`, `skip_walk_pasts` or `fight_rate`. |

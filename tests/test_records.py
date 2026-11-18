@@ -143,3 +143,54 @@ def test_ensure_file_writes_the_header_once(tmp_path: Path) -> None:
     store.ensure_file()
     assert store.path.read_text(encoding="utf-8-sig").splitlines() == [",".join(records.COLUMNS)]
     assert store.read_all() == []
+
+
+def test_remove_last_takes_the_newest_row_and_keeps_the_rest(tmp_path: Path) -> None:
+    store = RecordStore(tmp_path / "records.csv")
+    first, second = make_record(boss="first"), make_record(boss="黄金河马")
+    store.append(first)
+    store.append(second)
+
+    assert store.remove_last() == second
+    assert store.read_all() == [first]
+    assert store.path.read_bytes().startswith(b"\xef\xbb\xbf")  # still opens right in Excel
+    assert not store.path.with_name("records.csv.tmp").exists()
+    assert store.remove_last() == first
+    assert store.read_all() == []
+    assert store.remove_last() is None
+    store.append(second)  # the emptied file still takes new rows
+    assert store.read_all() == [second]
+
+
+def test_remove_last_prefers_rows_still_waiting(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    store = RecordStore(tmp_path / "records.csv")
+    saved = make_record(boss="saved")
+    store.append(saved)
+    with monkeypatch.context() as locked:
+        lock_main_file(locked, store)
+        store.append(make_record(boss="held 1"))
+        store.append(make_record(boss="held 2"))
+        assert store.remove_last().boss == "held 2"
+        assert store.pending_count() == 1
+        assert store.remove_last().boss == "held 1"
+        assert not store.pending_path.exists()
+    assert store.read_all() == [saved]
+
+
+def test_remove_last_changes_nothing_when_the_file_is_locked(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    store = RecordStore(tmp_path / "records.csv")
+    store.append(make_record())
+
+    def refuse(self: Path, target: Path) -> None:
+        raise PermissionError("open in Excel")
+
+    monkeypatch.setattr(Path, "replace", refuse)
+    with pytest.raises(PermissionError):
+        store.remove_last()
+    monkeypatch.undo()
+    assert len(store.read_all()) == 1
+    assert not store.path.with_name("records.csv.tmp").exists()

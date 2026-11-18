@@ -8,6 +8,7 @@ and announces the change. It draws nothing itself.
 from __future__ import annotations
 
 import os
+import time
 from collections.abc import Callable
 from pathlib import Path
 
@@ -17,8 +18,11 @@ from nightreign_boss_timer import settings as settings_file
 from nightreign_boss_timer.engine import Probe, State, records_path
 from nightreign_boss_timer.hotkeys import TABLE_PREFIX
 from nightreign_boss_timer.i18n import LANGUAGES, Translator
-from nightreign_boss_timer.records import RecordStore
+from nightreign_boss_timer.records import FightRecord, RecordStore
 from nightreign_boss_timer.settings import Settings, TableError
+
+# How long after discarding a record the same action brings it back.
+UNDO_SECONDS = 5.0
 
 
 def _open_with_windows(path: Path) -> None:
@@ -34,6 +38,8 @@ class Controller(QObject):
     records_changed = Signal()
     # The user asked for the calibration window, starting at this region (empty: the first).
     calibration_requested = Signal(str)
+    # The user asked for the fight in progress to be ended now.
+    end_fight_requested = Signal()
     # The user asked for the main window, at the page with this key (empty: the page it is on).
     window_requested = Signal(str)
     # What the engine is doing changed, for example the game window was found.
@@ -47,6 +53,7 @@ class Controller(QObject):
         *,
         settings_path: Path | None = None,
         opener: Callable[[Path], None] = _open_with_windows,
+        clock: Callable[[], float] = time.monotonic,
     ) -> None:
         super().__init__()
         self.settings = settings
@@ -60,6 +67,9 @@ class Controller(QObject):
         self.probe: Callable[[], Probe | None] | None = None
         self._settings_path = settings_path
         self._opener = opener
+        self._clock = clock
+        self._discarded: FightRecord | None = None
+        self._discarded_at = 0.0
 
     def save(self) -> None:
         settings_file.save(self.settings, self._settings_path)
@@ -81,6 +91,8 @@ class Controller(QObject):
             "toggle_overlay": self.toggle_overlay,
             "calibrate": self.calibrate,
             "open_window": self.show_window,
+            "end_fight": self.end_fight,
+            "discard_last": self.discard_last,
         }
         handler = handlers.get(action)
         if handler is None:
@@ -189,6 +201,30 @@ class Controller(QObject):
         return self._change_tables(lambda: self.settings.delete_table(name))
 
     # --- records --------------------------------------------------------------------------------
+
+    def end_fight(self) -> None:
+        """End the fight in progress now. It is saved as incomplete."""
+        self.end_fight_requested.emit()
+
+    def discard_last(self) -> None:
+        """Remove the most recent record. Doing it again within a few seconds puts it back."""
+        undo = self._discarded is not None and self._clock() - self._discarded_at < UNDO_SECONDS
+        try:
+            if undo:
+                self.store.append(self._discarded)
+                self._discarded = None
+                text = self.translate("overlay.record_restored")
+            else:
+                self._discarded = self.store.remove_last()
+                self._discarded_at = self._clock()
+                found = self._discarded is not None
+                text = self.translate(
+                    "overlay.record_discarded" if found else "overlay.nothing_to_discard"
+                )
+        except PermissionError:
+            text = self.translate("overlay.records_locked")
+        self.notice.emit(text)
+        self.records_changed.emit()
 
     def open_records_file(self) -> None:
         """Open the records file in the program Windows uses for CSV files, normally Excel."""

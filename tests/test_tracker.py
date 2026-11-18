@@ -228,3 +228,31 @@ def test_real_clip_with_hit_flashes_is_not_ended_early() -> None:
     assert outcome.started_at == pytest.approx(9.3, abs=0.15)
     assert outcome.duration_s == pytest.approx(142.2, abs=0.5)
     assert (outcome.start_hp_pct, outcome.end_hp_pct) == (100, 0)
+
+
+def test_ending_a_fight_by_hand_saves_it_as_incomplete() -> None:
+    replay = Replay()
+    replay.fall(1.0, 0.6, 10.0)
+    outcome = replay.tracker.end_now()
+    assert outcome is not None
+    assert (outcome.status, outcome.start_hp_pct, outcome.end_hp_pct) == (
+        Status.INCOMPLETE,
+        100,
+        60,
+    )
+    assert outcome.duration_s == pytest.approx(9.9, abs=0.15)
+    assert not replay.tracker.in_fight
+
+    # The bar is still on screen: under the recording rules that is a new record from 60%.
+    replay.fall(0.6, 0.3, 5.0)
+    second = replay.tracker.end_now()
+    assert second is not None
+    assert second.start_hp_pct == 60
+
+
+def test_ending_by_hand_with_no_fight_or_no_damage_writes_nothing() -> None:
+    replay = Replay()
+    assert replay.tracker.end_now() is None
+    replay.feed(bar(1.0), 5.0)
+    assert replay.tracker.end_now() is None  # a walk-past, as if the bar had gone away
+    assert not replay.tracker.in_fight
