@@ -38,6 +38,8 @@ class Controller(QObject):
     records_changed = Signal()
     # The user asked for the calibration window, starting at this region (empty: the first).
     calibration_requested = Signal(str)
+    # The main window was shown (True) or hidden (False).
+    window_shown = Signal(bool)
     # A shortcut is being typed in: hotkeys must not fire (True), or may again (False).
     hotkeys_suspended = Signal(bool)
     # The user asked for the fight in progress to be ended now.
@@ -204,6 +206,14 @@ class Controller(QObject):
         self.store.set_path(records_path(self.settings))
         self.save()
         self.records_changed.emit()
+        self.changed.emit()
+
+    def set_overlay_position(self, position: tuple[int, int] | None) -> None:
+        """Remember where the overlay was put. None puts it back where it starts."""
+        if position == self.settings.overlay_position:
+            return
+        self.settings.overlay_position = position
+        self.save()
         self.changed.emit()
 
     def set_option(self, name: str, value: float | bool) -> None:

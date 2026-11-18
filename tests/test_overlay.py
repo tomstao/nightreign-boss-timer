@@ -9,11 +9,16 @@ pytestmark = pytest.mark.skipif(sys.platform != "win32", reason="the UI is Windo
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 if sys.platform == "win32":
-    from PySide6.QtCore import Qt
+    from PySide6.QtCore import QPoint, Qt
+    from PySide6.QtTest import QTest
     from PySide6.QtWidgets import QApplication
 
-    from nightreign_boss_timer.ui.overlay import Overlay
+    from nightreign_boss_timer.ui.overlay import DEFAULT_POSITION, Overlay
     from nightreign_boss_timer.ui.presenter import OverlayText
+
+
+LEFT = Qt.MouseButton.LeftButton if sys.platform == "win32" else None
+NONE = Qt.KeyboardModifier.NoModifier if sys.platform == "win32" else None
 
 
 @pytest.fixture(scope="module")
@@ -71,3 +76,54 @@ def test_overlay_hides_when_it_has_nothing_to_say_or_is_turned_off(
     assert not overlay.isVisible()
     overlay.set_enabled(True)
     assert overlay.isVisible()
+
+
+def test_overlay_can_be_dragged_only_while_movable(application: "QApplication") -> None:
+    overlay = Overlay()
+    overlay.show_text(OverlayText(("Arena - ready",)))
+    overlay.set_position((300, 400))
+    places: list[tuple[int, int]] = []
+    overlay.moved.connect(lambda x, y: places.append((x, y)))
+
+    QTest.mousePress(overlay, LEFT, NONE, QPoint(5, 5))
+    QTest.mouseMove(overlay, QPoint(65, 35))
+    QTest.mouseRelease(overlay, LEFT, NONE, QPoint(65, 35))
+    assert places == []  # locked: nothing happens
+    assert (overlay.x(), overlay.y()) == (300, 400)
+
+    overlay.set_movable(True, "Overlay - drag to move")
+    assert overlay.isVisible()
+    assert not overlay.windowFlags() & Qt.WindowType.WindowTransparentForInput
+    QTest.mousePress(overlay, LEFT, NONE, QPoint(5, 5))
+    QTest.mouseMove(overlay, QPoint(65, 35))
+    QTest.mouseRelease(overlay, LEFT, NONE, QPoint(65, 35))
+    assert places == [(overlay.x(), overlay.y())]
+    assert places[0] != (300, 400)
+
+    overlay.set_movable(False)
+    assert overlay.windowFlags() & Qt.WindowType.WindowTransparentForInput
+    assert overlay.isVisible()  # still has something to say
+
+
+def test_movable_overlay_shows_a_hint_when_it_has_nothing_to_say(
+    application: "QApplication",
+) -> None:
+    overlay = Overlay()
+    overlay.show_text(OverlayText(()))
+    assert not overlay.isVisible()
+    overlay.set_movable(True, "Overlay - drag to move")
+    assert overlay.isVisible()  # or there would be nothing to take hold of
+    assert overlay.width() > 100
+    overlay.set_enabled(False)
+    assert not overlay.isVisible()  # switched off stays off
+    overlay.set_enabled(True)
+    overlay.set_movable(False)
+    assert not overlay.isVisible()
+
+
+def test_overlay_position_can_be_set_and_reset(application: "QApplication") -> None:
+    overlay = Overlay()
+    overlay.set_position((-1200, 50))  # a monitor to the left
+    assert (overlay.x(), overlay.y()) == (-1200, 50)
+    overlay.set_position(None)
+    assert (overlay.x(), overlay.y()) == DEFAULT_POSITION

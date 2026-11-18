@@ -162,3 +162,26 @@ def test_unknown_option_or_language_is_refused(application: "QApplication", tmp_
     assert harness.recorder.settings.ui_language == "en"
     with pytest.raises(ValueError, match="not an option"):
         harness.controller.set_option("ui_language", 1.0)
+
+
+def test_overlay_position_is_saved_and_can_be_reset(
+    application: "QApplication", tmp_path: Path
+) -> None:
+    harness = Harness(tmp_path)
+    assert not harness.page.reset_position.isEnabled()
+    harness.controller.set_overlay_position((-300, 120))
+    assert harness.saved().overlay_position == (-300, 120)
+    assert harness.page.reset_position.isEnabled()
+    QTest.mouseClick(harness.page.reset_position, LEFT)
+    assert harness.saved().overlay_position is None
+
+
+def test_main_window_says_when_it_is_shown_and_hidden(
+    application: "QApplication", tmp_path: Path
+) -> None:
+    harness = Harness(tmp_path)
+    seen: list[bool] = []
+    harness.controller.window_shown.connect(seen.append)
+    harness.window.show_page()
+    harness.window.close()
+    assert seen == [True, False]

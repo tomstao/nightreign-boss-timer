@@ -301,6 +301,8 @@ Every action the user can take, shared by the tray, the windows and the hotkeys.
 | `Controller.discard_last()` | Remove the most recent record. Again within `UNDO_SECONDS` puts it back. |
 | `Controller.set_language(language)` | Switch the UI language. Everything is redrawn at once. |
 | `Controller.set_records_folder(folder)` | Save records elsewhere from now on. Empty means the default folder. |
+| `Controller.set_overlay_position(position)` | Remember where the overlay was put. `None` resets it. |
+| `Controller.window_shown` | Signal: the main window was shown (True) or hidden (False). |
 | `Controller.set_option(name, value)` | Change `wait_window_s`, `skip_walk_pasts` or `fight_rate`. |
 | `Controller.open_records_file()` | Open `records.csv` in the program Windows uses for it. |
 | `Controller.open_records_folder()` | Open the folder that holds it. |
@@ -334,6 +336,10 @@ The see-through panel over the game. It never takes focus or clicks.
 | `Overlay` | The window. |
 | `Overlay.show_text(text)` | Replace what it says with an `OverlayText`. |
 | `Overlay.set_enabled(enabled)` | Turn it on or off. |
+| `Overlay.set_position(position)` | Put its top-left corner somewhere, or back at `DEFAULT_POSITION` with `None`. |
+| `Overlay.set_movable(movable, hint)` | Let the user drag it, with a frame, or give clicks back to the game. |
+| `Overlay.moved` | Signal with the new corner after a drag. |
+| `DEFAULT_POSITION` | Where the overlay starts. |
 | `Overlay.hidden_from_capture` | True once Windows has agreed to keep it out of screen captures. |
 
 ### `nightreign_boss_timer.ui.tray`

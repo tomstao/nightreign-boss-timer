@@ -73,6 +73,8 @@ class Settings:
     bar_region: Fractions | None = None
     defeat_text_region: Fractions | None = None
     calibrated_size: tuple[int, int] | None = None
+    # Top-left corner of the overlay on the desktop. None until the user moves it.
+    overlay_position: tuple[int, int] | None = None
     hotkeys: dict[str, str] = field(default_factory=lambda: dict(DEFAULT_HOTKEYS))
 
     # --- tables -----------------------------------------------------------------------------
@@ -147,6 +149,7 @@ class Settings:
             "bar_region": fractions(self.bar_region),
             "defeat_text_region": fractions(self.defeat_text_region),
             "calibrated_size": list(self.calibrated_size) if self.calibrated_size else None,
+            "overlay_position": list(self.overlay_position) if self.overlay_position else None,
             "hotkeys": dict(self.hotkeys),
         }
 
@@ -185,6 +188,15 @@ class Settings:
             and all(isinstance(v, int) and not isinstance(v, bool) and v > 0 for v in size)
         ):
             settings.calibrated_size = (size[0], size[1])
+
+        position = data.get("overlay_position")
+        if (
+            isinstance(position, list)
+            and len(position) == 2
+            and all(isinstance(v, int) and not isinstance(v, bool) for v in position)
+        ):
+            # A second monitor can be to the left or above, so negative values are fine.
+            settings.overlay_position = (position[0], position[1])
 
         hotkeys = data.get("hotkeys")
         if isinstance(hotkeys, dict):

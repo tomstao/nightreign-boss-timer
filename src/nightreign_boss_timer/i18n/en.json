@@ -32,6 +32,7 @@
   "overlay.record_restored": "Record restored",
   "overlay.nothing_to_discard": "No record to discard",
   "overlay.records_locked": "Records file is open in another program",
+  "overlay.drag_hint": "Overlay - drag to move",
 
   "page.records": "Records",
   "page.tables": "Tables",
@@ -52,6 +53,9 @@
   "settings.skip_walk_pasts": "Skip fights in which the boss lost no HP",
   "settings.fight_rate": "Screen checks per second during a fight",
   "settings.fight_rate_note": "Lower uses less CPU. Higher times the end of a fight more exactly.",
+  "settings.group.overlay": "Overlay",
+  "settings.overlay_note": "While this window is open the overlay has a frame and can be dragged to a new place.",
+  "settings.reset_position": "Reset position",
   "statusbar.tracking_on": "Tracking on",
   "statusbar.tracking_off": "Tracking paused",
   "statusbar.game_found": "Game: found",

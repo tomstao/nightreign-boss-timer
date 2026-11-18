@@ -32,6 +32,7 @@
   "overlay.record_restored": "已復原記錄",
   "overlay.nothing_to_discard": "沒有可捨棄的記錄",
   "overlay.records_locked": "記錄檔正被其他程式開啟",
+  "overlay.drag_hint": "懸浮視窗 - 拖曳可移動",
 
   "page.records": "記錄",
   "page.tables": "表格",
@@ -52,6 +53,9 @@
   "settings.skip_walk_pasts": "略過 Boss 沒有損血的戰鬥",
   "settings.fight_rate": "戰鬥中每秒檢查螢幕的次數",
   "settings.fight_rate_note": "數值越低，佔用的 CPU 越少；數值越高，戰鬥結束時間越精確。",
+  "settings.group.overlay": "懸浮視窗",
+  "settings.overlay_note": "本視窗開啟時，懸浮視窗會顯示邊框，可以拖曳到新的位置。",
+  "settings.reset_position": "還原預設位置",
   "statusbar.tracking_on": "正在記錄",
   "statusbar.tracking_off": "記錄已暫停",
   "statusbar.game_found": "遊戲：已找到",

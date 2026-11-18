@@ -59,6 +59,9 @@ class App:
 
         self.controller.probe = self.engine.probe
         self.overlay = Overlay()
+        self.overlay.set_position(self.settings.overlay_position)
+        self.overlay.moved.connect(lambda x, y: self.controller.set_overlay_position((x, y)))
+        self.controller.window_shown.connect(self._window_shown)
         self.result: FightRecord | None = None
         self.result_at = 0.0
         self.best: float | None = None
@@ -91,6 +94,7 @@ class App:
         """Bring the engine and the overlay in line with what the user chose."""
         self.engine.paused = not self.controller.tracking
         self.overlay.set_enabled(self.controller.overlay_visible)
+        self.overlay.set_position(self.settings.overlay_position)
         self.controller.refresh_hotkeys()  # a table or a shortcut may have changed
         self._step()
 
@@ -103,6 +107,11 @@ class App:
             self.hotkeys.manager.release_all()
         else:
             self.controller.refresh_hotkeys()
+
+    def _window_shown(self, shown: bool) -> None:
+        # The overlay can be dragged while the main window is open, and only then: during
+        # play it must never take a click meant for the game.
+        self.overlay.set_movable(shown, self.translate("overlay.drag_hint"))
 
     def _end_fight(self) -> None:
         self.engine.end_fight()

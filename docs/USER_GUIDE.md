@@ -11,8 +11,8 @@
 > [Everyday use](#everyday-use) and writes the file described under [Your records](#your-records).
 > Region calibration works as described under [First-run setup](#first-run-setup), from the tray
 > menu or with `Ctrl+Alt+C`. Until you calibrate, the tool uses the usual positions for a 16:9
-> game image. Picking a recent frame for the defeat text, first-run setup and moving the
-> overlay are not built yet.
+> game image. Picking a recent frame for the defeat text and first-run setup are not built
+> yet.
 
 To install the tool, see [INSTALL.md](INSTALL.md).
 
@@ -143,8 +143,12 @@ The tray icon shows the same at a glance: a red bar while the tool is watching, 
 fight, grey when paused, and a gold dot when something needs your attention (the game was not
 found, or finished fights are waiting because the records file is open in Excel).
 
-Open the main window to drag the overlay somewhere else. It can also be hidden completely:
-recording works without it.
+To move the overlay, open the main window. While it is open the overlay has a frame and can be
+dragged anywhere, including onto another monitor. Close the main window and it stays there, and
+clicks pass through it again. **Reset position** on the Settings page puts it back.
+
+The overlay can also be hidden completely, from the tray menu or with `Ctrl+Alt+O`: recording
+works without it.
 
 ## Your records
 
@@ -263,8 +267,8 @@ ightreign-boss-timer`. |
 | Skip fights in which the boss lost no HP | whether walking past a boss is left out of the records (default on) |
 | Screen checks per second during a fight | default 10, from 1 to 30; lower uses less CPU, higher times the end of a fight more exactly |
 
-Planned and not there yet: starting with Windows, overlay opacity, size and position, the
-capture method, and HDR compensation.
+Planned and not there yet: starting with Windows, overlay opacity and size, the capture
+method, and HDR compensation.
 
 ## Troubleshooting
 

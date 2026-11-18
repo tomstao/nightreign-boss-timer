@@ -32,6 +32,7 @@
   "overlay.record_restored": "已恢复记录",
   "overlay.nothing_to_discard": "没有可丢弃的记录",
   "overlay.records_locked": "记录文件正被其他程序打开",
+  "overlay.drag_hint": "悬浮窗 - 拖动可移动",
 
   "page.records": "记录",
   "page.tables": "表格",
@@ -52,6 +53,9 @@
   "settings.skip_walk_pasts": "跳过 Boss 没有掉血的战斗",
   "settings.fight_rate": "战斗中每秒检查屏幕的次数",
   "settings.fight_rate_note": "数值越低，占用的 CPU 越少；数值越高，战斗结束时间越精确。",
+  "settings.group.overlay": "悬浮窗",
+  "settings.overlay_note": "本窗口打开时，悬浮窗会显示边框，可以拖到新的位置。",
+  "settings.reset_position": "恢复默认位置",
   "statusbar.tracking_on": "正在记录",
   "statusbar.tracking_off": "记录已暂停",
   "statusbar.game_found": "游戏：已找到",

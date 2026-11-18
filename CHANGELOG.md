@@ -39,3 +39,4 @@ All notable changes are listed here. The format follows
 - Global hotkeys: pause or resume, next table, switch to a table, show or hide the overlay, open calibration.
 - Two more hotkey actions, not set by default: end the current fight now, and discard the last record (press again to undo).
 - Hotkeys page: change any shortcut by pressing the keys, with conflict checks and a mark on shortcuts Windows refuses.
+- The overlay can be dragged to a new place while the main window is open. The place is remembered.

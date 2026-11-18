@@ -6,6 +6,7 @@ menu entry.
 
 from __future__ import annotations
 
+from PySide6.QtGui import QHideEvent, QShowEvent
 from PySide6.QtWidgets import (
     QHBoxLayout,
     QListWidget,
@@ -87,6 +88,14 @@ class MainWindow(QWidget):
         else:
             button.clicked.connect(clicked)
         return button
+
+    def showEvent(self, event: QShowEvent) -> None:
+        super().showEvent(event)
+        self._controller.window_shown.emit(True)
+
+    def hideEvent(self, event: QHideEvent) -> None:
+        super().hideEvent(event)
+        self._controller.window_shown.emit(False)
 
     def _page_chosen(self, row: int) -> None:
         self.stack.setCurrentIndex(row)

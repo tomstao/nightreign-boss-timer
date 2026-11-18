@@ -84,6 +84,15 @@ class SettingsPage(Page):
         )
         self.rate_note = _note()
 
+        self.overlay_group = QGroupBox()
+        self.overlay_note = _note()
+        self.reset_position = QPushButton()
+        self.reset_position.clicked.connect(lambda: controller.set_overlay_position(None))
+        overlay_row = QHBoxLayout()
+        overlay_row.addWidget(self.overlay_note, 1)
+        overlay_row.addWidget(self.reset_position)
+        self.overlay_group.setLayout(overlay_row)
+
         self.general = QGroupBox()
         self.language_label = QLabel()
         general = QFormLayout(self.general)
@@ -111,7 +120,7 @@ class SettingsPage(Page):
         detection.addRow(self.rate_note)
 
         layout = QVBoxLayout(self)
-        for group in (self.general, self.records, self.detection):
+        for group in (self.general, self.records, self.detection, self.overlay_group):
             layout.addWidget(group)
         layout.addStretch(1)
 
@@ -137,6 +146,10 @@ class SettingsPage(Page):
         self.skip_walk_pasts.setText(translate("settings.skip_walk_pasts"))
         self.rate_label.setText(translate("settings.fight_rate"))
         self.rate_note.setText(translate("settings.fight_rate_note"))
+        self.overlay_group.setTitle(translate("settings.group.overlay"))
+        self.overlay_note.setText(translate("settings.overlay_note"))
+        self.reset_position.setText(translate("settings.reset_position"))
+        self.reset_position.setEnabled(settings.overlay_position is not None)
 
         # Show the values without each of them reporting a change back to the controller.
         widgets = (self.language, self.wait_window, self.skip_walk_pasts, self.fight_rate)
