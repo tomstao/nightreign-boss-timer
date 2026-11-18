@@ -54,6 +54,70 @@ def test_kill_is_complete_and_timed_to_zero_hp() -> None:
     assert (outcome.start_hp_pct, outcome.end_hp_pct) == (100, 0)
 
 
+def test_empty_bar_then_gone_is_complete_without_defeat_text() -> None:
+    # Not every boss shows the gold text. The bar emptied and went away: that is a kill.
+    run = Replay()
+    run.fall(1.0, 0.01, 30)
+    run.feed(bar(0.0), 3)
+    run.feed(GONE, 7.5)
+    assert run.outcomes == []  # the bar may still come back inside the wait window
+    run.feed(GONE, 1)
+
+    assert len(run.outcomes) == 1
+    outcome = run.outcomes[0]
+    assert outcome.status is Status.COMPLETE
+    assert outcome.duration_s == pytest.approx(30.0, abs=0.11)
+    assert (outcome.start_hp_pct, outcome.end_hp_pct) == (100, 0)
+
+
+def test_a_moment_of_empty_readings_before_the_bar_goes_is_not_a_kill() -> None:
+    # A popup or a menu dims the bar so it reads empty, then hides it.
+    run = Replay()
+    run.fall(1.0, 0.4, 20)
+    run.feed(bar(0.0), 1)
+    run.feed(GONE, 9)
+    assert [o.status for o in run.outcomes] == [Status.INCOMPLETE]
+
+
+def test_empty_readings_that_end_do_not_stick() -> None:
+    run = Replay()
+    run.fall(1.0, 0.4, 20)
+    run.feed(bar(0.0), 2)  # read as empty for a while, wrongly
+    run.feed(bar(0.4), 1.5)
+    assert run.tracker.hp == pytest.approx(0.4)
+    run.feed(GONE, 9)
+    assert [(o.status, o.end_hp_pct) for o in run.outcomes] == [(Status.INCOMPLETE, 40)]
+
+
+def test_bar_that_refills_starts_the_next_phase_of_the_same_fight() -> None:
+    run = Replay()
+    run.fall(1.0, 0.01, 20)
+    run.feed(bar(0.0), 2)
+    run.feed(GONE, 3)
+    run.fall(1.0, 0.5, 20)  # second phase
+    run.feed(GONE, 9)
+    assert [(o.status, o.start_hp_pct, o.end_hp_pct) for o in run.outcomes] == [
+        (Status.INCOMPLETE, 100, 50)
+    ]
+
+
+def test_one_wrong_reading_changes_nothing() -> None:
+    run = Replay()
+    run.feed(bar(0.0), STEP)  # the bar fading in reads as empty once
+    run.feed(bar(0.99), 2)
+    run.feed(bar(0.0), STEP)
+    run.fall(0.99, 0.6, 10)
+    run.feed(GONE, 9)
+    assert (run.outcomes[0].start_hp_pct, run.outcomes[0].end_hp_pct) == (100, 60)
+
+
+def test_empty_bar_that_was_never_fuller_is_not_recorded() -> None:
+    run = Replay()
+    run.feed(bar(0.0), 5)
+    run.feed(GONE, 9)
+    assert run.outcomes == []
+
+
 def test_bar_gone_without_defeat_text_is_incomplete() -> None:
     run = Replay()
     run.fall(1.0, 0.62, 20)
@@ -208,6 +272,21 @@ def test_real_clip_gives_one_complete_fight() -> None:
     assert (outcome.start_hp_pct, outcome.end_hp_pct) == (100, 0)
 
 
+def test_real_clip_of_a_kill_with_no_gold_text_is_complete() -> None:
+    """A night boss: the banner is silver, which the defeat text check does not know."""
+    run = Replay()
+    replay_readings("bell_bearing_hunter_readings.csv", run)
+
+    assert len(run.outcomes) == 1
+    outcome = run.outcomes[0]
+    assert outcome.status is Status.COMPLETE
+    # The bar appears at 11.8 s. Its last red goes at 60.7 s, but a paler strip of recent damage
+    # covers the end of the fill until 61.4 s, so the tracker stops the clock there.
+    assert outcome.started_at == pytest.approx(11.8, abs=0.1)
+    assert outcome.duration_s == pytest.approx(49.6, abs=0.2)
+    assert (outcome.start_hp_pct, outcome.end_hp_pct) == (100, 0)
+
+
 def test_real_clip_with_hit_flashes_is_not_ended_early() -> None:
     """A 160 s kill of a golden boss. Hit flashes hide the bar and look like defeat text 20 times.
 
@@ -244,6 +323,7 @@ def test_ending_a_fight_by_hand_saves_it_as_incomplete() -> None:
     assert not replay.tracker.in_fight
 
     # The bar is still on screen: under the recording rules that is a new record from 60%.
+    replay.feed(bar(0.6), 0.5)
     replay.fall(0.6, 0.3, 5.0)
     second = replay.tracker.end_now()
     assert second is not None

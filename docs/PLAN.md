@@ -46,6 +46,10 @@ Set by the project owner on 2026-11-17. These override anything else in this pla
 10. **Every record shows the boss HP % when the fight began**, in its own column. A full bar is
     written as 100. A boss met already damaged is written with its actual percentage.
 
+11. **An empty bar is a kill.** Set by the project owner on 2026-11-18. Some bosses do not show
+    the defeat text. When the bar had emptied before it went away, the record is `complete`
+    without it. This narrows rule 2 to fights where the boss still had HP.
+
 How the plan applies these: after the bar disappears the tool waits a short time (the "wait
 window", a setting, 8 seconds to start with). Defeat text seen in that window makes the record
 `complete`. No defeat text by the end of it makes the record `incomplete`. If the bar comes back
@@ -153,8 +157,8 @@ capture (ROI only) -> bar detector -> fight state machine -> timer -> record sto
 | Pending | bar seen | must persist about 300 ms to count |
 | Fighting | bar confirmed | start time backdated to first sight, start HP % stored, OCR fires |
 | Waiting | bar gone | watch the defeat text region for the wait window; back to Fighting if the bar returns |
-| Complete | defeat text seen while Waiting | end time is the moment HP reached zero (rule 8) |
-| Incomplete | wait window ended with no defeat text | end time is the last sight of the bar; remaining HP % stored |
+| Complete | defeat text seen while Waiting, or the wait window ended and the bar had been empty for 1.2 s when it went away (rule 11) | end time is the moment HP reached zero (rule 8) |
+| Incomplete | wait window ended with no defeat text and HP left | end time is the last sight of the bar; remaining HP % stored |
 | Skipped | wait window ended and HP never changed | nothing written (rule 9) |
 
 Details that follow from the rules and the first clip:

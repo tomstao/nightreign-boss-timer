@@ -108,7 +108,8 @@ so the same shape at another resolution usually still works: check the live prev
 | A boss health bar appears | starts the timer |
 | The boss's HP reaches zero | stops the timer |
 | The defeat text appears | saves the fight as `complete` |
-| The bar disappears for 8 seconds with no defeat text | saves the fight as `incomplete` |
+| The bar empties, then disappears for 8 seconds | saves the fight as `complete`, with or without defeat text |
+| The bar disappears for 8 seconds while the boss still has HP | saves the fight as `incomplete` |
 | The bar comes back within those 8 seconds | carries on with the same fight |
 | The bar appears and goes away without the boss losing HP | saves nothing |
 
@@ -281,7 +282,7 @@ method, and HDR compensation.
 | Problem | What to try |
 |---|---|
 | Fights are not recorded | Check the overlay for a warning. Open **Regions** and look at the live preview: it should show the bar and say `Bar detected: yes` during a fight. |
-| Every fight is `incomplete` | The defeat text area is in the wrong place, or its box is too small. Recalibrate it, and check it on the Regions page. |
+| A kill is saved as `incomplete` | The bar was hidden at the moment of the kill and no gold defeat text was seen. Check that the defeat text area is in the right place on the Regions page. Night bosses show a silver banner that the tool does not recognise yet; their kills are saved from the empty bar alone. |
 | One fight became two records | The bar was hidden for longer than the wait, for example by a long look at the map. Raise **Seconds to wait after the bar disappears** on the Settings page. |
 | Boss name is `unknown` | The name was covered when the bar appeared, or the text model was not downloaded (see [INSTALL.md](INSTALL.md#running-from-source)). The fight is still timed. Correcting a name in the program is planned; for now edit `records.csv`. |
 | Times look a few seconds long or short | Recalibrate the health bar so the box covers the bar exactly, edge to edge. |

@@ -84,3 +84,10 @@ Two bar regions from a third clip (卡利亚禁卫骑士, 1920x1080), the same s
 |---|---|---|
 | before_popup | 135.4 s | normal frame, about 18% |
 | popup_over_low_fill | 136.0 s | the skill popup's dark box covers the whole fill, which shows through as dim red |
+
+## bell_bearing_hunter_readings.csv
+
+Detector readings from a fourth clip, like `hippo_readings.csv`: a 75 s kill of a night boss
+(铃珠猎人) at 1920x1080, 751 rows, one every 0.1 s. The banner after this kill is the silver
+NIGHT REPULSED, so the defeat column is 0 through the kill. The bar empties at 61.4 s and goes
+away at 64.5 s. Made with the detector that reads through a skill popup.

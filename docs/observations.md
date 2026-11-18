@@ -183,3 +183,41 @@ Analysed 2026-11-18: 20 clips at 1920x1080, Simplified Chinese, 19 of them kills
 - `hippo_readings.csv` and `tree_sentinel_readings.csv` were made before this change and were
   not regenerated: decoding the clips again did not give the same pixels as the first time, so
   a new file would mix that difference with the detector's.
+
+## Kills without the gold text
+
+Analysed 2026-11-18, from the same 20 clips.
+
+- **A night boss shows a different banner.** After the kill of 铃珠猎人 the banner reads NIGHT
+  REPULSED in silver-white letters on a faint band, in the same place as the gold text, from
+  about 0.3 s to 3 s after the bar goes away. The gold check does not see it, so the kill was
+  saved as `incomplete`. The project owner adds that bosses with two stages do not always show
+  a banner at all.
+- **The empty bar is the dependable sign.** In all 19 kill clips the bar read empty for 1.7 s or
+  more before it went away. The tracker now calls that a kill when the wait window ends
+  (PLAN.md, recording rule 11). With it, all 19 clips replay as complete from 100% to 0%.
+- **Wrong readings that would spoil this.** The bar fading in read as empty for one sample in
+  two clips, which made the record start at 0%. Blood crossing the empty bar after a kill read
+  as 7% to 11% for two samples in a row. HP is now the middle of three readings, goes up only
+  after a second of higher readings, and the kill time survives four stray readings in a row.
+- **A paler strip follows the fill.** After a hit, the HP just lost stays for about 0.7 s as a
+  paler strip beyond the red. The detector reports it as an unsure reading, so after the last
+  hit the clock stops when the strip has gone: 0.7 s late in the 铃珠猎人 clip.
+- Not seen in any clip: a boss whose bar refills for a second stage, and a menu over the bar.
+
+### Banners after a kill
+
+Collected 2026-11-18. Only the first two were seen in footage. The rest come from wikis and
+forum posts and have not been checked in the game. Their colours are not known.
+
+| Banner | When | Source | Recognised by the gold check |
+|---|---|---|---|
+| GREAT ENEMY FELLED (gold) | a boss in the field or the arena | footage | yes |
+| NIGHT REPULSED (silver) | the boss at the end of a night | footage | no |
+| NIGHTLORD SLAIN, also reported as NIGHTLORD FELLED | a Nightlord | Fandom wiki, GamesRadar | unknown |
+| VICTORY ACHIEVED | Centipede Demon | forum post | unknown |
+| HEIR OF FIRE DESTROYED | Nameless King | forum post | unknown |
+
+The check goes by how the text looks and never reads it, so a new wording in gold needs no
+change. A banner in another colour is covered by the empty bar, as long as the bar is readable
+when the boss dies.

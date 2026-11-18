@@ -9,12 +9,14 @@ ends.
                                                  +------bar back--------+
 
 While waiting, defeat text that holds makes the fight complete, provided the boss was nearly dead
-when the bar was last read. The wait window running out makes it incomplete. A fight in which
-the boss HP never moved is dropped as a walk-past.
+when the bar was last read. When the wait window runs out, the fight is complete if the bar had
+been empty for a while when it went away, and incomplete otherwise. A fight in which the boss HP
+never moved is dropped as a walk-past.
 """
 
 from __future__ import annotations
 
+from collections import deque
 from dataclasses import dataclass
 from enum import Enum, auto
 
@@ -36,8 +38,22 @@ KILL_HP_MAX = 0.10
 HP_CERTAIN_GAP = 0.03
 # The bar is empty when the visible red ends below this. A sliver stays lit at the left cap.
 ZERO_HP = 0.005
-# This many readings in a row above zero cancel an earlier zero reading.
-ZERO_CANCEL_SAMPLES = 2
+# This many readings in a row above zero cancel an earlier zero reading. Blood crossing the empty
+# bar after a kill gave two such readings in a row, so two is not enough.
+ZERO_CANCEL_SAMPLES = 5
+# A bar that stayed empty this long before it went away is a kill, with or without defeat text.
+# Not every boss shows the text. In 19 kill clips the empty bar stayed for 1.7 s or more, and
+# before the detector learned to read through a skill popup, a wrong empty reading lasted up to
+# 1.1 s (docs/observations.md).
+ZERO_HOLD_S = 1.2
+# HP is the middle one of this many trusted readings, so one wrong reading changes nothing.
+HP_MEDIAN_SAMPLES = 3
+# HP only goes up when this many readings in a row are above it by more than HP_RISE_MIN: a bar
+# that was read too low for a moment, or a boss whose bar refills for its next phase.
+HP_RISE_SAMPLES = 10
+HP_RISE_MIN = 0.02
+# A rise this soon after the bar appeared also corrects the starting HP: the bar fades in.
+START_SETTLE_S = 2.0
 # A start reading at or above this is a full bar: the fill's right tip fades out.
 FULL_HP = 0.98
 # Fights where HP moved less than this are walk-pasts and are not recorded.
@@ -78,6 +94,8 @@ class FightTracker:
         self._above_zero_run = 0
         self._start_hp: float | None = None
         self._hp: float | None = None
+        self._recent: deque[float] = deque(maxlen=HP_MEDIAN_SAMPLES)
+        self._rise: list[float] = []
         self._defeat_since: float | None = None
 
     @property
@@ -142,7 +160,7 @@ class FightTracker:
         ):
             return self._finish(Status.COMPLETE)
         if now - self._gone_at >= self.wait_window_s:
-            return self._finish(Status.INCOMPLETE)
+            return self._finish(Status.COMPLETE if self._left_empty() else Status.INCOMPLETE)
         return None
 
     def end_now(self) -> FightOutcome | None:
@@ -163,16 +181,23 @@ class FightTracker:
         self._above_zero_run = 0
         self._start_hp = None
         self._hp = None
+        self._recent.clear()
+        self._rise.clear()
         self._defeat_since = None
+
+    def _left_empty(self) -> bool:
+        """True when the bar had been empty for a while at the moment it was last seen."""
+        return (
+            self._zero_at is not None
+            and self._last_seen - self._zero_at >= ZERO_HOLD_S
+            and self._start_hp is not None
+            and self._start_hp >= MIN_HP_CHANGE
+        )
 
     def _read_hp(self, now: float, bar: BarReading) -> None:
         self._last_seen = now
         if bar.hp_high - bar.hp > HP_CERTAIN_GAP:
             return  # something covers the end of the fill
-        if self._start_hp is None:
-            self._start_hp = bar.hp
-        # HP never goes up within a fight, so a higher reading is an effect crossing the bar.
-        self._hp = bar.hp if self._hp is None else min(self._hp, bar.hp)
         # The clock stops at the start of the last stretch of empty readings. One stray reading
         # above zero does not restart it, because effects cross the bar after the kill too.
         if bar.hp <= ZERO_HP:
@@ -183,6 +208,24 @@ class FightTracker:
             self._above_zero_run += 1
             if self._above_zero_run >= ZERO_CANCEL_SAMPLES:
                 self._zero_at = None
+
+        self._recent.append(bar.hp)
+        if len(self._recent) < HP_MEDIAN_SAMPLES:
+            return
+        level = sorted(self._recent)[HP_MEDIAN_SAMPLES // 2]
+        if self._hp is None or self._start_hp is None:
+            self._start_hp = self._hp = level
+        elif level <= self._hp + HP_RISE_MIN:
+            # HP does not go up within a phase: a higher reading is an effect crossing the bar.
+            self._hp = min(self._hp, level)
+            self._rise.clear()
+        else:
+            self._rise.append(level)
+            if len(self._rise) >= HP_RISE_SAMPLES:
+                self._hp = min(self._rise)
+                self._rise.clear()
+                if now - self._started_at <= START_SETTLE_S:
+                    self._start_hp = max(self._start_hp, self._hp)
 
     def _finish(self, status: Status) -> FightOutcome | None:
         self._state = _State.IDLE
