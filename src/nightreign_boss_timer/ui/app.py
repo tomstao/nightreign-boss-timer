@@ -73,7 +73,9 @@ class App:
         self.tray.icon.show()
         self.hotkeys = GlobalHotkeys()
         self.hotkeys.triggered.connect(self.controller.run_action)
-        self.hotkeys.apply(self.settings)
+        self.controller.hotkey_applier = self._apply_hotkeys
+        self.controller.hotkeys_suspended.connect(self._suspend_hotkeys)
+        self.controller.refresh_hotkeys()
         self.controller.changed.connect(self._apply)
         self.controller.notice.connect(self._show_notice)
         self.controller.calibration_requested.connect(self.calibration.start)
@@ -89,8 +91,18 @@ class App:
         """Bring the engine and the overlay in line with what the user chose."""
         self.engine.paused = not self.controller.tracking
         self.overlay.set_enabled(self.controller.overlay_visible)
-        self.hotkeys.apply(self.settings)  # a table or a shortcut may have changed
+        self.controller.refresh_hotkeys()  # a table or a shortcut may have changed
         self._step()
+
+    def _apply_hotkeys(self, settings: settings_file.Settings) -> set[str]:
+        self.hotkeys.apply(settings)
+        return self.hotkeys.failed
+
+    def _suspend_hotkeys(self, suspended: bool) -> None:
+        if suspended:
+            self.hotkeys.manager.release_all()
+        else:
+            self.controller.refresh_hotkeys()
 
     def _end_fight(self) -> None:
         self.engine.end_fight()

@@ -16,10 +16,10 @@ from PySide6.QtCore import QObject, Signal
 
 from nightreign_boss_timer import settings as settings_file
 from nightreign_boss_timer.engine import Probe, State, records_path
-from nightreign_boss_timer.hotkeys import TABLE_PREFIX
+from nightreign_boss_timer.hotkeys import TABLE_PREFIX, conflict, has_modifier, normalise
 from nightreign_boss_timer.i18n import LANGUAGES, Translator
 from nightreign_boss_timer.records import FightRecord, RecordStore
-from nightreign_boss_timer.settings import Settings, TableError
+from nightreign_boss_timer.settings import DEFAULT_HOTKEYS, Settings, TableError, default_tables
 
 # How long after discarding a record the same action brings it back.
 UNDO_SECONDS = 5.0
@@ -38,6 +38,8 @@ class Controller(QObject):
     records_changed = Signal()
     # The user asked for the calibration window, starting at this region (empty: the first).
     calibration_requested = Signal(str)
+    # A shortcut is being typed in: hotkeys must not fire (True), or may again (False).
+    hotkeys_suspended = Signal(bool)
     # The user asked for the fight in progress to be ended now.
     end_fight_requested = Signal()
     # The user asked for the main window, at the page with this key (empty: the page it is on).
@@ -69,12 +71,92 @@ class Controller(QObject):
         self._opener = opener
         self._clock = clock
         self._discarded: FightRecord | None = None
+        # Set by the app: registers the hotkeys in the settings with Windows and returns the
+        # actions it refused. Left empty when there is nothing to register with, as in tests.
+        self.hotkey_applier: Callable[[Settings], set[str]] | None = None
+        # Actions whose shortcut Windows refused, usually because another program has it.
+        self.failed_hotkeys: set[str] = set()
         self._discarded_at = 0.0
 
     def save(self) -> None:
         settings_file.save(self.settings, self._settings_path)
 
     # --- hotkeys --------------------------------------------------------------------------------
+
+    def hotkey_actions(self) -> list[str]:
+        """Every action that can have a shortcut, in display order."""
+        tables = [TABLE_PREFIX + name for name in self.settings.table_names()]
+        return [*DEFAULT_HOTKEYS, *tables]
+
+    def action_label(self, action: str) -> str:
+        """The name of an action in the user's language."""
+        if action.startswith(TABLE_PREFIX):
+            return self.translate("hotkey.switch_table", table=action[len(TABLE_PREFIX) :])
+        return self.translate(f"hotkey.{action}")
+
+    def hotkey_of(self, action: str) -> str:
+        """The shortcut of an action, or nothing."""
+        if action.startswith(TABLE_PREFIX):
+            name = action[len(TABLE_PREFIX) :]
+            return next((t.hotkey for t in self.settings.tables if t.name == name), "")
+        return self.settings.hotkeys.get(action, "")
+
+    def refresh_hotkeys(self) -> None:
+        """Register the shortcuts in the settings with Windows and note which were refused."""
+        if self.hotkey_applier is not None:
+            self.failed_hotkeys = set(self.hotkey_applier(self.settings))
+
+    def _store_hotkey(self, action: str, shortcut: str) -> None:
+        if action.startswith(TABLE_PREFIX):
+            name = action[len(TABLE_PREFIX) :]
+            for table in self.settings.tables:
+                if table.name == name:
+                    table.hotkey = shortcut
+        else:
+            self.settings.hotkeys[action] = shortcut
+
+    def set_hotkey(self, action: str, shortcut: str) -> str:
+        """Give an action a shortcut, or none with an empty one.
+
+        Returns a message in the user's language: why it was refused, a warning about a
+        shortcut that was accepted, or nothing. Check :meth:`hotkey_of` to tell which.
+        """
+        if action not in self.hotkey_actions():
+            return self.translate("hotkey.invalid")
+        standard = normalise(shortcut)
+        if shortcut.strip() and not standard:
+            return self.translate("hotkey.invalid")
+        other = conflict(self.settings, action, standard)
+        if other:
+            return self.translate("hotkey.conflict", action=self.action_label(other))
+        self._store_hotkey(action, standard)
+        self.save()
+        self.refresh_hotkeys()
+        self.changed.emit()
+        if action in self.failed_hotkeys:
+            return self.translate("hotkey.failed")
+        if standard and not has_modifier(standard):
+            return self.translate("hotkey.single_key")
+        return ""
+
+    def restore_default_hotkeys(self) -> None:
+        """Put every shortcut back as it was at first. Tables added by the user get none."""
+        self.settings.hotkeys = dict(DEFAULT_HOTKEYS)
+        defaults = [table.hotkey for table in default_tables()]
+        builtin = 0
+        for table in self.settings.tables:
+            if table.builtin and builtin < len(defaults):
+                table.hotkey = defaults[builtin]
+                builtin += 1
+            else:
+                table.hotkey = ""
+        self.save()
+        self.refresh_hotkeys()
+        self.changed.emit()
+
+    def suspend_hotkeys(self, suspended: bool) -> None:
+        """Stop hotkeys from firing while a new shortcut is being typed, or let them again."""
+        self.hotkeys_suspended.emit(suspended)
 
     def run_action(self, action: str) -> bool:
         """Do what a hotkey stands for. ``action`` is a name from ``settings.hotkeys``, or

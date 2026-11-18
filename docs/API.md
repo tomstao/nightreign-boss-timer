@@ -288,6 +288,13 @@ Every action the user can take, shared by the tray, the windows and the hotkeys.
 | `Controller.set_overlay_visible(on)` | Show or hide the overlay. Also `toggle_overlay()`. |
 | `Controller.set_table(name)` | Switch the active table and save. Also `next_table()`. |
 | `Controller.add_table(name)` | Add a table. Returns an error message in the user's language, or an empty string. Also `rename_table(old, new)` and `delete_table(name)`. |
+| `Controller.hotkey_actions()` | Every action that can have a shortcut, in display order. |
+| `Controller.action_label(action)` | An action's name in the user's language. |
+| `Controller.hotkey_of(action)` | An action's shortcut, or an empty string. |
+| `Controller.set_hotkey(action, shortcut)` | Set or clear a shortcut. Returns a refusal or a warning in the user's language, or an empty string. |
+| `Controller.restore_default_hotkeys()` | Put every shortcut back as it was at first. |
+| `Controller.refresh_hotkeys()` | Register the settings' shortcuts with Windows through `hotkey_applier` and update `failed_hotkeys`. |
+| `Controller.suspend_hotkeys(suspended)` | Stop hotkeys firing while a shortcut is typed. Emits `hotkeys_suspended`. |
 | `Controller.run_action(action)` | Do what a hotkey stands for. Returns False for an unknown action. |
 | `Controller.end_fight()` | Ask for the fight in progress to be ended now. Emits `end_fight_requested`. |
 | `Controller.discard_last()` | Remove the most recent record. Again within `UNDO_SECONDS` puts it back. |
@@ -351,6 +358,18 @@ Registers hotkeys with Windows (`RegisterHotKey`) and announces presses.
 | `GlobalHotkeys.failed` | Actions whose shortcut Windows refused. |
 | `GlobalHotkeys.pressed(hotkey_id)` | Called when Windows reports a press. |
 | `GlobalHotkeys.close()` | Release every hotkey. |
+
+### `nightreign_boss_timer.ui.hotkeys_page`
+
+The Hotkeys page: every action with its shortcut, and a field to press a new one into.
+
+| Name | What it is |
+|---|---|
+| `HotkeysPage` | The page. |
+| `HotkeysPage.selected()` | The selected action, or an empty string. |
+| `HotkeysPage.set_shortcut()` | Give the selected action the shortcut shown in the field. Also `clear_shortcut()` and `restore_defaults()`. |
+| `ShortcutEdit` | A field that shows the shortcut pressed into it. Signals `accepted`, `cleared`, `focus_changed`. |
+| `key_name(key, modifiers, native_code)` | A pressed key's name as shortcuts spell it, or an empty string. |
 
 ### `nightreign_boss_timer.ui.main_window`
 

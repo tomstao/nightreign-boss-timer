@@ -11,8 +11,8 @@
 > [Everyday use](#everyday-use) and writes the file described under [Your records](#your-records).
 > Region calibration works as described under [First-run setup](#first-run-setup), from the tray
 > menu or with `Ctrl+Alt+C`. Until you calibrate, the tool uses the usual positions for a 16:9
-> game image. Picking a recent frame for the defeat text, changing hotkeys in the program,
-> first-run setup and moving the overlay are not built yet.
+> game image. Picking a recent frame for the defeat text, first-run setup and moving the
+> overlay are not built yet.
 
 To install the tool, see [INSTALL.md](INSTALL.md).
 
@@ -120,8 +120,8 @@ stop the tool: it keeps running in the tray, and **Quit** in the tray menu ends 
 The bar at the bottom shows whether tracking is on, the active table, whether the game was
 found and whether the regions are calibrated. Click **Tracking on** to pause or resume.
 
-So far the window has the **Records**, **Tables**, **Regions**, **Settings** and **About**
-pages. Hotkeys are being added.
+The window has six pages: **Records**, **Tables**, **Hotkeys**, **Regions**, **Settings** and
+**About**.
 
 ## The overlay
 
@@ -202,11 +202,26 @@ All tables are saved in the same file. Use the `table` column to filter in Excel
 
 The defaults below work as soon as the tool runs, wherever the keyboard focus is.
 
-Changing them on a **Hotkeys** page in the main window is planned. Until then they are in
-`%APPDATA%
-ightreign-boss-timer\settings.json`, under `hotkeys` and under each table's
-`hotkey`, written like `Ctrl+Alt+P`. Quit the tool before editing the file. If two actions have
-the same shortcut, or another program already uses it, that hotkey does not work.
+To change one, open **Hotkeys** in the main window:
+
+1. Select the action.
+2. Click the field below the list and press the new shortcut, for example `Ctrl+Alt+E`. The
+   field shows what you pressed. Press again to replace it.
+3. Press Enter, or choose **Set**.
+
+Backspace in the field, or **Clear**, leaves the action without a shortcut. Esc empties the
+field. **Restore defaults** puts every shortcut back.
+
+- A shortcut is one key, with any of Ctrl, Alt, Shift and Win: letters, digits, F1 to F24, the
+  numpad digits, the navigation keys and punctuation.
+- Each table has its own shortcut, at the bottom of the list.
+- A shortcut already used by another action is refused, with the name of that action.
+- A shortcut Windows will not hand over, usually because another program uses it, is marked
+  `(not working)` in the list. Choose another, or close the other program and restart the tool.
+- A single key such as `F8` is accepted with a warning: while the tool runs, that key no longer
+  reaches the game.
+- While the field has the keyboard, hotkeys are switched off, so pressing `Ctrl+Alt+P` there
+  types it instead of pausing the tool.
 
 | Action | Default |
 |---|---|
