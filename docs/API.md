@@ -64,7 +64,7 @@ The recording rules as a state machine. Fed one sample at a time, it says when a
 | `FightTracker.started_at` | The tracker-clock time the current fight began. |
 | `FightTracker.hp` | The current smoothed HP, or `None`. |
 | `FightTracker.watching_for_defeat` | True while the defeat text region needs to be read. |
-| `FightOutcome` | `status`, `started_at`, `duration_s`, `start_hp_pct`, `end_hp_pct`, `level` (`None` if unread), and `boss_en`, `boss_zh_cn`, `boss_zh_tw` (empty if the boss is not a known one). |
+| `FightOutcome` | `status`, `started_at`, `duration_s`, `start_hp_pct`, `end_hp_pct`. |
 | `FULL_HP` | A reading at or above this is written as 100%. |
 
 ### `nightreign_boss_timer.boss_names`
@@ -179,7 +179,7 @@ Fight records and the CSV file they are stored in.
 
 | Name | What it is |
 |---|---|
-| `FightRecord` | One fight: `started_at`, `table`, `boss`, `language`, `status`, `duration_s`, `start_hp_pct`, `end_hp_pct`. |
+| `FightRecord` | One fight: `started_at`, `table`, `boss`, `language`, `status`, `duration_s`, `start_hp_pct`, `end_hp_pct`, `level` (`None` if unread), and `boss_2`, `language_2`, `boss_3`, `language_3` for the same boss in a second and third language (empty if not asked for). |
 | `Status` | `COMPLETE` or `INCOMPLETE`. |
 | `RecordStore(path)` | The CSV file. |
 | `RecordStore.append(record)` | Save a record. Returns `False` if it had to be held because the file is locked. |
@@ -203,7 +203,7 @@ Chooses which records to show and sums them up. No drawing.
 | `summarise(records)` | A `Summary` of a set of fights. |
 | `Summary` | `attempts`, `completes`, `best_s`, `average_s`. The times count only complete fights that began at full health. |
 | `names_in(records)` | The table names and boss keys that appear, each sorted. |
-| `translations(record)` | The boss in English, Simplified and Traditional Chinese: as saved, or looked up for older records. |
+| `translations(record)` | The boss in English, Simplified and Traditional Chinese, looked up from the name saved. |
 | `boss_key(record)`, `key_of(name)` | What a boss is grouped under: its English name if known, else the name as read. |
 | `boss_label(record, language)` | The boss in a UI language, or as it was read. |
 | `label_of(name, language)` | The same for a bare name, as the overlay has during a fight. |
@@ -216,6 +216,9 @@ The user's settings, kept in one JSON file. Loading never fails.
 | Name | What it is |
 |---|---|
 | `Settings` | All settings: language, tables, active table, records folder, timing, regions, hotkeys. |
+| `Settings.record_languages()` | The languages a boss name is saved in: the user's choice, or the UI language until they choose. |
+| `Settings.set_name_language(language, on)` | Start or stop saving the name in a language. `False` if it would leave none or exceed `MAX_NAMES`. |
+| `NAME_LANGUAGES`, `MAX_NAMES` | The languages a name can be saved in, and how many one record holds. |
 | `Settings.add_table(name)` | Add a table. Raises `TableError` for an empty or duplicate name. |
 | `Settings.rename_table(old, new)` | Rename a table. |
 | `Settings.delete_table(name)` | Delete a table. Built-in tables cannot be deleted. |
@@ -283,7 +286,7 @@ Joins capture, detectors, tracker, name reading and the record store, one step a
 | `Screen` | The interface the engine needs from the screen: `find_window(title)` and `grab(box)`. |
 | `NameSource` | The interface for reading a name: `read(region)`. |
 | `records_path(settings)` | Where `records.csv` is for these settings. |
-| `to_record(outcome, table, now, wall_now, boss, level)` | Turn a tracker outcome into a `FightRecord`. A known boss gets its name as the game writes it and its translations; any other keeps the text as read. |
+| `to_record(outcome, table, now, wall_now, boss, level, languages)` | Turn a tracker outcome into a `FightRecord`. A known boss gets its name in each of `languages`, up to three; any other keeps the text as read. |
 | `GAME_TITLE` | The game window title looked for by default. |
 
 ### `nightreign_boss_timer.__main__`
@@ -341,6 +344,7 @@ Every action the user can take, shared by the tray, the windows and the hotkeys.
 | `Controller.set_overlay_position(position)` | Remember where the overlay was put. `None` resets it. |
 | `Controller.window_shown` | Signal: the main window was shown (True) or hidden (False). |
 | `Controller.set_option(name, value)` | Change `wait_window_s`, `skip_walk_pasts`, `fight_rate` or `overlay_in_captures`. |
+| `Controller.set_name_language(language, on)` | Start or stop saving the boss name in a language. |
 | `Controller.delete_records(records)` | Delete these records for good. Returns an error message, or `""`. |
 | `Controller.open_records_file()` | Open `records.csv` in the program Windows uses for it. |
 | `Controller.open_records_folder()` | Open the folder that holds it. |

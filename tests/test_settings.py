@@ -153,3 +153,35 @@ def test_overlay_in_captures_is_off_unless_the_file_says_true() -> None:
     assert Settings.from_json({"overlay_in_captures": "yes"}).overlay_in_captures is False
     kept = Settings.from_json(Settings(overlay_in_captures=True).to_json())
     assert kept.overlay_in_captures is True
+
+
+def test_boss_name_is_saved_in_the_ui_language_until_the_user_chooses() -> None:
+    settings = Settings(ui_language="zh_TW")
+    assert settings.record_languages() == ["zh_TW"]
+    settings.ui_language = "en"
+    assert settings.record_languages() == ["en"]
+
+    assert settings.set_name_language("zh_CN", True)
+    assert settings.record_languages() == ["en", "zh_CN"]  # always in the same order
+    settings.ui_language = "zh_TW"
+    assert settings.record_languages() == ["en", "zh_CN"]  # a choice no longer follows the UI
+
+
+def test_at_least_one_and_at_most_three_name_languages() -> None:
+    settings = Settings()
+    assert not settings.set_name_language("en", False)  # the last one stays
+    assert not settings.set_name_language("fr", True)  # not a language names exist in
+    assert settings.set_name_language("zh_TW", True)
+    assert settings.set_name_language("zh_CN", True)
+    assert settings.record_languages() == ["en", "zh_CN", "zh_TW"]
+    assert settings.set_name_language("en", False)
+    assert settings.record_languages() == ["zh_CN", "zh_TW"]
+
+
+def test_name_languages_survive_the_file_and_bad_values_do_not() -> None:
+    settings = Settings()
+    settings.set_name_language("zh_CN", True)
+    assert Settings.from_json(settings.to_json()).name_languages == ["en", "zh_CN"]
+    loaded = Settings.from_json({"name_languages": ["zh_TW", "xx", 3, "en", "zh_TW"]})
+    assert loaded.name_languages == ["en", "zh_TW"]
+    assert Settings.from_json({"name_languages": "en"}).name_languages == []

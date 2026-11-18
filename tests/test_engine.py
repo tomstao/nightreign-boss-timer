@@ -237,3 +237,22 @@ def test_level_is_left_empty_when_it_cannot_be_read(tmp_path: Path) -> None:
     h.run(1, 0.2)
     h.run(9, None)
     assert h.records[1].level is None
+
+
+def test_boss_name_is_saved_in_the_languages_chosen_in_the_settings(tmp_path: Path) -> None:
+    settings = Settings(ui_language="zh_CN")
+    h = Harness(tmp_path, settings)
+    h.run(3, 0.8)
+    h.run(1, 0.5)
+    h.run(9, None)
+    assert (h.records[0].boss, h.records[0].language) == ("大树守卫", "zh_CN")
+    assert h.records[0].boss_2 == ""
+
+    settings.set_name_language("en", True)  # applies to the next fight
+    h.run(3, 0.5)
+    h.run(1, 0.2)
+    h.run(9, None)
+    record = h.records[1]
+    assert (record.boss, record.language) == ("Tree Sentinel", "en")
+    assert (record.boss_2, record.language_2) == ("大树守卫", "zh_CN")
+    assert (record.boss_3, record.language_3) == ("", "")

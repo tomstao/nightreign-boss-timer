@@ -126,6 +126,28 @@ def test_showing_the_overlay_in_recordings_is_off_until_chosen(
     assert page.overlay_in_captures.isChecked()
 
 
+def test_boss_name_languages_can_be_ticked_but_never_all_unticked(
+    application: "QApplication", tmp_path: Path
+) -> None:
+    harness = Harness(tmp_path)
+    page = harness.page
+    boxes = page.name_languages
+    assert [box.text() for box in boxes.values()] == ["English", "简体中文", "繁體中文"]
+    # It starts with the language of the program alone, which cannot be unticked.
+    assert [box.isChecked() for box in boxes.values()] == [True, False, False]
+    assert not boxes["en"].isEnabled()
+
+    boxes["zh_CN"].click()
+
+    assert harness.saved().name_languages == ["en", "zh_CN"]
+    assert boxes["en"].isEnabled()
+    boxes["en"].click()
+    assert harness.saved().name_languages == ["zh_CN"]
+    assert [box.isChecked() for box in boxes.values()] == [False, True, False]
+    assert not boxes["zh_CN"].isEnabled()
+    assert "3" in page.names_note.text()
+
+
 def test_out_of_range_values_cannot_be_entered(application: "QApplication", tmp_path: Path) -> None:
     page = Harness(tmp_path).page
     page.wait_window.setValue(500)

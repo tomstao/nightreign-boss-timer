@@ -20,6 +20,7 @@ from PySide6.QtWidgets import (
 )
 
 from nightreign_boss_timer.i18n import LANGUAGES
+from nightreign_boss_timer.settings import MAX_NAMES, NAME_LANGUAGES
 from nightreign_boss_timer.ui.controller import Controller
 from nightreign_boss_timer.ui.pages import Page
 
@@ -64,6 +65,14 @@ class SettingsPage(Page):
         self.default_folder.clicked.connect(lambda: controller.set_records_folder(""))
         self.open_folder.clicked.connect(controller.open_records_folder)
         self.folder_note = _note()
+
+        self.names_label = QLabel()
+        self.names_note = _note()
+        self.name_languages: dict[str, QCheckBox] = {}
+        for code in NAME_LANGUAGES:
+            box = QCheckBox(controller.translate(f"language.{code}"))
+            box.toggled.connect(lambda on, code=code: controller.set_name_language(code, bool(on)))
+            self.name_languages[code] = box
 
         self.wait_window = QDoubleSpinBox()
         self.wait_window.setRange(1.0, 120.0)
@@ -119,6 +128,13 @@ class SettingsPage(Page):
         records.addWidget(self.folder_label)
         records.addLayout(folder_row)
         records.addWidget(self.folder_note)
+        names_row = QHBoxLayout()
+        names_row.addWidget(self.names_label)
+        for box in self.name_languages.values():
+            names_row.addWidget(box)
+        names_row.addStretch(1)
+        records.addLayout(names_row)
+        records.addWidget(self.names_note)
 
         self.detection = QGroupBox()
         self.wait_label = QLabel()
@@ -153,6 +169,16 @@ class SettingsPage(Page):
         self.default_folder.setText(translate("settings.default_folder"))
         self.open_folder.setText(translate("records.open_folder"))
         self.folder_note.setText(translate("settings.folder_note"))
+        self.names_label.setText(translate("settings.name_languages"))
+        self.names_note.setText(translate("settings.name_languages_note", most=MAX_NAMES))
+        chosen = settings.record_languages()
+        for code, box in self.name_languages.items():
+            box.blockSignals(True)
+            box.setChecked(code in chosen)
+            box.blockSignals(False)
+            # The last one cannot be unticked, and a full set cannot grow.
+            only_one = chosen == [code]
+            box.setEnabled(not only_one and (code in chosen or len(chosen) < MAX_NAMES))
         self.wait_label.setText(translate("settings.wait_window"))
         self.wait_note.setText(translate("settings.wait_window_note"))
         self.skip_walk_pasts.setText(translate("settings.skip_walk_pasts"))

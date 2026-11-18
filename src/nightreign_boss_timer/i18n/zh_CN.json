@@ -48,6 +48,8 @@
   "settings.browse": "选择…",
   "settings.default_folder": "使用默认位置",
   "settings.folder_note": "已保存的记录仍留在原来的文件夹。如需保持同一个文件，请自行将 records.csv 移到新文件夹。",
+  "settings.name_languages": "保存 Boss 名称的语言：",
+  "settings.name_languages_note": "最多 {most} 种语言。勾选的第一种写入记录的 boss 列，其余写入 boss_2 和 boss_3。在你更改之前，名称按本程序的界面语言保存。仅对之后的战斗生效。",
   "settings.wait_window": "血条消失后等待的秒数",
   "settings.wait_window_note": "血条在这段时间内重新出现，则视为同一场战斗；出现击败文字，则记为已完成；否则保存为未完成。",
   "settings.skip_walk_pasts": "跳过 Boss 没有掉血的战斗",

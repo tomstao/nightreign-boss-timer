@@ -16,6 +16,10 @@ from nightreign_boss_timer.regions import Fractions
 
 FILE_VERSION = 1
 UI_LANGUAGES = ("en", "zh_CN", "zh_TW")
+# The languages a boss name can be saved in, in the order they are saved, and how many of them
+# one record may hold. More languages may come, but a record never holds more names than this.
+NAME_LANGUAGES = ("en", "zh_CN", "zh_TW")
+MAX_NAMES = 3
 
 # Shown in this order on the Hotkeys page. An empty shortcut means "not set".
 DEFAULT_HOTKEYS: dict[str, str] = {
@@ -79,7 +83,33 @@ class Settings:
     overlay_position: tuple[int, int] | None = None
     # True lets screenshots and recordings show the overlay. The tool then reads it too.
     overlay_in_captures: bool = False
+    # The languages the boss name is saved in, at most MAX_NAMES. Empty until the user chooses:
+    # the name is then saved in the language of the UI.
+    name_languages: list[str] = field(default_factory=list)
     hotkeys: dict[str, str] = field(default_factory=lambda: dict(DEFAULT_HOTKEYS))
+
+    # --- boss name languages ------------------------------------------------------------------
+
+    def record_languages(self) -> list[str]:
+        """The languages a boss name is saved in, in the order of the record's name columns."""
+        return list(self.name_languages) or [self.ui_language]
+
+    def set_name_language(self, language: str, on: bool) -> bool:
+        """Start or stop saving the boss name in a language. False if that is not allowed.
+
+        At least one language stays, and no more than MAX_NAMES are saved.
+        """
+        if language not in NAME_LANGUAGES:
+            return False
+        chosen = set(self.record_languages())
+        if on:
+            chosen.add(language)
+        else:
+            chosen.discard(language)
+        if not chosen or len(chosen) > MAX_NAMES:
+            return False
+        self.name_languages = [code for code in NAME_LANGUAGES if code in chosen]
+        return True
 
     # --- tables -----------------------------------------------------------------------------
 
@@ -156,6 +186,7 @@ class Settings:
             "calibrated_size": list(self.calibrated_size) if self.calibrated_size else None,
             "overlay_position": list(self.overlay_position) if self.overlay_position else None,
             "overlay_in_captures": self.overlay_in_captures,
+            "name_languages": list(self.name_languages),
             "hotkeys": dict(self.hotkeys),
         }
 
@@ -207,6 +238,11 @@ class Settings:
             settings.overlay_position = (position[0], position[1])
 
         settings.overlay_in_captures = data.get("overlay_in_captures") is True
+
+        languages = data.get("name_languages")
+        if isinstance(languages, list):
+            chosen = [code for code in NAME_LANGUAGES if code in languages]
+            settings.name_languages = chosen[:MAX_NAMES]
 
         hotkeys = data.get("hotkeys")
         if isinstance(hotkeys, dict):

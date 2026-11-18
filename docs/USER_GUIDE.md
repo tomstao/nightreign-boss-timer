@@ -172,8 +172,8 @@ Excel or any spreadsheet program, or choose **Open records file in Excel** from 
 |---|---|
 | `started_at` | date and time the fight began |
 | `table` | the table that was active (see below) |
-| `boss` | boss name as shown in game, or `unknown` if it could not be read. A reading one or two characters off a known name is corrected to it. |
-| `language` | language the name was read in: `en`, `zh_CN` (Simplified) or `zh_TW` (Traditional). It is `zh` when the name is written the same in both kinds of Chinese, or is not in the list of known names. |
+| `boss` | boss name, in the first language you chose to save names in (see below), or `unknown` if it could not be read |
+| `language` | the language of `boss`: `en`, `zh_CN` (Simplified) or `zh_TW` (Traditional). For a name that is not a known boss it is `en` or `zh`, from the look of the text. |
 | `status` | `complete` or `incomplete` |
 | `duration` | fight time as minutes:seconds |
 | `duration_s` | the same in seconds, for sorting and charts |
@@ -181,17 +181,23 @@ Excel or any spreadsheet program, or choose **Open records file in Excel** from 
 | `end_hp_pct` | boss HP when the fight ended; 0 for a kill |
 | `level` | your level when the fight began, read from the emblem at the top left; empty if it could not be read |
 
-| `boss_en` | the same boss in English, if the name is in the list of known names |
-| `boss_zh_cn` | the same boss in Simplified Chinese |
-| `boss_zh_tw` | the same boss in Traditional Chinese |
+| `boss_2`, `language_2` | the same boss in the second language you chose, and that language; empty if you chose one |
+| `boss_3`, `language_3` | the same for a third language |
 
-The tool knows the names of the game's bosses in all three languages. When the name it reads is
-one of them, the record carries all three, whatever language your game is in. When it is not,
-for example a boss added by a later update, `boss` holds the text as it was read and the three
-translation columns stay empty.
+**Which language the boss name is saved in.** The tool knows the names of the game's bosses in
+English, Simplified Chinese and Traditional Chinese, so it can save a name in a language other
+than the one your game is in. To start with, it saves the name in the language the program is
+set to. On the Settings page, under **Records**, tick the languages you want: one, two or
+three. A record never holds more than three names, also when more languages are added later.
+The ticked languages fill `boss`, `boss_2` and `boss_3` in a fixed order: English, Simplified,
+Traditional. A change applies to the fights still to come.
 
-The `level` and `boss_...` columns are new. A `records.csv` made by an older version gets them
-the next time a fight is saved, left empty for the fights already in it.
+When the name read from the screen is not a known boss, for example one added by a later
+update, `boss` holds the text as it was read and the other name columns stay empty. A reading
+one or two characters off a known name is corrected to it.
+
+The `level`, `boss_2` and `boss_3` columns are new. A `records.csv` made by an older version
+gets them the next time a fight is saved, left empty for the fights already in it.
 
 **If the file is open in Excel when a fight ends**, Excel blocks other programs from writing to
 it. The tool keeps the new rows in `records.pending.csv` next to it and adds them, in order, the

@@ -48,6 +48,8 @@
   "settings.browse": "選擇…",
   "settings.default_folder": "使用預設位置",
   "settings.folder_note": "已儲存的記錄仍留在原來的資料夾。如需維持同一個檔案，請自行將 records.csv 移到新資料夾。",
+  "settings.name_languages": "儲存 Boss 名稱的語言：",
+  "settings.name_languages_note": "最多 {most} 種語言。勾選的第一種寫入紀錄的 boss 欄，其餘寫入 boss_2 和 boss_3。在你變更之前，名稱依本程式的介面語言儲存。僅對之後的戰鬥生效。",
   "settings.wait_window": "血條消失後等待的秒數",
   "settings.wait_window_note": "血條在這段時間內重新出現，則視為同一場戰鬥；出現擊敗文字，則記為已完成；否則儲存為未完成。",
   "settings.skip_walk_pasts": "略過 Boss 沒有損血的戰鬥",

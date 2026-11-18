@@ -221,16 +221,43 @@ def test_level_is_saved_and_read_back(tmp_path: Path) -> None:
     assert store.read_all() == [with_level, without]
 
 
-def test_translations_are_saved_and_read_back(tmp_path: Path) -> None:
+def test_second_and_third_names_are_saved_and_read_back(tmp_path: Path) -> None:
     store = RecordStore(tmp_path / "records.csv")
     record = make_record(
-        boss="黄金河马", boss_en="Golden Hippopotamus", boss_zh_cn="黄金河马", boss_zh_tw="黃金河馬"
+        boss="Golden Hippopotamus",
+        language="en",
+        boss_2="黄金河马",
+        language_2="zh_CN",
+        boss_3="黃金河馬",
+        language_3="zh_TW",
     )
     store.append(record)
     lines = store.path.read_text(encoding="utf-8-sig").splitlines()
-    assert lines[0].endswith(",level,boss_en,boss_zh_cn,boss_zh_tw")
-    assert lines[1].endswith(",Golden Hippopotamus,黄金河马,黃金河馬")
+    assert lines[0].endswith(",level,boss_2,language_2,boss_3,language_3")
+    assert lines[1].endswith(",黄金河马,zh_CN,黃金河馬,zh_TW")
     assert store.read_all() == [record]
+
+
+def test_columns_of_an_earlier_layout_are_dropped_on_the_next_save(tmp_path: Path) -> None:
+    # For a short while the file had one column per language instead.
+    path = tmp_path / "records.csv"
+    level = records.COLUMNS.index("level")
+    header = [*records.COLUMNS[: level + 1], "boss_en", "boss_zh_cn", "boss_zh_tw"]
+    row = [
+        *make_record(boss="大树守卫").to_row()[: level + 1],
+        "Tree Sentinel",
+        "大树守卫",
+        "大樹守衛",
+    ]
+    path.write_text(",".join(header) + "\n" + ",".join(row) + "\n", encoding="utf-8-sig")
+    store = RecordStore(path)
+    assert store.read_all() == [make_record(boss="大树守卫")]
+
+    store.append(make_record(boss="New"))
+
+    lines = path.read_text(encoding="utf-8-sig").splitlines()
+    assert lines[0] == ",".join(records.COLUMNS)
+    assert store.read_all() == [make_record(boss="大树守卫"), make_record(boss="New")]
 
 
 def test_file_from_before_the_newer_columns_gets_them_on_the_next_save(tmp_path: Path) -> None:

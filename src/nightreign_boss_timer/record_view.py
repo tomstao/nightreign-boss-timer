@@ -34,10 +34,8 @@ def _known(name: str) -> boss_names.BossMatch | None:
 def translations(record: FightRecord) -> tuple[str, str, str]:
     """The boss of a record in English, Simplified and Traditional Chinese. Empty where unknown.
 
-    Records saved before translations were kept have none, so their name is looked up now.
+    A record holds the name in the languages its owner chose, so the others are looked up.
     """
-    if record.boss_en or record.boss_zh_cn or record.boss_zh_tw:
-        return record.boss_en, record.boss_zh_cn, record.boss_zh_tw
     known = _known(record.boss)
     return (known.en, known.zh_cn, known.zh_tw) if known else ("", "", "")
 

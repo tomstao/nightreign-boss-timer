@@ -197,6 +197,12 @@ class Controller(QObject):
         self.save()
         self.changed.emit()
 
+    def set_name_language(self, language: str, on: bool) -> None:
+        """Start or stop saving the boss name in a language, for the fights still to come."""
+        if self.settings.set_name_language(language, on):
+            self.save()
+        self.changed.emit()  # also when refused, so the page shows what really holds
+
     def set_records_folder(self, folder: str) -> None:
         """Save records in another folder from now on. Empty means the default folder.
 

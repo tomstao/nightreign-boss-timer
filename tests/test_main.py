@@ -2,7 +2,7 @@ from datetime import datetime
 
 from nightreign_boss_timer.__main__ import describe
 from nightreign_boss_timer.engine import to_record
-from nightreign_boss_timer.records import Status
+from nightreign_boss_timer.records import FightRecord, Status
 from nightreign_boss_timer.regions import Box, bar_region, defeat_text_region, name_region
 from nightreign_boss_timer.tracker import FightOutcome
 
@@ -57,29 +57,61 @@ def test_describe_is_one_readable_line() -> None:
     assert describe(record) == "21:04:33  incomplete  02:41.3  HP 100% -> 62%  unknown"
 
 
-def test_record_carries_the_boss_name_and_its_language() -> None:
-    outcome = FightOutcome(1000.0, 60.0, Status.COMPLETE, 100, 0)
-    record = to_record(outcome, "Arena", 1067.0, datetime(2026, 11, 17, 21, 5, 40), "黄金河马")
-    assert (record.boss, record.language) == ("黄金河马", "zh_CN")
-    assert (record.boss_en, record.boss_zh_cn, record.boss_zh_tw) == (
-        "Golden Hippopotamus",
-        "黄金河马",
-        "黃金河馬",
+OUTCOME = FightOutcome(1000.0, 60.0, Status.COMPLETE, 100, 0)
+WHEN = datetime(2026, 11, 17, 21, 5, 40)
+
+
+def names_of(record: FightRecord) -> list[tuple[str, str]]:
+    pairs = [
+        (record.boss, record.language),
+        (record.boss_2, record.language_2),
+        (record.boss_3, record.language_3),
+    ]
+    return [pair for pair in pairs if pair != ("", "")]
+
+
+def test_boss_is_saved_in_the_one_language_asked_for() -> None:
+    # The game is in Simplified Chinese and the program in English.
+    record = to_record(OUTCOME, "Arena", 1067.0, WHEN, "黄金河马", languages=["en"])
+    assert names_of(record) == [("Golden Hippopotamus", "en")]
+
+
+def test_boss_is_saved_in_up_to_three_languages_in_the_order_asked_for() -> None:
+    two = to_record(OUTCOME, "Arena", 1067.0, WHEN, "黄金河马", languages=["en", "zh_CN"])
+    assert names_of(two) == [("Golden Hippopotamus", "en"), ("黄金河马", "zh_CN")]
+    three = to_record(
+        OUTCOME, "Arena", 1067.0, WHEN, "Tree Sentinel", languages=["en", "zh_CN", "zh_TW"]
     )
+    assert names_of(three) == [
+        ("Tree Sentinel", "en"),
+        ("大树守卫", "zh_CN"),
+        ("大樹守衛", "zh_TW"),
+    ]
+    # A fourth language would be one name too many for a record.
+    four = to_record(
+        OUTCOME, "Arena", 1067.0, WHEN, "Tree Sentinel", languages=["zh_TW", "en", "zh_CN", "en"]
+    )
+    assert names_of(four) == [("大樹守衛", "zh_TW"), ("Tree Sentinel", "en"), ("大树守卫", "zh_CN")]
+
+
+def test_with_no_language_asked_for_the_name_is_saved_as_the_game_writes_it() -> None:
+    record = to_record(OUTCOME, "Arena", 1067.0, WHEN, "黄金河马")
+    assert names_of(record) == [("黄金河马", "zh_CN")]
+    same_in_both = to_record(OUTCOME, "Arena", 1067.0, WHEN, "王室幽魂")
+    assert names_of(same_in_both) == [("王室幽魂", "zh")]
 
 
 def test_misread_name_is_repaired_and_an_unlisted_name_is_kept_as_read() -> None:
-    outcome = FightOutcome(1000.0, 60.0, Status.COMPLETE, 100, 0)
-    when = datetime(2026, 11, 17, 21, 5, 40)
-    repaired = to_record(outcome, "Arena", 1067.0, when, "卡利亚禁卫骑土")
-    assert (repaired.boss, repaired.boss_en) == ("卡利亚禁卫骑士", "Royal Carian Knight")
+    repaired = to_record(
+        OUTCOME, "Arena", 1067.0, WHEN, "卡利亚禁卫骑土", languages=["zh_CN", "en"]
+    )
+    assert names_of(repaired) == [("卡利亚禁卫骑士", "zh_CN"), ("Royal Carian Knight", "en")]
 
-    unlisted = to_record(outcome, "Arena", 1067.0, when, "某个新头目")
-    assert (unlisted.boss, unlisted.language) == ("某个新头目", "zh")
-    assert (unlisted.boss_en, unlisted.boss_zh_cn, unlisted.boss_zh_tw) == ("", "", "")
-
-    same_in_both = to_record(outcome, "Arena", 1067.0, when, "王室幽魂")
-    assert (same_in_both.language, same_in_both.boss_en) == ("zh", "Royal Revenant")
+    # Not a known boss: the text read from the screen is all there is, whatever was asked for.
+    unlisted = to_record(OUTCOME, "Arena", 1067.0, WHEN, "某个新头目", languages=["en", "zh_TW"])
+    assert names_of(unlisted) == [("某个新头目", "zh")]
+    unread = to_record(OUTCOME, "Arena", 1067.0, WHEN, languages=["en"])
+    assert names_of(unread) == [("unknown", "")]
 
 
 def test_name_region_covers_the_measured_name_at_1440p() -> None:

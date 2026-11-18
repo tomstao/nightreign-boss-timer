@@ -11,7 +11,7 @@ It talks to the screen through a small interface, so tests can hand it made-up p
 from __future__ import annotations
 
 import time
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from enum import Enum
@@ -37,7 +37,7 @@ from nightreign_boss_timer.regions import (
     level_region,
     name_region,
 )
-from nightreign_boss_timer.settings import Settings
+from nightreign_boss_timer.settings import MAX_NAMES, Settings
 from nightreign_boss_timer.tracker import FightOutcome, FightTracker
 
 GAME_TITLE = "ELDEN RING NIGHTREIGN"
@@ -118,28 +118,38 @@ def to_record(
     wall_now: datetime,
     boss: str = UNKNOWN,
     level: int | None = None,
+    languages: Sequence[str] = (),
 ) -> FightRecord:
     """Turn a tracker outcome into a row. ``now`` is the tracker's clock at ``wall_now``.
 
-    ``boss`` is the name as read. If it is in the list of known names, the record gets the name
-    as the game writes it and the same boss in the other languages. If not, it keeps the text
-    that was read.
+    ``boss`` is the name as read. If it is a known boss, the record gets its name in each of
+    ``languages``, up to three, in that order. With no languages given it gets the name in the
+    language it was read in, as the game writes it. A name that is not a known boss is kept as
+    it was read.
     """
     started = wall_now - timedelta(seconds=now - outcome.started_at)
     known = None if boss == UNKNOWN else boss_names.load().lookup(boss)
+    names = [(boss, language_of(boss))]
+    if known:
+        by_language = {"en": known.en, "zh_CN": known.zh_cn, "zh_TW": known.zh_tw}
+        wanted = [(by_language.get(code, ""), code) for code in languages[:MAX_NAMES]]
+        # A language the list has no single name for is left out.
+        names = [pair for pair in wanted if pair[0]] or [(known.name, known.language)]
+    names += [("", "")] * (MAX_NAMES - len(names))
     return FightRecord(
         started_at=started.replace(microsecond=0),
         table=table,
-        boss=known.name if known else boss,
-        language=known.language if known else language_of(boss),
-        boss_en=known.en if known else "",
-        boss_zh_cn=known.zh_cn if known else "",
-        boss_zh_tw=known.zh_tw if known else "",
+        boss=names[0][0],
+        language=names[0][1],
         status=outcome.status,
         duration_s=round(outcome.duration_s, 1),
         start_hp_pct=outcome.start_hp_pct,
         end_hp_pct=outcome.end_hp_pct,
         level=level,
+        boss_2=names[1][0],
+        language_2=names[1][1],
+        boss_3=names[2][0],
+        language_3=names[2][1],
     )
 
 
@@ -232,6 +242,7 @@ class Engine:
                 self._wall_clock(),
                 self._vote.name,
                 self._level.level,
+                self.settings.record_languages(),
             )
             saved = self._store.append(record)
 
