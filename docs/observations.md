@@ -245,3 +245,6 @@ is 2560x1440. The levels in them are 2, 7, 8 and 15, read by eye.
   fading. The 2560x1440 frame reads correctly with the same fractions.
 - Not covered: levels 1, 3 to 6 and 9 to 14, other resolutions and ultrawide, and a level that
   changes during a fight.
+- Run through the whole engine, six clips gave the right level in their record: 2, 7, 7, 8, 15
+  at 1920x1080 and 15 at 2560x1440. The level is read at the start of a fight until three
+  readings agree, eight have been made, or 50 looks found no digits.

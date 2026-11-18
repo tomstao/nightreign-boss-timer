@@ -23,6 +23,7 @@ COLUMNS = (
     "duration_s",
     "start_hp_pct",
     "end_hp_pct",
+    "level",
 )
 
 _TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
@@ -54,6 +55,8 @@ class FightRecord:
     duration_s: float
     start_hp_pct: int
     end_hp_pct: int
+    # The player's level when the fight began. None if it could not be read.
+    level: int | None = None
 
     def to_row(self) -> list[str]:
         return [
@@ -66,6 +69,7 @@ class FightRecord:
             f"{self.duration_s:.1f}",
             str(self.start_hp_pct),
             str(self.end_hp_pct),
+            "" if self.level is None else str(self.level),
         ]
 
     @classmethod
@@ -79,12 +83,29 @@ class FightRecord:
             duration_s=float(row["duration_s"]),
             start_hp_pct=int(row["start_hp_pct"]),
             end_hp_pct=int(row["end_hp_pct"]),
+            # Files written before the level was recorded have no such column.
+            level=int(level) if (level := row.get("level") or "").isdecimal() else None,
         )
+
+
+def _values(row: dict[str, str]) -> list[str]:
+    """A row read from a file as a list in column order. A column the file lacks is empty."""
+    return [row.get(column) or "" for column in COLUMNS]
+
+
+def _add_missing_columns(path: Path) -> None:
+    """Rewrite a file made by an older version so that its header has every column."""
+    with path.open(newline="", encoding="utf-8-sig") as handle:
+        header = next(csv.reader(handle), None)
+    if header is not None and tuple(header) != COLUMNS:
+        _write_rows(path, _read_rows(path))
 
 
 def _append_rows(path: Path, rows: list[list[str]]) -> None:
     """Append rows, writing the byte order mark and header first if the file is new."""
     is_new = not path.exists() or path.stat().st_size == 0
+    if not is_new:
+        _add_missing_columns(path)
     # "utf-8-sig" writes a byte order mark at the start of every write session, so it is only
     # used for the first write. Later appends use plain UTF-8.
     encoding = "utf-8-sig" if is_new else "utf-8"
@@ -101,7 +122,7 @@ def _write_rows(path: Path, rows: list[dict[str, str]]) -> None:
     with partial.open("w", newline="", encoding="utf-8-sig") as handle:
         writer = csv.writer(handle)
         writer.writerow(COLUMNS)
-        writer.writerows([row[column] for column in COLUMNS] for row in rows)
+        writer.writerows(_values(row) for row in rows)
     try:
         partial.replace(path)
     except PermissionError:
@@ -141,7 +162,7 @@ class RecordStore:
         waiting = _read_rows(self.pending_path)
         if not waiting:
             return True
-        rows = [[row[column] for column in COLUMNS] for row in waiting]
+        rows = [_values(row) for row in waiting]
         try:
             _append_rows(self.path, rows)
         except PermissionError:
@@ -191,7 +212,7 @@ class RecordStore:
         unwanted = [record.to_row() for record in records]
         kept = []
         for row in rows:
-            values = [row[column] for column in COLUMNS]
+            values = _values(row)
             if values in unwanted:
                 unwanted.remove(values)
             else:

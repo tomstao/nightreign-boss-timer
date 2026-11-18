@@ -64,7 +64,7 @@ The recording rules as a state machine. Fed one sample at a time, it says when a
 | `FightTracker.started_at` | The tracker-clock time the current fight began. |
 | `FightTracker.hp` | The current smoothed HP, or `None`. |
 | `FightTracker.watching_for_defeat` | True while the defeat text region needs to be read. |
-| `FightOutcome` | `status`, `started_at`, `duration_s`, `start_hp_pct`, `end_hp_pct`. |
+| `FightOutcome` | `status`, `started_at`, `duration_s`, `start_hp_pct`, `end_hp_pct`, and `level` (`None` if unread). |
 | `FULL_HP` | A reading at or above this is written as 100%. |
 
 ### `nightreign_boss_timer.level`
@@ -76,9 +76,9 @@ several readings.
 |---|---|
 | `find_digits(region)` | A tight crop around the white digits in the level box, or `None` if there are none. |
 | `parse_level(text)` | The level a reading stands for, `MIN_LEVEL` to `MAX_LEVEL`, or `None`. |
-| `LevelVote` | Collects readings for one fight: `add(text)`, `settled`, `level`. |
+| `LevelVote` | Collects readings for one fight: `add(text)`, `miss()` for a look that found no digits, `settled`, `level`. |
 | `MIN_LEVEL`, `MAX_LEVEL` | The levels the game has. |
-| `AGREE`, `MAX_READS` | When the vote stops asking for readings. |
+| `AGREE`, `MAX_READS`, `MAX_MISSES` | When the vote stops asking for readings. |
 
 ### `nightreign_boss_timer.ocr`
 
@@ -266,7 +266,7 @@ Joins capture, detectors, tracker, name reading and the record store, one step a
 | `Screen` | The interface the engine needs from the screen: `find_window(title)` and `grab(box)`. |
 | `NameSource` | The interface for reading a name: `read(region)`. |
 | `records_path(settings)` | Where `records.csv` is for these settings. |
-| `to_record(outcome, table, now, wall_now, boss)` | Turn a tracker outcome into a `FightRecord`. |
+| `to_record(outcome, table, now, wall_now, boss, level)` | Turn a tracker outcome into a `FightRecord`. |
 | `GAME_TITLE` | The game window title looked for by default. |
 
 ### `nightreign_boss_timer.__main__`

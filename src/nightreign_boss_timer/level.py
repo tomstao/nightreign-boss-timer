@@ -22,6 +22,8 @@ MAX_LEVEL = 15
 AGREE = 3
 # ...or after this many attempts, whichever comes first.
 MAX_READS = 8
+# Give up after this many looks that found no digits at all: the emblem is hidden.
+MAX_MISSES = 50
 
 # White means every colour channel is high. A digit pixel is at least this share of the
 # brightest white in the box. The lines of the emblem are bluer, so their lowest channel is lower.
@@ -72,6 +74,11 @@ class LevelVote:
     def __init__(self) -> None:
         self._votes: Counter[int] = Counter()
         self._reads = 0
+        self._misses = 0
+
+    def miss(self) -> None:
+        """Note a look at the screen that found no digits to read."""
+        self._misses += 1
 
     def add(self, text: str) -> None:
         self._reads += 1
@@ -82,7 +89,7 @@ class LevelVote:
     @property
     def settled(self) -> bool:
         """True when no more readings are needed."""
-        if self._reads >= MAX_READS:
+        if self._reads >= MAX_READS or self._misses >= MAX_MISSES:
             return True
         return bool(self._votes) and self._votes.most_common(1)[0][1] >= AGREE
 

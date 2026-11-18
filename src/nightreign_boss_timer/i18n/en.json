@@ -91,6 +91,7 @@
   "records.column.started_at": "Date and time",
   "records.column.table": "Table",
   "records.column.boss": "Boss",
+  "records.column.level": "Level",
   "records.column.status": "Status",
   "records.column.start_hp": "Start HP",
   "records.column.end_hp": "End HP",

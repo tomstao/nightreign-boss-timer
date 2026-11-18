@@ -11,6 +11,7 @@ def fight(
     status: Status = Status.COMPLETE,
     seconds: float = 100.0,
     start: int = 100,
+    level: int | None = None,
 ) -> FightRecord:
     return FightRecord(
         started_at=datetime(2026, 11, 17, 21, minute, 0),
@@ -21,6 +22,7 @@ def fight(
         duration_s=seconds,
         start_hp_pct=start,
         end_hp_pct=0 if status is Status.COMPLETE else 40,
+        level=level,
     )
 
 

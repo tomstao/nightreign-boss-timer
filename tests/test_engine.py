@@ -7,12 +7,13 @@ from nightreign_boss_timer.detector import MARGIN_HEIGHTS
 from nightreign_boss_timer.engine import Engine, State, records_path
 from nightreign_boss_timer.ocr import TextReading
 from nightreign_boss_timer.records import RecordStore, Status
-from nightreign_boss_timer.regions import Box, bar_region, defeat_text_region
+from nightreign_boss_timer.regions import Box, bar_region, defeat_text_region, level_region
 from nightreign_boss_timer.settings import Settings
 
 WINDOW = Box(0, 0, 1920, 1080)
 BAR_BOX = bar_region(WINDOW)
 DEFEAT_BOX = defeat_text_region(WINDOW)
+LEVEL_BOX = level_region(WINDOW)
 FILL, TRACK, SCENE, GOLD = (110, 53, 24), (22, 22, 22), (70, 68, 64), (230, 190, 60)
 
 
@@ -23,6 +24,7 @@ class FakeScreen:
         self.window: Box | None = WINDOW
         self.hp: float | None = None
         self.defeat_text = False
+        self.level_shown = True
         self.grabs: list[Box] = []
 
     def find_window(self, title: str) -> Box | None:
@@ -43,12 +45,17 @@ class FakeScreen:
             for i in range(16):
                 left = round(box.width * 0.2 + i * pitch)
                 image[20:55, left : left + round(pitch * 0.6)] = GOLD
+        if box == LEVEL_BOX and self.level_shown:
+            image[12:30, 20:32] = (235, 235, 235)  # a white block where the digits are
         return image
 
 
 class FakeReader:
-    def read(self, region: np.ndarray) -> TextReading:
-        return TextReading("Tree Sentinel", 0.99)
+    def __init__(self) -> None:
+        self.level = "7"
+
+    def read(self, region: np.ndarray, *, digits_only: bool = False) -> TextReading:
+        return TextReading(self.level if digits_only else "Tree Sentinel", 0.99)
 
 
 class Harness:
@@ -56,11 +63,12 @@ class Harness:
         self.now = 100.0
         self.screen = FakeScreen()
         self.store = RecordStore(tmp_path / "records.csv")
+        self.reader = FakeReader()
         self.engine = Engine(
             settings or Settings(),
             self.screen,
             self.store,
-            FakeReader(),
+            self.reader,
             clock=lambda: self.now,
             wall_clock=lambda: datetime(2026, 11, 17, 21, 0, 0),
         )
@@ -108,6 +116,7 @@ def test_kill_is_saved_with_name_table_and_time(tmp_path: Path) -> None:
     record = h.records[0]
     assert (record.status, record.boss, record.language) == (Status.COMPLETE, "Tree Sentinel", "en")
     assert (record.table, record.start_hp_pct, record.end_hp_pct) == ("Arena", 100, 0)
+    assert record.level == 7
     assert 19.5 <= record.duration_s <= 20.5  # bar appears to zero HP, not to the defeat text
     assert h.store.read_all() == [record]
     assert h.last.snapshot.state is State.IDLE
@@ -200,3 +209,31 @@ def test_end_fight_saves_the_fight_in_progress_on_the_next_step(tmp_path: Path) 
     h.engine.end_fight()  # nothing in progress that lost HP: nothing more is written
     h.run(1, 0.5)
     assert len(h.records) == 1
+
+
+def test_level_is_read_a_few_times_at_the_start_and_then_left_alone(tmp_path: Path) -> None:
+    h = Harness(tmp_path)
+    h.run(1, None)
+    assert LEVEL_BOX not in h.screen.grabs  # nothing to read outside a fight
+    h.run(10, 0.8)
+    assert h.screen.grabs.count(LEVEL_BOX) == 3  # three readings that agree are enough
+    h.run(1, 0.5)
+    h.run(9, None)
+    assert h.records[0].level == 7
+
+
+def test_level_is_left_empty_when_it_cannot_be_read(tmp_path: Path) -> None:
+    h = Harness(tmp_path)
+    h.screen.level_shown = False  # the emblem is hidden
+    h.run(10, 0.8)
+    assert h.screen.grabs.count(LEVEL_BOX) == 50  # it stops looking after a while
+    h.run(1, 0.5)
+    h.run(9, None)
+    assert h.records[0].level is None
+
+    h.screen.level_shown = True
+    h.reader.level = "73"  # not a level the game has
+    h.run(3, 0.5)
+    h.run(1, 0.2)
+    h.run(9, None)
+    assert h.records[1].level is None

@@ -27,7 +27,7 @@ from nightreign_boss_timer.records import FightRecord, Status, format_duration
 from nightreign_boss_timer.ui.controller import Controller
 from nightreign_boss_timer.ui.pages import Page
 
-COLUMNS = ("started_at", "table", "boss", "status", "start_hp", "end_hp", "duration")
+COLUMNS = ("started_at", "table", "boss", "level", "status", "start_hp", "end_hp", "duration")
 _INCOMPLETE = QColor(200, 129, 26)
 _ERROR = "color: #c8811a;"
 
@@ -213,6 +213,7 @@ class RecordsPage(Page):
                 _Cell(f"{record.started_at:%Y-%m-%d %H:%M:%S}", record.started_at),
                 _Cell(record.table, record.table.casefold()),
                 _Cell(self._boss_name(record.boss), record.boss.casefold()),
+                _Cell("" if record.level is None else str(record.level), record.level or 0),
                 _Cell(translate(f"status.{record.status.value}"), record.status.value),
                 _Cell(f"{record.start_hp_pct}%", record.start_hp_pct),
                 _Cell(f"{record.end_hp_pct}%", record.end_hp_pct),

@@ -207,3 +207,32 @@ def test_remove_takes_out_the_given_records_and_keeps_the_rest(tmp_path: Path) -
     assert store.remove([first, third, second]) == 3
     assert store.read_all() == []
     assert store.remove([first]) == 0
+
+
+def test_level_is_saved_and_read_back(tmp_path: Path) -> None:
+    store = RecordStore(tmp_path / "records.csv")
+    with_level, without = make_record(level=15), make_record(boss="Second")
+    store.append(with_level)
+    store.append(without)
+    lines = store.path.read_text(encoding="utf-8-sig").splitlines()
+    assert lines[0].endswith(",end_hp_pct,level")
+    assert lines[1].endswith(",62,15")
+    assert lines[2].endswith(",62,")
+    assert store.read_all() == [with_level, without]
+
+
+def test_file_from_before_the_level_column_gets_it_on_the_next_save(tmp_path: Path) -> None:
+    path = tmp_path / "records.csv"
+    old_header = ",".join(records.COLUMNS[:-1])
+    old_row = ",".join(make_record().to_row()[:-1])
+    path.write_text(f"{old_header}\n{old_row}\n", encoding="utf-8-sig")
+    store = RecordStore(path)
+    assert store.read_all() == [make_record()]  # readable as it is, with no level
+
+    store.append(make_record(boss="New", level=7))
+
+    lines = path.read_text(encoding="utf-8-sig").splitlines()
+    assert lines[0] == ",".join(records.COLUMNS)
+    assert all(line.count(",") == len(records.COLUMNS) - 1 for line in lines)
+    assert store.read_all() == [make_record(), make_record(boss="New", level=7)]
+    assert store.remove([make_record()]) == 1

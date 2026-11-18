@@ -23,6 +23,7 @@ from numpy.typing import NDArray
 
 from nightreign_boss_timer.defeat_text import DefeatReading, measure_defeat_text
 from nightreign_boss_timer.detector import BarReading, measure_bar
+from nightreign_boss_timer.level import LevelVote, find_digits
 from nightreign_boss_timer.names import UNKNOWN, NameVote, language_of
 from nightreign_boss_timer.ocr import TextReading
 from nightreign_boss_timer.records import FightRecord, RecordStore
@@ -32,6 +33,7 @@ from nightreign_boss_timer.regions import (
     Box,
     bar_region,
     defeat_text_region,
+    level_region,
     name_region,
 )
 from nightreign_boss_timer.settings import Settings
@@ -53,7 +55,7 @@ class Screen(Protocol):
 
 
 class NameSource(Protocol):
-    def read(self, region: NDArray[np.uint8]) -> TextReading: ...
+    def read(self, region: NDArray[np.uint8], *, digits_only: bool = False) -> TextReading: ...
 
 
 class State(Enum):
@@ -109,7 +111,12 @@ def records_path(settings: Settings) -> Path:
 
 
 def to_record(
-    outcome: FightOutcome, table: str, now: float, wall_now: datetime, boss: str = UNKNOWN
+    outcome: FightOutcome,
+    table: str,
+    now: float,
+    wall_now: datetime,
+    boss: str = UNKNOWN,
+    level: int | None = None,
 ) -> FightRecord:
     """Turn a tracker outcome into a row. ``now`` is the tracker's clock at ``wall_now``."""
     started = wall_now - timedelta(seconds=now - outcome.started_at)
@@ -122,6 +129,7 @@ def to_record(
         duration_s=round(outcome.duration_s, 1),
         start_hp_pct=outcome.start_hp_pct,
         end_hp_pct=outcome.end_hp_pct,
+        level=level,
     )
 
 
@@ -147,6 +155,7 @@ class Engine:
         self._wall_clock = wall_clock
         self._tracker = self._new_tracker()
         self._vote = NameVote()
+        self._level = LevelVote()
         self._fight_table = settings.active_table
         self._end_requested = False
 
@@ -191,15 +200,29 @@ class Engine:
         if self._tracker.in_fight and not was_in_fight:
             # The table is fixed when the fight starts, whatever is switched to during it.
             self._vote = NameVote()
+            self._level = LevelVote()
             self._fight_table = settings.active_table
 
         if self._reader and self._tracker.in_fight and bar.present and not self._vote.settled:
             reading = self._reader.read(self._screen.grab(name_region(window, bar_fractions)))
             self._vote.add(reading.text, reading.confidence)
+        if self._reader and self._tracker.in_fight and not self._level.settled:
+            digits = find_digits(self._screen.grab(level_region(window)))
+            if digits is None:
+                self._level.miss()
+            else:
+                self._level.add(self._reader.read(digits, digits_only=True).text)
 
         record, saved = None, False
         if outcome:
-            record = to_record(outcome, self._fight_table, now, self._wall_clock(), self._vote.name)
+            record = to_record(
+                outcome,
+                self._fight_table,
+                now,
+                self._wall_clock(),
+                self._vote.name,
+                self._level.level,
+            )
             saved = self._store.append(record)
 
         in_fight = self._tracker.in_fight

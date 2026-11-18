@@ -91,6 +91,7 @@
   "records.column.started_at": "日期與時間",
   "records.column.table": "表格",
   "records.column.boss": "Boss",
+  "records.column.level": "等級",
   "records.column.status": "狀態",
   "records.column.start_hp": "開始血量",
   "records.column.end_hp": "結束血量",

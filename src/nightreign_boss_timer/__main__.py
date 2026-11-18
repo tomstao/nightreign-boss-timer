@@ -22,7 +22,7 @@ def describe(record: FightRecord) -> str:
     return (
         f"{record.started_at:%H:%M:%S}  {record.status.value:<10}  "
         f"{format_duration(record.duration_s)}  HP {record.start_hp_pct}% -> {record.end_hp_pct}%"
-        f"  {record.boss}"
+        f"  {record.boss}" + ("" if record.level is None else f"  level {record.level}")
     )
 
 

@@ -91,6 +91,7 @@
   "records.column.started_at": "日期和时间",
   "records.column.table": "表格",
   "records.column.boss": "Boss",
+  "records.column.level": "等级",
   "records.column.status": "状态",
   "records.column.start_hp": "开始血量",
   "records.column.end_hp": "结束血量",

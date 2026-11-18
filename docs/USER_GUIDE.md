@@ -179,6 +179,10 @@ Excel or any spreadsheet program, or choose **Open records file in Excel** from 
 | `duration_s` | the same in seconds, for sorting and charts |
 | `start_hp_pct` | boss HP when the fight began; 100 for a full bar |
 | `end_hp_pct` | boss HP when the fight ended; 0 for a kill |
+| `level` | your level when the fight began, read from the emblem at the top left; empty if it could not be read |
+
+The `level` column is new. A `records.csv` made by an older version gets it the next time a
+fight is saved, with the level left empty for the fights already in it.
 
 **If the file is open in Excel when a fight ends**, Excel blocks other programs from writing to
 it. The tool keeps the new rows in `records.pending.csv` next to it and adds them, in order, the

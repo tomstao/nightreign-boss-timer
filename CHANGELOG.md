@@ -49,3 +49,4 @@ All notable changes are listed here. The format follows
 - A log file at `%LOCALAPPDATA%\nightreign-boss-timer\logs\app.log`.
 - Setting to show the overlay in screenshots and recordings, for making videos of the tool. Off by default.
 - Records can be deleted on the Records page: select rows, then **Delete selected**, the Delete key or the right-click menu. It asks first.
+- Records now carry the player's level, read from the emblem at the top left when a fight begins. It is a new `level` column in `records.csv` and on the Records page. Older files get the column on the next save.

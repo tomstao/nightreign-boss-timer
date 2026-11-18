@@ -41,11 +41,20 @@ def choose(box: object, value: str) -> None:
 def test_lists_every_record_newest_first(application: "QApplication", tmp_path: Path) -> None:
     _, page = make(tmp_path)
     headers = [page.table.horizontalHeaderItem(i).text() for i in range(page.table.columnCount())]
-    assert headers == ["Date and time", "Table", "Boss", "Status", "Start HP", "End HP", "Time"]
+    assert headers == [
+        "Date and time",
+        "Table",
+        "Boss",
+        "Level",
+        "Status",
+        "Start HP",
+        "End HP",
+        "Time",
+    ]
     assert column(page, 0)[0] == "2026-11-17 21:30:00"
     assert column(page, 0)[-1] == "2026-11-17 21:01:00"
     assert column(page, 2)[0] == "unknown"
-    assert column(page, 6)[-1] == "02:41.3"
+    assert column(page, 7)[-1] == "02:41.3"
     assert page.count.text() == "6 records"
     assert page.summary.text() == ""
 
@@ -83,17 +92,17 @@ def test_search_narrows_as_you_type(application: "QApplication", tmp_path: Path)
 
 def test_hp_and_time_sort_as_numbers(application: "QApplication", tmp_path: Path) -> None:
     _, page = make(tmp_path)
-    page.table.sortByColumn(4, Qt.SortOrder.AscendingOrder)
-    assert column(page, 4)[0] == "62%"  # as text, "100%" would come first
-    page.table.sortByColumn(6, Qt.SortOrder.DescendingOrder)
-    assert column(page, 6)[0] == "02:41.3"
+    page.table.sortByColumn(5, Qt.SortOrder.AscendingOrder)
+    assert column(page, 5)[0] == "62%"  # as text, "100%" would come first
+    page.table.sortByColumn(7, Qt.SortOrder.DescendingOrder)
+    assert column(page, 7)[0] == "02:41.3"
 
 
 def test_incomplete_rows_look_different(application: "QApplication", tmp_path: Path) -> None:
     _, page = make(tmp_path)
-    statuses = column(page, 3)
-    incomplete = page.table.item(statuses.index("Incomplete"), 3).foreground().color()
-    complete = page.table.item(statuses.index("Complete"), 3).foreground().color()
+    statuses = column(page, 4)
+    incomplete = page.table.item(statuses.index("Incomplete"), 4).foreground().color()
+    complete = page.table.item(statuses.index("Complete"), 4).foreground().color()
     assert incomplete != complete
 
 
@@ -130,7 +139,7 @@ def test_empty_file_shows_an_empty_page(application: "QApplication", tmp_path: P
 def test_page_is_translated(application: "QApplication", tmp_path: Path, language: str) -> None:
     _, english = make(tmp_path / "en")
     _, other = make(tmp_path / language, language)
-    assert column(other, 3) != column(english, 3)
+    assert column(other, 4) != column(english, 4)
     assert column(other, 2)[0] != "unknown"
     assert other.count.text() != english.count.text()
     assert other.open_file.text() != english.open_file.text()
@@ -139,6 +148,17 @@ def test_page_is_translated(application: "QApplication", tmp_path: Path, languag
     choose(english.boss_filter, "Tree Sentinel")
     choose(other.boss_filter, "Tree Sentinel")
     assert other.summary.text() != english.summary.text()
+
+
+def test_level_column_shows_the_level_or_nothing(
+    application: "QApplication", tmp_path: Path
+) -> None:
+    recorder = Recorder(tmp_path)
+    recorder.store.append(fight(minute=1, level=7))
+    recorder.store.append(fight(minute=2))
+    page = RecordsPage(recorder.controller)
+    page.refresh()
+    assert column(page, 3) == ["", "7"]  # newest first
 
 
 def make_asking(folder: Path, answer: bool) -> tuple["Recorder", "RecordsPage", list[str]]:
@@ -169,7 +189,7 @@ def test_delete_removes_the_selected_rows_after_asking(
     application: "QApplication", tmp_path: Path
 ) -> None:
     recorder, page, asked = make_asking(tmp_path, answer=True)
-    page.table.sortByColumn(6, Qt.SortOrder.AscendingOrder)  # the rows are not in file order
+    page.table.sortByColumn(7, Qt.SortOrder.AscendingOrder)  # the rows are not in file order
     page.table.selectRow(0)
     assert page.delete_button.isEnabled()
     (chosen,) = page.selected_records()
