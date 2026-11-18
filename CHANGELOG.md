@@ -6,6 +6,8 @@ All notable changes are listed here. The format follows
 
 ## Unreleased
 
+## 0.2.0 - 2026-11-18
+
 ### Added
 
 - A `character` column in `records.csv` for the character a fight was played with, and the list of the game's ten characters in three languages. A file made by an older version gets the column the next time a fight is saved.

@@ -1,6 +1,6 @@
 # Installation
 
-> The first release is 0.1.0. The author uses the program with the game at 2560x1440 in
+> The current release is 0.2.0. The author uses the program with the game at 2560x1440 in
 > Simplified Chinese; other set-ups are untested.
 
 ## Requirements
