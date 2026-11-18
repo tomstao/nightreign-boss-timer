@@ -305,7 +305,8 @@ Done when: a play session produces correct records with no manual input and the 
 
 Status, 2026-11-18: everything in the list above is built, except the last point. The whole
 program was run against a recorded kill played back in a window: saved as `complete`, 59.9 s
-against 60.5 s measured by hand, with the boss name read. It has not been run against the game.
+against 60.5 s measured by hand, with the boss name read. Since then the owner has used it
+with the game itself, at 2560x1440 in Simplified Chinese.
 Built differently from this plan, pending the owner's decision:
 
 - The tool tracks from the first start with the measured 16:9 positions, instead of waiting
@@ -371,11 +372,12 @@ what a user sees or does updates them in the same pull request.
 
 ## Not yet verified
 
-Nothing has been run against the real game. These are assumptions until someone tests them:
+The owner uses the tool with the game at 2560x1440 in Simplified Chinese: the game window is
+found, fights are recorded and the overlay shows. Nothing below has been checked on purpose.
+These are assumptions until someone tests them:
 
 | Assumption | Where it matters |
 |---|---|
-| The game window's title is `ELDEN RING NIGHTREIGN` | finding the game; `--title` overrides it |
 | GDI capture returns the game image in borderless mode | everything |
 | The capture costs no measurable frame rate | the performance budget |
 | Global hotkeys fire while the game has the keyboard | hotkeys |

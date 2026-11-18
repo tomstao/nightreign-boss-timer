@@ -2,7 +2,8 @@
 
 > **No release has been published yet.** The program can be built as a ready-to-run Windows
 > folder today (see "Build the program yourself"), and the install steps below were followed
-> with such a build. It has not been run against the real game yet.
+> with such a build. The author uses it with the game at 2560x1440 in Simplified Chinese;
+> other set-ups are untested.
 
 ## Requirements
 

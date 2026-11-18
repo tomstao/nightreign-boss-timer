@@ -3,26 +3,28 @@
 Records how long each boss fight takes in ELDEN RING NIGHTREIGN by reading the boss health bar
 from the screen. Built to cost no measurable game FPS.
 
-> **Status: feature-complete for a first version, not yet tested against the real game.**
-> Recording, the overlay, the tray menu, the main window, region calibration, global hotkeys and
-> first-run setup all work, in English, 简体中文 and 繁體中文, and the program can be built as a
-> ready-to-run Windows folder. It has been checked against recorded fights played back in a
-> window. Still to do: a test session with the game itself, and the first published release.
-> See the [plan](docs/PLAN.md) for milestones.
+> **Status: early, and used by its author.** Recording, the overlay, the tray menu, the main
+> window, region calibration, global hotkeys and first-run setup all work, in English, 简体中文
+> and 繁體中文. The author uses it with the game at 2560x1440 in Simplified Chinese, and
+> detection is tested against 21 recorded fights at 1920x1080 and 2560x1440. Other resolutions,
+> ultrawide, and the game in English or Traditional Chinese are untested, and the cost in frame
+> rate has not been measured yet. No release has been published: see [Install](#install).
 
 ## What it does
 
 - Starts a timer when a boss health bar appears and stops it when the boss's HP reaches zero.
 - Saves every fight as a row in a CSV file that opens in Excel: date and time, table, boss
-  name, duration, and the boss HP % at the start and at the end.
-- Marks a fight `complete` when the defeat text appears, and `incomplete` when the bar
-  disappears without it.
+  name, duration, the boss HP % at the start and at the end, and your level.
+- Marks a fight `complete` when the boss bar empties or the defeat text appears, and
+  `incomplete` when the bar disappears while the boss still has HP.
 - Treats a return to a damaged boss as a new record that starts at that boss's current HP %.
 - Groups records into tables: `Arena` (Boss Arena mod training), `Normal` (regular game), or any
   name you add.
 - Shows the table, boss, timer and boss HP on a small overlay that never takes a click.
 - Has global hotkeys you can change, for pausing, switching tables and the other actions.
-- Reads boss names in English, 简体中文 and 繁體中文.
+- Reads boss names in English, 简体中文 and 繁體中文, knows 210 bosses in all three, and saves
+  and shows each name in the language you choose, whatever language the game is in.
+- Lists your records with filters, a best time per boss, and a way to delete rows.
 
 ## Install
 
@@ -178,6 +180,27 @@ other screen-reading Nightreign tools use. No third-party tool can be guaranteed
 anti-cheat software, so you use it at your own risk.
 
 This project is not affiliated with FromSoftware or Bandai Namco.
+
+## Use of AI
+
+Most of the code, tests and documentation in this repository were written with an AI coding
+assistant (Claude Code, by Anthropic), directed and reviewed by the maintainer. Commits made
+that way carry a `Co-Authored-By: Claude` line.
+
+What that means for you:
+
+- The maintainer decides what is built and merges every change, and every change has to pass
+  the tests. Detection is checked against recorded fights, as described in
+  [docs/observations.md](docs/observations.md).
+- AI-written code can be wrong in ways that look right. Where something has not been tested,
+  the documentation says so. Treat the tool as early software, and please report what
+  misbehaves.
+- No AI runs in the program itself, and nothing is sent anywhere. Boss names are read by a
+  small text recognition model that runs on your own PC.
+- The Chinese texts of the interface were written with AI and have not been reviewed by a
+  native speaker yet.
+
+As the [licence](LICENSE) says, the software comes with no warranty.
 
 ## Development
 

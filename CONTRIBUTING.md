@@ -18,6 +18,16 @@ working with footage.
 - **Performance is a feature.** A change to the capture or detection loop needs before and after
   numbers. See the performance budget in the plan.
 
+## Using AI tools
+
+You may use AI tools to write a contribution. Most of this project was written that way. The
+same rules apply as for any other change:
+
+- You are responsible for what you submit. Read it, run it, and be able to explain it.
+- Say in the pull request that AI was used, and what you tested yourself.
+- Do not submit code an AI reproduced from a project whose licence does not allow it here. The
+  rule about AGPL and GPL code above applies whoever typed it.
+
 ## Setup
 
 Install [uv](https://docs.astral.sh/uv/), then:
@@ -54,6 +64,26 @@ CI runs the same commands and must pass.
 - Say what changed and why in the pull request description, and how you tested it.
 - Add a line to `CHANGELOG.md` under "Unreleased" for anything a user would notice.
 - Update `docs/API.md` when you add or change a module or a public function. A test checks it.
+
+## How changes reach `main`
+
+`main` is protected. Nobody pushes to it directly, maintainers included.
+
+- Every change is a pull request, merged by squashing, so `main` has one commit per change.
+- The three CI checks must pass first: **Lint and format**, **Test (Python 3.11)** and
+  **Test (Python 3.13)**. The branch must be up to date with `main`.
+- Open discussions on the pull request must be resolved.
+- `main` cannot be force-pushed or deleted.
+
+A pull request from a fork runs CI without access to anything secret. The first one from a new
+contributor waits for a maintainer to allow the run.
+
+These rules, and the security settings (secret scanning with push protection, private
+vulnerability reports, Dependabot alerts), are set by `tools/protect_main.sh`. A maintainer
+runs it again after changing it.
+
+Workflow actions are pinned to an exact commit, with the version in a comment. Dependabot
+proposes the updates.
 
 ## Making a release
 

@@ -1,10 +1,11 @@
 # User guide
 
-> **No release has been published yet, and the tool has not been run against the real game.**
+> **No release has been published yet.**
 > Everything in this guide works today, in a program you build yourself or run from source (see
-> [INSTALL.md](INSTALL.md)), except what is marked as planned. It has been checked against
-> recorded fights played back in a window, not against the game itself: the game window's
-> title, borderless mode and the cost in frame rate are still to be confirmed. Where the program
+> [INSTALL.md](INSTALL.md)), except what is marked as planned. The author uses it with the game
+> at 2560x1440 in Simplified Chinese, and detection is tested against recorded fights. Other
+> resolutions, the game in English or Traditional Chinese, and the cost in frame rate are still
+> to be confirmed. Where the program
 > and this guide disagree, that is a bug: please report it.
 
 To install the tool, see [INSTALL.md](INSTALL.md).

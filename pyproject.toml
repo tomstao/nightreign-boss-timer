@@ -21,6 +21,11 @@ dependencies = [
     "pyside6-essentials>=6.8",
 ]
 
+[project.urls]
+Repository = "https://github.com/sunfish-LittleKight/nightreign-boss-timer"
+Issues = "https://github.com/sunfish-LittleKight/nightreign-boss-timer/issues"
+Changelog = "https://github.com/sunfish-LittleKight/nightreign-boss-timer/blob/main/CHANGELOG.md"
+
 [dependency-groups]
 dev = [
     "pre-commit>=4.0",
