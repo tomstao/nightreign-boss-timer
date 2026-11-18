@@ -267,7 +267,7 @@ A short sequence shown once, skippable at every step:
 | Overlay options | show or hide, and position by dragging. Not built: only during fights, opacity, scale, show HP, show best time |
 | Overlay over a calibrated region | not prevented. It is left out of captures instead, on Windows 10 version 2004 and later |
 | Main window, status bar | built as designed |
-| Records page | filters, search, sorting, summary, open in Excel and folder. delete selected rows. A character column, **Set character** for the selected rows and **Delete incomplete** for the list shown, which the design did not have. Not built: the other row actions (move, correct the boss name), and the saved image of an unknown name |
+| Records page | filters, search, sorting, summary, open in Excel and folder. delete selected rows. A character column, **Set character** for the selected rows and **Delete incomplete** for the list shown, which the design did not have. Rows are chosen with a tick box per row and one in the heading for all rows shown, with the number chosen under the list. Not built: the other row actions (move, correct the boss name), and the saved image of an unknown name |
 | Tables page | built. Names are typed into a field on the page instead of a dialog. Renaming does not rename existing rows yet. Table hotkeys are set on the Hotkeys page |
 | Hotkeys page | built for the keyboard. The shortcut is pressed into a field below the list instead of into the cell. Not built: the Controller column |
 | Regions page | built, with both regions previewed at once instead of a Preview button per row. A changed window size is pointed out but does not pause tracking |

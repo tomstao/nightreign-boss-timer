@@ -472,12 +472,29 @@ The Records page: every saved fight with filters, sorting and a per-boss summary
 |---|---|
 | `RecordsPage` | The page. Reads the records file on `refresh()`. |
 | `RecordsPage.shown_records()` | The records that pass the filters as they are set now. |
-| `RecordsPage.selected_records()` | The records of the selected rows. |
+| `RecordsPage.selected_records()` | The records of the ticked rows. Ticks are cleared when a filter changes and kept when the file is read again. |
 | `RecordsPage.delete_incomplete()` | Delete every incomplete record among those shown, after asking with their number. |
 | `RecordsPage.filtered()` | True while a filter or the search box hides some records. |
 | `RecordsPage.set_character(character)` | Give the selected records a character, by its English name. Empty takes it away. The `character_button` and the right-click menu both open the list that calls this. |
 | `RecordsPage.delete_selected()` | Delete the selected records, after asking. `ask` in the constructor replaces the question window. |
-| `COLUMNS` | The table's columns, in order. |
+| `COLUMNS` | The table's columns, in order. The first, `selected`, holds the tick boxes. |
+
+### `nightreign_boss_timer.ui.tick_table`
+
+A table with a tick box in front of every row and one in the header for all rows. A ticked row
+is a selected row, so Ctrl and Shift with a click and Ctrl+A keep working.
+
+| Name | What it is |
+|---|---|
+| `TickTable(columns)` | The table. The page fills the rows; the item in column `TICK_COLUMN` of a row is where its tick is drawn. |
+| `TickTable.ticked_rows()` | The rows that are ticked, top to bottom. |
+| `TickTable.tick_rows(rows)` | Tick exactly these rows. |
+| `TickTable.toggle_all()` | Tick every row, or untick them all if every row is ticked. What a click on the header box does. |
+| `TickTable.all_state()` | What the header box shows: all, some or none. |
+| `TickTable.show_ticks()` | Make every box match the selection. Call it after filling the rows. |
+| `TickTable.ticks_changed` | Signal: the set of ticked rows is different. |
+| `TickHeader` | The header that draws the box for all rows. `set_state(state)` changes it, `clicked` reports a click on it. |
+| `TICK_COLUMN` | The column of the tick boxes: the first. |
 
 ### `nightreign_boss_timer.ui.regions_page`
 

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from dataclasses import replace
 
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor, QKeySequence, QShortcut
@@ -15,7 +16,6 @@ from PySide6.QtWidgets import (
     QMenu,
     QMessageBox,
     QPushButton,
-    QTableWidget,
     QTableWidgetItem,
     QVBoxLayout,
     QWidget,
@@ -35,8 +35,11 @@ from nightreign_boss_timer.record_view import (
 from nightreign_boss_timer.records import FightRecord, Status, format_duration
 from nightreign_boss_timer.ui.controller import Controller
 from nightreign_boss_timer.ui.pages import Page
+from nightreign_boss_timer.ui.tick_table import TICK_COLUMN, TickTable
 
+# The first column holds the tick box of a row and has no heading of its own.
 COLUMNS = (
+    "selected",
     "started_at",
     "table",
     "boss",
@@ -56,6 +59,11 @@ def _ask(parent: QWidget, title: str, question: str) -> bool:
     buttons = QMessageBox.StandardButton
     answer = QMessageBox.question(parent, title, question, buttons.Yes | buttons.No, buttons.No)
     return answer == buttons.Yes
+
+
+def _identity(record: FightRecord) -> FightRecord:
+    """What stays the same about a record when its character is changed by hand."""
+    return replace(record, character="")
 
 
 class _Cell(QTableWidgetItem):
@@ -100,13 +108,12 @@ class RecordsPage(Page):
         filters.addWidget(self.search, 1)
         self.search.textChanged.connect(self._show)
 
-        self.table = QTableWidget(0, len(COLUMNS))
-        self.table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        self.table = TickTable(len(COLUMNS))
         self.table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         self.table.verticalHeader().setVisible(False)
         self.table.horizontalHeader().setStretchLastSection(True)
         self.table.setSortingEnabled(True)
-        self.table.itemSelectionChanged.connect(self._selection_changed)
+        self.table.ticks_changed.connect(self._selection_changed)
         self.table.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.table.customContextMenuRequested.connect(self._menu)
         delete_key = QShortcut(QKeySequence(QKeySequence.StandardKey.Delete), self.table)
@@ -154,16 +161,27 @@ class RecordsPage(Page):
 
     def selected_records(self) -> list[FightRecord]:
         """The records of the rows that are selected now."""
-        rows = sorted({index.row() for index in self.table.selectedIndexes()})
-        return [self._shown[self.table.item(row, 0).index] for row in rows]  # type: ignore[union-attr]
+        return [self._record_at(row) for row in self.table.ticked_rows()]
+
+    def _record_at(self, row: int) -> FightRecord:
+        """The record a row of the table shows, wherever sorting has put it."""
+        return self._shown[self.table.item(row, TICK_COLUMN).index]  # type: ignore[union-attr]
 
     def _selection_changed(self) -> None:
-        selected = bool(self.table.selectedIndexes())
-        self.delete_button.setEnabled(selected)
-        self.character_button.setEnabled(selected)
+        """Say how many rows are ticked, on the count line and on the delete button."""
+        translate = self.controller.translate
+        shown, selected = len(self._shown), len(self.table.ticked_rows())
+        self.delete_button.setText(translate("records.delete", count=selected))
+        self.delete_button.setEnabled(selected > 0)
+        self.character_button.setEnabled(selected > 0)
+        if selected:
+            text = translate("records.count_selected", count=shown, selected=selected)
+        else:
+            text = translate("records.count", count=shown)
+        self.count.setText(text)
 
     def _menu(self, position: object) -> None:
-        if not self.table.selectedIndexes():
+        if not self.table.ticked_rows():
             return
         menu = QMenu(self.table)
         menu.addMenu(self.character_menu)
@@ -177,7 +195,7 @@ class RecordsPage(Page):
             return
         translate = self.controller.translate
         question = translate("records.delete_ask", count=len(records))
-        if not self._ask(self, translate("records.delete"), question):
+        if not self._ask(self, translate("records.delete", count=len(records)), question):
             return
         error = self.controller.delete_records(records)
         self.refresh()
@@ -244,8 +262,13 @@ class RecordsPage(Page):
         box.blockSignals(False)
 
     def refresh(self) -> None:
-        """Read the records file again and redraw everything in the current language."""
+        """Read the records file again and redraw everything in the current language.
+
+        Rows that were ticked stay ticked if their records are still shown, so a fight that is
+        saved while the page is open does not undo a selection.
+        """
         controller, translate = self.controller, self.controller.translate
+        ticked = {_identity(record) for record in self.selected_records()}
         self._records = controller.store.read_all()
         tables, bosses = names_in(self._records)
         # Tables from the settings come first, in their order, then any that only records have.
@@ -262,15 +285,17 @@ class RecordsPage(Page):
             label.setText(translate(f"records.column.{key}"))
         self.search.setPlaceholderText(translate("records.search"))
         self.table.setHorizontalHeaderLabels(
-            [translate(f"records.column.{column}") for column in COLUMNS]
+            ["", *(translate(f"records.column.{column}") for column in COLUMNS[1:])]
         )
-        self.delete_button.setText(translate("records.delete"))
+        self.table.horizontalHeaderItem(TICK_COLUMN).setToolTip(translate("records.select_all"))
         self.character_button.setText(translate("records.set_character"))
         self._fill_character_menu()
         self.message.setText("")
         self.open_file.setText(translate("records.open_file"))
         self.open_folder.setText(translate("records.open_folder"))
         self._show()
+        rows = range(self.table.rowCount())
+        self.table.tick_rows([row for row in rows if _identity(self._record_at(row)) in ticked])
 
     def shown_records(self) -> list[FightRecord]:
         return filter_records(
@@ -282,7 +307,11 @@ class RecordsPage(Page):
         )
 
     def _show(self) -> None:
-        """Fill the table and the summary from the records already read, for the filters as set."""
+        """Fill the table and the summary from the records already read, for the filters as set.
+
+        No row is ticked afterwards: a filter may have hidden what was ticked, and nothing that
+        cannot be seen is to be deleted.
+        """
         translate, language = self.controller.translate, self.controller.settings.ui_language
         records = self._shown = self.shown_records()
         self.table.clearSelection()  # the rows are about to show other records
@@ -290,6 +319,7 @@ class RecordsPage(Page):
         self.table.setRowCount(len(records))
         for row, record in enumerate(records):
             cells = (
+                _Cell("", 0),  # the tick box
                 _Cell(f"{record.started_at:%Y-%m-%d %H:%M:%S}", record.started_at),
                 _Cell(record.table, record.table.casefold()),
                 _Cell(self._boss_name(record), boss_key(record).casefold()),
@@ -304,15 +334,16 @@ class RecordsPage(Page):
                 _Cell(f"{record.end_hp_pct}%", record.end_hp_pct),
                 _Cell(format_duration(record.duration_s), record.duration_s),
             )
-            cells[0].index = row  # which record this row shows, wherever sorting puts it
+            cells[TICK_COLUMN].index = row  # which record this row shows, wherever sorting puts it
+            cells[TICK_COLUMN].setCheckState(Qt.CheckState.Unchecked)
             for column, cell in enumerate(cells):
                 if record.status is Status.INCOMPLETE:
                     cell.setForeground(_INCOMPLETE)
                 self.table.setItem(row, column, cell)
         self.table.setSortingEnabled(True)
-        self.table.sortByColumn(0, Qt.SortOrder.DescendingOrder)
+        self.table.sortByColumn(COLUMNS.index("started_at"), Qt.SortOrder.DescendingOrder)
         self.table.resizeColumnsToContents()
-        self.count.setText(translate("records.count", count=len(records)))
+        self.table.show_ticks()  # also fills in the count line and the delete button
         unfinished = len(incompletes(records))
         self.delete_incomplete_button.setText(
             translate("records.delete_incomplete", count=unfinished)

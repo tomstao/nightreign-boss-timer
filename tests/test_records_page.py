@@ -48,6 +48,7 @@ def test_lists_every_record_newest_first(application: "QApplication", tmp_path: 
     _, page = make(tmp_path)
     headers = [page.table.horizontalHeaderItem(i).text() for i in range(page.table.columnCount())]
     assert headers == [
+        "",  # the tick boxes
         "Date and time",
         "Table",
         "Boss",
@@ -189,7 +190,7 @@ def make_asking(folder: Path, answer: bool) -> tuple["Recorder", "RecordsPage", 
 
 def test_delete_needs_a_selection(application: "QApplication", tmp_path: Path) -> None:
     recorder, page, asked = make_asking(tmp_path, answer=True)
-    assert page.delete_button.text() == "Delete selected"
+    assert page.delete_button.text() == "Delete selected (0)"
     assert not page.delete_button.isEnabled()
     page.delete_selected()
     assert asked == []
@@ -438,3 +439,109 @@ def test_delete_incomplete_is_translated(
 ) -> None:
     _, page = make(tmp_path, language)
     assert page.delete_incomplete_button.text() == text
+
+
+def ticked(page: "RecordsPage") -> int:
+    rows = range(page.table.rowCount())
+    return sum(page.table.item(row, 0).checkState() is Qt.CheckState.Checked for row in rows)
+
+
+def test_count_line_and_delete_button_say_how_many_are_ticked(
+    application: "QApplication", tmp_path: Path
+) -> None:
+    _, page, _ = make_asking(tmp_path, answer=False)
+    assert page.count.text() == "6 records"
+    assert page.delete_button.text() == "Delete selected (0)"
+    assert ticked(page) == 0
+
+    page.table.tick_rows([0, 2])
+
+    assert page.count.text() == "6 records, 2 selected"
+    assert page.delete_button.text() == "Delete selected (2)"
+    assert page.delete_button.isEnabled()
+    assert ticked(page) == 2
+    assert len(page.selected_records()) == 2
+    assert page.table.horizontalHeaderItem(0).toolTip() == "Tick or untick every record shown"
+
+
+def test_ticking_all_takes_only_the_records_the_filter_shows(
+    application: "QApplication", tmp_path: Path
+) -> None:
+    recorder, page, asked = make_asking(tmp_path, answer=True)
+    choose(page.table_filter, "Arena")
+
+    page.table.toggle_all()
+
+    assert page.count.text() == "4 records, 4 selected"
+    page.delete_selected()
+    assert asked == ["Delete the selected records (4)? This cannot be undone."]
+    assert [record.table for record in recorder.store.read_all()] == ["Normal", "No-hit practice"]
+    assert page.count.text() == "0 records"
+
+
+def test_changing_a_filter_or_the_search_unticks_everything(
+    application: "QApplication", tmp_path: Path
+) -> None:
+    _, page, _ = make_asking(tmp_path, answer=True)
+    page.table.toggle_all()
+    assert ticked(page) == 6
+
+    choose(page.status_filter, "complete")
+
+    assert ticked(page) == 0
+    assert page.selected_records() == []
+    assert page.count.text() == "4 records"
+    assert not page.delete_button.isEnabled()
+    page.table.toggle_all()
+    page.search.setText("tree")
+    assert ticked(page) == 0
+
+
+def test_ticks_survive_a_new_fight_and_a_change_of_character(
+    application: "QApplication", tmp_path: Path
+) -> None:
+    recorder, page, _ = make_asking(tmp_path, answer=True)
+    page.table.sortByColumn(at("duration"), Qt.SortOrder.AscendingOrder)
+    page.table.tick_rows([0, 1])
+    chosen = page.selected_records()
+
+    recorder.store.append(fight(minute=45, boss="Night Aspect"))
+    page.refresh()  # what a fight saved while the page is open leads to
+
+    assert page.table.rowCount() == len(RECORDS) + 1
+    assert sorted(page.selected_records(), key=str) == sorted(chosen, key=str)
+    assert page.count.text() == "7 records, 2 selected"
+
+    pick_character(page, "Raider")
+
+    again = page.selected_records()
+    assert [record.character for record in again] == ["Raider", "Raider"]
+    assert {record.started_at for record in again} == {record.started_at for record in chosen}
+    assert ticked(page) == 2
+
+
+def test_ticks_do_not_come_back_for_records_that_were_deleted(
+    application: "QApplication", tmp_path: Path
+) -> None:
+    _, page, _ = make_asking(tmp_path, answer=True)
+    page.table.tick_rows([0, 1, 2])
+    page.delete_selected()
+    assert page.table.rowCount() == len(RECORDS) - 3
+    assert ticked(page) == 0
+    assert page.delete_button.text() == "Delete selected (0)"
+
+
+@pytest.mark.parametrize(
+    ("language", "count", "button"),
+    [
+        ("zh_CN", "共 6 条记录，已选 6 条", "删除所选（6）"),
+        ("zh_TW", "共 6 筆記錄，已選 6 筆", "刪除所選（6）"),
+    ],
+)
+def test_selection_texts_are_translated(
+    application: "QApplication", tmp_path: Path, language: str, count: str, button: str
+) -> None:
+    _, page = make(tmp_path, language)
+    page.table.toggle_all()
+    assert page.count.text() == count
+    assert page.delete_button.text() == button
