@@ -17,7 +17,7 @@ from nightreign_boss_timer import settings as settings_file
 from nightreign_boss_timer.engine import State
 from nightreign_boss_timer.i18n import Translator
 from nightreign_boss_timer.records import RecordStore
-from nightreign_boss_timer.settings import Settings
+from nightreign_boss_timer.settings import Settings, TableError
 
 
 def _open_with_windows(path: Path) -> None:
@@ -99,6 +99,31 @@ class Controller(QObject):
         self.save()
         self.notice.emit(self.translate("overlay.table_switched", table=self.settings.active_table))
         self.changed.emit()
+
+    def _change_tables(self, change: Callable[[], object]) -> str:
+        """Make a change to the list of tables. Returns why it was refused, or nothing."""
+        active = self.settings.active_table
+        try:
+            change()
+        except TableError as error:
+            return self.translate(f"tables.error.{error.reason}", name=error.name)
+        self.save()
+        if self.settings.active_table != active:
+            self.notice.emit(
+                self.translate("overlay.table_switched", table=self.settings.active_table)
+            )
+        self.changed.emit()
+        return ""
+
+    def add_table(self, name: str) -> str:
+        """Add a table. Returns an error message in the user's language, or nothing if it worked."""
+        return self._change_tables(lambda: self.settings.add_table(name))
+
+    def rename_table(self, old: str, new: str) -> str:
+        return self._change_tables(lambda: self.settings.rename_table(old, new))
+
+    def delete_table(self, name: str) -> str:
+        return self._change_tables(lambda: self.settings.delete_table(name))
 
     # --- records --------------------------------------------------------------------------------
 

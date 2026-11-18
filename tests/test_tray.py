@@ -59,7 +59,8 @@ class Harness:
         return next(action for action in self.tray.menu.actions() if action.text() == text)
 
     def tables(self) -> list["QAction"]:
-        return self.tray.menu.actions()[1].menu().actions()
+        """The entries of the table submenu that stand for a table."""
+        return [a for a in self.tray.menu.actions()[1].menu().actions() if a.isCheckable()]
 
 
 def test_menu_lists_everything_in_order(application: "QApplication", tmp_path: Path) -> None:
@@ -160,9 +161,10 @@ def test_clicking_the_icon_or_the_menu_entry_asks_for_the_main_window(
     harness.controller.window_requested.connect(asked.append)
     harness.entry("Open main window").trigger()
     harness.entry("Open records").trigger()
+    harness.tray.menu.actions()[1].menu().actions()[-1].trigger()  # Manage tables...
     harness.tray.icon.activated.emit(QSystemTrayIcon.ActivationReason.Trigger)
     harness.tray.icon.activated.emit(QSystemTrayIcon.ActivationReason.Context)  # a right click
-    assert asked == ["", "records", ""]
+    assert asked == ["", "records", "tables", ""]
 
 
 def test_calibrate_and_quit(application: "QApplication", tmp_path: Path) -> None:

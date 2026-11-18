@@ -30,7 +30,16 @@ DEFAULT_HOTKEYS: dict[str, str] = {
 
 
 class TableError(ValueError):
-    """A table change that is not allowed. The message says why, in plain words."""
+    """A table change that is not allowed.
+
+    The message says why in plain English. ``reason`` is ``missing``, ``empty``, ``duplicate``
+    or ``builtin``, and ``name`` the table it is about, so the UI can say it in its own language.
+    """
+
+    def __init__(self, message: str, reason: str, name: str = "") -> None:
+        super().__init__(message)
+        self.reason = reason
+        self.name = name
 
 
 @dataclass(slots=True)
@@ -75,14 +84,14 @@ class Settings:
         for table in self.tables:
             if table.name == name:
                 return table
-        raise TableError(f'There is no table named "{name}".')
+        raise TableError(f'There is no table named "{name}".', "missing", name)
 
     def _check_new_name(self, name: str) -> str:
         name = name.strip()
         if not name:
-            raise TableError("A table needs a name.")
+            raise TableError("A table needs a name.", "empty")
         if name.casefold() in (existing.casefold() for existing in self.table_names()):
-            raise TableError(f'A table named "{name}" already exists.')
+            raise TableError(f'A table named "{name}" already exists.', "duplicate", name)
         return name
 
     def add_table(self, name: str) -> Table:
@@ -101,7 +110,9 @@ class Settings:
     def delete_table(self, name: str) -> None:
         table = self._find(name)
         if table.builtin:
-            raise TableError(f'"{name}" is a built-in table. It can be renamed but not deleted.')
+            raise TableError(
+                f'"{name}" is a built-in table. It can be renamed but not deleted.', "builtin", name
+            )
         self.tables.remove(table)
         if self.active_table == name:
             self.active_table = self.tables[0].name

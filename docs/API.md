@@ -185,7 +185,7 @@ The user's settings, kept in one JSON file. Loading never fails.
 | `Settings.next_table()` | Make the next table active, wrapping around. |
 | `Settings.table_names()` | Names in display order. |
 | `Table` | `name`, `builtin`, `hotkey`. |
-| `TableError` | A table change that is not allowed. |
+| `TableError` | A table change that is not allowed. Carries `reason` (`missing`, `empty`, `duplicate`, `builtin`) and `name`. |
 | `load(path)` | Read the file. Missing or damaged files give defaults. |
 | `save(settings, path)` | Write the file safely. |
 | `default_settings_path()` | `%APPDATA%\nightreign-boss-timer\settings.json`. |
@@ -259,6 +259,7 @@ Every action the user can take, shared by the tray, the windows and the hotkeys.
 | `Controller.set_tracking(on)` | Pause or resume. Also `toggle_tracking()`. |
 | `Controller.set_overlay_visible(on)` | Show or hide the overlay. Also `toggle_overlay()`. |
 | `Controller.set_table(name)` | Switch the active table and save. Also `next_table()`. |
+| `Controller.add_table(name)` | Add a table. Returns an error message in the user's language, or an empty string. Also `rename_table(old, new)` and `delete_table(name)`. |
 | `Controller.open_records_file()` | Open `records.csv` in the program Windows uses for it. |
 | `Controller.open_records_folder()` | Open the folder that holds it. |
 | `Controller.calibrate()` | Ask for the calibration window. |
@@ -334,6 +335,17 @@ The Records page: every saved fight with filters, sorting and a per-boss summary
 | `RecordsPage` | The page. Reads the records file on `refresh()`. |
 | `RecordsPage.shown_records()` | The records that pass the filters as they are set now. |
 | `COLUMNS` | The table's columns, in order. |
+
+### `nightreign_boss_timer.ui.tables_page`
+
+The Tables page: add, rename, delete, and choose the active table.
+
+| Name | What it is |
+|---|---|
+| `TablesPage` | The page. |
+| `TablesPage.selected()` | The name of the selected table, or an empty string. |
+| `TablesPage.add()` | Add a table named by the text field. Also `rename()`, `delete()` and `make_active()` for the selected table. |
+| `ACTIVE_MARK` | The mark shown beside the active table. |
 
 ### `nightreign_boss_timer.ui.region_canvas`
 

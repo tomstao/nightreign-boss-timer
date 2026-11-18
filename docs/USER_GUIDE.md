@@ -108,7 +108,7 @@ stop the tool: it keeps running in the tray, and **Quit** in the tray menu ends 
 The bar at the bottom shows whether tracking is on, the active table, whether the game was
 found and whether the regions are calibrated. Click **Tracking on** to pause or resume.
 
-So far the window has the **Records** and **About** pages. Tables, Hotkeys, Regions and
+So far the window has the **Records**, **Tables** and **About** pages. Hotkeys, Regions and
 Settings are being added.
 
 ## The overlay
@@ -171,10 +171,16 @@ it) is planned; for now edit the file in Excel with the tool closed.
 A table is a name you give to a group of records, so that practice and real runs stay apart.
 
 - Two tables exist from the start: **Arena** and **Normal**.
-- Add your own under **Tables** in the main window, for example `No-hit practice`.
+- Add your own under **Tables** in the main window, for example `No-hit practice`: type the
+  name and choose **New table**. To rename a table, select it, type the new name and choose
+  **Rename**. **Tables** is also reached from the tray menu: **Table**, **Manage tables**.
+- Arena and Normal can be renamed but not deleted, so there is always somewhere to record.
+- Records keep the table name they were saved with. Renaming or deleting a table does not
+  change rows already in the file (renaming them along with the table is planned).
 - One table is active at a time. Every fight is saved with the table that was active when it
   began.
-- Switch tables from the tray menu (**Table**) or with a hotkey. The overlay always shows the
+- Switch tables from the tray menu (**Table**), on the **Tables** page (**Make active**, or
+  double-click a table) or with a hotkey. The overlay always shows the
   active one, and confirms a switch for a few seconds. A switch during a fight applies from the
   next fight on.
 

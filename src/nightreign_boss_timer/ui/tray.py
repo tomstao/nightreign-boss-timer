@@ -96,6 +96,8 @@ class Tray:
             action.triggered.connect(lambda _checked, name=name: controller.set_table(name))
             group.addAction(action)
             tables.addAction(action)
+        tables.addSeparator()
+        tables.addAction(translate("tray.manage_tables"), lambda: controller.show_window("tables"))
 
         menu.addSeparator()
         self._check(
