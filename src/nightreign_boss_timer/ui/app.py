@@ -9,8 +9,12 @@ second, so it does not need a thread of its own.
 from __future__ import annotations
 
 import argparse
+import logging
+import os
 import sys
+import tempfile
 import time
+from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
 import numpy as np
@@ -18,6 +22,7 @@ from numpy.typing import NDArray
 from PySide6.QtCore import QTimer
 from PySide6.QtWidgets import QApplication
 
+from nightreign_boss_timer import __version__
 from nightreign_boss_timer import settings as settings_file
 from nightreign_boss_timer.capture import ScreenGrabber, WindowsScreen, enable_dpi_awareness
 from nightreign_boss_timer.engine import (
@@ -40,10 +45,19 @@ from nightreign_boss_timer.ui.presenter import best_time, overlay_text
 from nightreign_boss_timer.ui.setup_window import SetupWindow
 from nightreign_boss_timer.ui.tray import IconState, Tray
 
+log = logging.getLogger("nightreign_boss_timer")
+
 
 class App:
-    def __init__(self, application: QApplication, title: str, records: Path | None) -> None:
-        self.settings = settings_file.load()
+    def __init__(
+        self,
+        application: QApplication,
+        title: str,
+        records: Path | None,
+        settings_path: Path | None = None,
+    ) -> None:
+        """``settings_path`` is for the self-test, which must not touch the real settings."""
+        self.settings = settings_file.load(settings_path)
         self.translate = Translator(self.settings.ui_language)
         self.store = RecordStore(records or records_path(self.settings))
         self.screen = WindowsScreen()
@@ -51,9 +65,13 @@ class App:
             reader = NameReader()
         except FileNotFoundError:
             reader = None  # fights are still timed, and the boss is recorded as unknown
+            log.warning("Text model not found: boss names will be recorded as unknown")
+        self.reader = reader
         self.title = title
         self.engine = Engine(self.settings, self.screen, self.store, reader, title=title)
-        self.controller = Controller(self.settings, self.translate, self.store)
+        self.controller = Controller(
+            self.settings, self.translate, self.store, settings_path=settings_path
+        )
         self.calibration = CalibrationWindow(
             self.settings, self.translate, self._take_picture, self.controller.save
         )
@@ -180,18 +198,94 @@ class App:
         self.tray.icon.hide()
 
 
+def log_path() -> Path:
+    base = os.environ.get("LOCALAPPDATA") or str(Path.home() / ".cache")
+    return Path(base) / "nightreign-boss-timer" / "logs" / "app.log"
+
+
+def start_logging() -> None:
+    """Write warnings and crashes to a small log file.
+
+    The packaged program has no console, so without this an error would leave no trace.
+    """
+    path = log_path()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    handler = RotatingFileHandler(path, maxBytes=500_000, backupCount=1, encoding="utf-8")
+    handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(message)s"))
+    log.addHandler(handler)
+    log.setLevel(logging.INFO)
+
+    def crashed(kind: type[BaseException], error: BaseException, trace: object) -> None:
+        log.critical("Unhandled error", exc_info=(kind, error, trace))  # type: ignore[arg-type]
+        sys.__excepthook__(kind, error, trace)  # type: ignore[arg-type]
+
+    sys.excepthook = crashed
+
+
+def self_test(application: QApplication) -> int:
+    """Start everything for a moment and say whether it works. Used on a freshly built program.
+
+    It uses a temporary folder for settings and records, shows nothing that needs an answer,
+    and returns 0 only if every part came up. In a packaged program the text model must be
+    there too, because it is packed in.
+    """
+    with tempfile.TemporaryDirectory() as folder:
+        app = App(
+            application,
+            "nightreign-boss-timer self-test: no such window",
+            Path(folder) / "records.csv",
+            settings_path=Path(folder) / "settings.json",
+        )
+        app.setup.close()
+        problems = []
+        for language in ("en", "zh_CN", "zh_TW"):
+            app.controller.set_language(language)
+            if app.translate("tray.quit") == "tray.quit":
+                problems.append(f"no texts for {language}")
+        if app.reader is None and getattr(sys, "frozen", False):
+            problems.append("the text model is not packed in")
+        if not app.tray.menu.actions():
+            problems.append("the tray menu is empty")
+        app.controller.show_window("records")
+        QTimer.singleShot(1500, application.quit)
+        application.exec()
+        failed = sorted(app.controller.failed_hotkeys)
+        del app
+    for problem in problems:
+        log.error("Self-test: %s", problem)
+    log.info("Self-test %s (hotkeys refused: %s)", "failed" if problems else "passed", failed)
+    return 1 if problems else 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(prog="nightreign-boss-timer")
     parser.add_argument("--title", default=GAME_TITLE, help="title of the game window")
     parser.add_argument("--records", type=Path, default=None, help="path of the records CSV")
+    parser.add_argument(
+        "--settings",
+        type=Path,
+        default=None,
+        help="path of the settings file, instead of the usual one",
+    )
+    parser.add_argument(
+        "--self-test", action="store_true", help="start, check that everything loads, and exit"
+    )
     args = parser.parse_args()
 
+    start_logging()
+    log.info("Starting version %s", __version__)
     enable_dpi_awareness()
     application = QApplication(sys.argv[:1])
     application.setQuitOnLastWindowClosed(False)
-    app = App(application, args.title, args.records)
-    code = application.exec()
-    del app
+    try:
+        if args.self_test:
+            return self_test(application)
+        app = App(application, args.title, args.records, args.settings)
+        code = application.exec()
+        del app
+    except Exception:
+        log.exception("Could not start")
+        return 1
     return code
 
 

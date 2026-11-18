@@ -11,6 +11,7 @@ The model file is not part of the repository. ``tools/fetch_model.py`` downloads
 from __future__ import annotations
 
 import os
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -29,11 +30,24 @@ _INPUT_HEIGHT = 48
 _MAX_INPUT_WIDTH = 960
 
 
+def bundled_model_path() -> Path | None:
+    """The model packed into the packaged program, or None when running from source."""
+    bundle = getattr(sys, "_MEIPASS", None)  # set by PyInstaller in a packaged program
+    return Path(bundle) / "models" / MODEL_NAME if bundle else None
+
+
 def default_model_path() -> Path:
-    """Where the model is kept: ``NBT_MODEL_DIR`` if set, else the user's local app data."""
+    """Where the model is kept.
+
+    ``NBT_MODEL_DIR`` if set, else the copy packed into the packaged program, else the
+    user's local app data, where ``tools/fetch_model.py`` saves it.
+    """
     folder = os.environ.get("NBT_MODEL_DIR")
     if folder:
         return Path(folder) / MODEL_NAME
+    bundled = bundled_model_path()
+    if bundled is not None and bundled.exists():
+        return bundled
     base = os.environ.get("LOCALAPPDATA") or str(Path.home() / ".cache")
     return Path(base) / "nightreign-boss-timer" / "models" / MODEL_NAME
 

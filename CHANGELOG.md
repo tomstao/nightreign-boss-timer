@@ -41,3 +41,5 @@ All notable changes are listed here. The format follows
 - Hotkeys page: change any shortcut by pressing the keys, with conflict checks and a mark on shortcuts Windows refuses.
 - The overlay can be dragged to a new place while the main window is open. The place is remembered.
 - First-run setup guide: language, game check and calibration, table, records folder and hotkeys. Shown once, and again on request from the Settings page.
+- A packaged Windows program: `tools/build_exe.py` builds a folder with `nightreign-boss-timer.exe`, its own Python and the text model, and a ZIP of it.
+- A log file at `%LOCALAPPDATA%\nightreign-boss-timer\logs\app.log`.

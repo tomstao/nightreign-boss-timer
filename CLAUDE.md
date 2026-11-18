@@ -29,6 +29,7 @@ uv run ruff format --check .
 uv run pytest
 uv run python -m nightreign_boss_timer.ui.app    # overlay and tray icon
 uv run python -m nightreign_boss_timer           # command-line version
+uv run python tools/build_exe.py                 # the packaged program and its ZIP, in dist/
 ```
 
 ## Conventions

@@ -76,7 +76,8 @@ Reads one line of text, the boss name, with a small ONNX model on the CPU.
 | `NameReader(model_path)` | Loads the model. Raises `FileNotFoundError` if it was not downloaded. |
 | `NameReader.read(region)` | Returns a `TextReading`. |
 | `TextReading` | `text` and `confidence`. |
-| `default_model_path()` | Where the model file is kept. `NBT_MODEL_DIR` overrides the folder. |
+| `default_model_path()` | Where the model file is: `NBT_MODEL_DIR` if set, else the copy packed into the packaged program, else the user's local app data. |
+| `bundled_model_path()` | The copy packed into the packaged program, or `None` when running from source. |
 | `MODEL_URL` | Where `tools/fetch_model.py` downloads it from. |
 | `MODEL_SHA256` | The checksum the download must match. |
 
@@ -271,8 +272,11 @@ Starts everything: `python -m nightreign_boss_timer.ui.app`.
 
 | Name | What it is |
 |---|---|
-| `App` | Builds the engine, controller, overlay, tray and calibration window, and drives the engine with a timer. |
-| `main()` | Parses `--title` and `--records` and runs the Qt event loop. |
+| `App` | Builds the engine, controller, overlay, tray and windows, and drives the engine with a timer. `settings_path` replaces the usual settings file. |
+| `main()` | Parses `--title`, `--records`, `--settings` and `--self-test`, starts logging and runs the Qt event loop. |
+| `self_test(application)` | Start everything for a moment against temporary files and return 0 if every part came up. Run on each freshly built program. |
+| `start_logging()` | Write warnings and crashes to `log_path()`. The packaged program has no console. |
+| `log_path()` | `%LOCALAPPDATA%\nightreign-boss-timer\logs\app.log`. |
 
 ### `nightreign_boss_timer.ui.controller`
 
@@ -492,5 +496,7 @@ Scripts outside the package, run with `uv run python <path>`.
 |---|---|
 | `tools/fetch_model.py` | Downloads the text recognition model and checks its checksum. |
 | `tools/bench_capture.py` | Measures the time and CPU cost of capture and detection. |
+| `tools/build_exe.py` | Builds the Windows program with PyInstaller, collects licence files, runs its self-test and packs the release ZIP. |
+| `packaging/launcher.py` | The file the packaged program starts with. |
 | `.claude/skills/check-ui/standin_game.py` | Shows a screenshot in a window as a stand-in for the game. |
 | `.claude/skills/detector-footage/cut_regions.py` | Cuts test regions out of full game frames. |
