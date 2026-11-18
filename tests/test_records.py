@@ -233,8 +233,8 @@ def test_second_and_third_names_are_saved_and_read_back(tmp_path: Path) -> None:
     )
     store.append(record)
     lines = store.path.read_text(encoding="utf-8-sig").splitlines()
-    assert lines[0].endswith(",level,boss_2,language_2,boss_3,language_3")
-    assert lines[1].endswith(",黄金河马,zh_CN,黃金河馬,zh_TW")
+    assert lines[0].endswith(",level,boss_2,language_2,boss_3,language_3,character")
+    assert lines[1].endswith(",黄金河马,zh_CN,黃金河馬,zh_TW,")
     assert store.read_all() == [record]
 
 
@@ -276,3 +276,33 @@ def test_file_from_before_the_newer_columns_gets_them_on_the_next_save(tmp_path:
     assert all(line.count(",") == len(records.COLUMNS) - 1 for line in lines)
     assert store.read_all() == [make_record(), make_record(boss="New", level=7)]
     assert store.remove([make_record()]) == 1
+
+
+def test_character_is_saved_and_read_back(tmp_path: Path) -> None:
+    store = RecordStore(tmp_path / "records.csv")
+    played, unset = make_record(character="追踪者"), make_record(boss="Second")
+    store.append(played)
+    store.append(unset)
+    lines = store.path.read_text(encoding="utf-8-sig").splitlines()
+    assert lines[0].endswith(",language_3,character")
+    assert lines[1].endswith(",追踪者")
+    assert lines[2].endswith(",")
+    assert store.read_all() == [played, unset]
+
+
+def test_file_from_before_the_character_column_gets_it_left_empty(tmp_path: Path) -> None:
+    path = tmp_path / "records.csv"
+    old_header = ",".join(records.COLUMNS[:-1])  # release 0.1.0 had every column but the last
+    old_row = ",".join(make_record(level=7).to_row()[:-1])
+    path.write_text(f"{old_header}\n{old_row}\n", encoding="utf-8-sig")
+    store = RecordStore(path)
+    assert store.read_all() == [make_record(level=7)]  # readable as it is, with no character
+    assert store.read_all()[0].character == ""
+
+    store.append(make_record(boss="New", character="Wylder"))
+
+    lines = path.read_text(encoding="utf-8-sig").splitlines()
+    assert lines[0] == ",".join(records.COLUMNS)
+    assert all(line.count(",") == len(records.COLUMNS) - 1 for line in lines)
+    assert store.read_all() == [make_record(level=7), make_record(boss="New", character="Wylder")]
+    assert store.remove([make_record(level=7)]) == 1

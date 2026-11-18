@@ -183,6 +183,7 @@ Excel or any spreadsheet program, or choose **Open records file in Excel** from 
 
 | `boss_2`, `language_2` | the same boss in the second language you chose, and that language; empty if you chose one |
 | `boss_3`, `language_3` | the same for a third language |
+| `character` | the character you played. Planned: it is empty until a later version lets you choose one |
 
 **Which language the boss name is saved in.** The tool knows the names of the game's bosses in
 English, Simplified Chinese and Traditional Chinese, so it can save a name in a language other
@@ -196,7 +197,7 @@ When the name read from the screen is not a known boss, for example one added by
 update, `boss` holds the text as it was read and the other name columns stay empty. A reading
 one or two characters off a known name is corrected to it.
 
-The `level`, `boss_2` and `boss_3` columns are new. A `records.csv` made by an older version
+The `level`, `boss_2`, `boss_3` and `character` columns are new. A `records.csv` made by an older version
 gets them the next time a fight is saved, left empty for the fights already in it.
 
 **If the file is open in Excel when a fight ends**, Excel blocks other programs from writing to

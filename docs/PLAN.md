@@ -95,6 +95,7 @@ use the user marks two regions by hand, and the tool does not start tracking unt
 | boss_2, language_2, boss_3, language_3 | 大树守卫, zh_CN | the same boss in a second and a third language. The owner's rule of 2026-11-18: the user chooses which languages are saved, the UI language alone to start with, and a record never holds more than three names, also when more languages are added. `boss` and `language` hold the first. A name that is not a known boss is saved as read. |
 | level | 7 | the player's level when the fight began, read from the emblem at the top left; empty if unreadable (asked for by the project owner on 2026-11-18) |
 | end_hp_pct | 0 | HP % left when the bar was last seen |
+| character | Wylder | the character played, written in the language the program is set to when the fight is saved (the owner's choice of 2026-11-18). One of the game's ten, from a default the user sets and later from the icon on screen. Empty if not set, and for records made before the column existed. It is the last column of the file |
 
 ### How the history reads
 
