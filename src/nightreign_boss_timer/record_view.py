@@ -6,7 +6,7 @@ from collections.abc import Iterable
 from dataclasses import dataclass
 from functools import cache
 
-from nightreign_boss_timer import boss_names
+from nightreign_boss_timer import boss_names, characters
 from nightreign_boss_timer.records import FightRecord, Status
 
 # A filter left at this value lets everything through.
@@ -65,6 +65,13 @@ def boss_label(record: FightRecord, language: str) -> str:
     return {"en": en, "zh_CN": zh_cn, "zh_TW": zh_tw}.get(language) or record.boss
 
 
+def character_names(record: FightRecord) -> tuple[str, ...]:
+    """The character of a record as saved and in each language it has a name in. No repeats."""
+    names = [record.character]
+    names += [characters.label_of(record.character, code) for code in characters.LANGUAGES]
+    return tuple(dict.fromkeys(name for name in names if name))
+
+
 def filter_records(
     records: Iterable[FightRecord],
     *,
@@ -76,8 +83,8 @@ def filter_records(
     """The records that pass every filter, newest first.
 
     ``boss`` is a :func:`boss_key`. ``status`` is ``complete`` or ``incomplete``. ``search``
-    matches any part of the boss name in any language, the table name or the date and time,
-    ignoring case.
+    matches any part of the boss name or the character in any language, the table name or the
+    date and time, ignoring case.
     """
     needle = search.strip().casefold()
     chosen = [
@@ -90,6 +97,7 @@ def filter_records(
             not needle
             or needle in record.boss.casefold()
             or any(needle in name.casefold() for name in translations(record))
+            or any(needle in name.casefold() for name in character_names(record))
             or needle in record.table.casefold()
             or needle in f"{record.started_at:%Y-%m-%d %H:%M:%S}"
         )

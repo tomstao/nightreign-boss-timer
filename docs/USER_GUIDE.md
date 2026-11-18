@@ -215,13 +215,20 @@ next time it can write. No fight is lost. Close and reopen the file in Excel to 
 The main window's **Records** page shows the same data, newest first. Open it from the tray
 menu with **Open records**.
 
-- Filter by table, boss and status, or type in the search box to match a boss, a table or a
-  date.
+- Filter by table, boss and status, or type in the search box to match a boss, a character, a
+  table or a date.
 - Click a column heading to sort by it.
 - A known boss is shown under its name in the language the program is set to, also for older
   records and for fights recorded with the game in another language. They count as one boss in
   the filter, the summary and the best time. Searching finds a boss by its name in any of the
   three languages.
+- The **Character** column shows the character a record was saved with, in the language the
+  program is set to, whatever language it was saved in. It is empty for records made before
+  you chose a character on the Settings page.
+- To give records a character or correct it, select one or more rows, press **Set character**
+  (or right-click the selection) and choose from the list. **None** takes the character away.
+  The name is written to `records.csv` in the language the program is set to. It cannot be
+  done while the file is open in Excel.
 - To delete records, select one or more rows (Ctrl or Shift for several) and press **Delete
   selected** or the Delete key, or right-click the selection. The tool asks first. Deleted rows
   are gone from `records.csv` for good, and it cannot be done while the file is open in Excel.

@@ -347,6 +347,23 @@ class Controller(QObject):
             self.records_changed.emit()
         return ""
 
+    def set_character(self, records: list[FightRecord], character: str) -> str:
+        """Say which character these records were played with. Returns an error message, or "".
+
+        ``character`` is the English name of one, and it is written in the language of the
+        program, as for a new record. Empty takes the character away.
+        """
+        if character and character not in characters.all_keys():
+            return ""
+        name = characters.label_of(character, self.settings.ui_language)
+        try:
+            self.store.set_character(records, name)
+        except PermissionError:
+            return self.translate("overlay.records_locked")
+        finally:
+            self.records_changed.emit()
+        return ""
+
     def open_records_file(self) -> None:
         """Open the records file in the program Windows uses for CSV files, normally Excel."""
         self.store.ensure_file()

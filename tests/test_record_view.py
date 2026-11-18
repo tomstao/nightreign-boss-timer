@@ -3,6 +3,7 @@ from datetime import datetime
 from nightreign_boss_timer.record_view import (
     boss_key,
     boss_label,
+    character_names,
     filter_records,
     key_of,
     names_in,
@@ -20,6 +21,7 @@ def fight(
     seconds: float = 100.0,
     start: int = 100,
     level: int | None = None,
+    character: str = "",
 ) -> FightRecord:
     return FightRecord(
         started_at=datetime(2026, 11, 17, 21, minute, 0),
@@ -31,6 +33,7 @@ def fight(
         start_hp_pct=start,
         end_hp_pct=0 if status is Status.COMPLETE else 40,
         level=level,
+        character=character,
     )
 
 
@@ -115,3 +118,16 @@ def test_boss_is_shown_in_the_ui_language_or_as_read() -> None:
     assert translations(unlisted) == ("", "", "")
     assert boss_key(unlisted) == key_of("某个新头目") == "某个新头目"
     assert boss_label(unlisted, "en") == "某个新头目"
+
+
+def test_search_finds_a_character_by_its_name_in_any_language() -> None:
+    played = [fight(1, character="追踪者"), fight(2, character="Raider"), fight(3)]
+    assert character_names(played[0]) == ("追踪者", "Wylder", "追蹤者")
+    assert character_names(played[2]) == ()
+    assert filter_records(played, search="wylder") == [played[0]]
+    assert filter_records(played, search="追蹤") == [played[0]]
+    assert filter_records(played, search="无赖") == [played[1]]
+    # A name typed into the file by hand is no known character, and is found as it is.
+    own = fight(4, character="My build")
+    assert character_names(own) == ("My build",)
+    assert filter_records([*played, own], search="my b") == [own]

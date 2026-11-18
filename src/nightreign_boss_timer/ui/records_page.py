@@ -21,6 +21,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from nightreign_boss_timer import characters
 from nightreign_boss_timer.names import UNKNOWN
 from nightreign_boss_timer.record_view import (
     ALL,
@@ -34,7 +35,17 @@ from nightreign_boss_timer.records import FightRecord, Status, format_duration
 from nightreign_boss_timer.ui.controller import Controller
 from nightreign_boss_timer.ui.pages import Page
 
-COLUMNS = ("started_at", "table", "boss", "level", "status", "start_hp", "end_hp", "duration")
+COLUMNS = (
+    "started_at",
+    "table",
+    "boss",
+    "character",
+    "level",
+    "status",
+    "start_hp",
+    "end_hp",
+    "duration",
+)
 _INCOMPLETE = QColor(200, 129, 26)
 _ERROR = "color: #c8811a;"
 
@@ -106,6 +117,11 @@ class RecordsPage(Page):
         self.delete_button = QPushButton()
         self.delete_button.setEnabled(False)
         self.delete_button.clicked.connect(self.delete_selected)
+        # A button that opens the list of characters, for the selected rows.
+        self.character_menu = QMenu(self)
+        self.character_button = QPushButton()
+        self.character_button.setEnabled(False)
+        self.character_button.setMenu(self.character_menu)
         self.summary = QLabel()
         self.count = QLabel()
         self.open_file = QPushButton()
@@ -116,6 +132,7 @@ class RecordsPage(Page):
         bottom.addWidget(self.count)
         bottom.addWidget(self.message)
         bottom.addStretch(1)
+        bottom.addWidget(self.character_button)
         bottom.addWidget(self.delete_button)
         bottom.addWidget(self.open_file)
         bottom.addWidget(self.open_folder)
@@ -137,12 +154,15 @@ class RecordsPage(Page):
         return [self._shown[self.table.item(row, 0).index] for row in rows]  # type: ignore[union-attr]
 
     def _selection_changed(self) -> None:
-        self.delete_button.setEnabled(bool(self.table.selectedIndexes()))
+        selected = bool(self.table.selectedIndexes())
+        self.delete_button.setEnabled(selected)
+        self.character_button.setEnabled(selected)
 
     def _menu(self, position: object) -> None:
         if not self.table.selectedIndexes():
             return
         menu = QMenu(self.table)
+        menu.addMenu(self.character_menu)
         menu.addAction(self.delete_button.text(), self.delete_selected)
         menu.exec(self.table.viewport().mapToGlobal(position))  # type: ignore[arg-type]
 
@@ -158,6 +178,26 @@ class RecordsPage(Page):
         error = self.controller.delete_records(records)
         self.refresh()
         self.message.setText(error)
+
+    def set_character(self, character: str) -> None:
+        """Give the selected records a character, by its English name. Empty takes it away."""
+        records = self.selected_records()
+        if not records:
+            return
+        error = self.controller.set_character(records, character)
+        self.refresh()
+        self.message.setText(error)
+
+    def _fill_character_menu(self) -> None:
+        """List "none" and every character, named in the current language."""
+        translate, language = self.controller.translate, self.controller.settings.ui_language
+        self.character_menu.clear()
+        self.character_menu.setTitle(translate("records.set_character"))
+        choices = [(translate("records.no_character"), "")]
+        choices += [(characters.label_of(key, language), key) for key in characters.all_keys()]
+        for text, key in choices:
+            action = self.character_menu.addAction(text)
+            action.triggered.connect(lambda _checked=False, key=key: self.set_character(key))
 
     def _boss_name(self, record: FightRecord) -> str:
         """The boss of a record in the UI language if it is a known boss, else as it was read."""
@@ -198,6 +238,8 @@ class RecordsPage(Page):
             [translate(f"records.column.{column}") for column in COLUMNS]
         )
         self.delete_button.setText(translate("records.delete"))
+        self.character_button.setText(translate("records.set_character"))
+        self._fill_character_menu()
         self.message.setText("")
         self.open_file.setText(translate("records.open_file"))
         self.open_folder.setText(translate("records.open_folder"))
@@ -214,7 +256,7 @@ class RecordsPage(Page):
 
     def _show(self) -> None:
         """Fill the table and the summary from the records already read, for the filters as set."""
-        translate = self.controller.translate
+        translate, language = self.controller.translate, self.controller.settings.ui_language
         records = self._shown = self.shown_records()
         self.table.clearSelection()  # the rows are about to show other records
         self.table.setSortingEnabled(False)  # or rows move while they are being filled
@@ -224,6 +266,11 @@ class RecordsPage(Page):
                 _Cell(f"{record.started_at:%Y-%m-%d %H:%M:%S}", record.started_at),
                 _Cell(record.table, record.table.casefold()),
                 _Cell(self._boss_name(record), boss_key(record).casefold()),
+                # One character sorts as one, whatever language its name was saved in.
+                _Cell(
+                    characters.label_of(record.character, language),
+                    (characters.key_of(record.character) or record.character).casefold(),
+                ),
                 _Cell("" if record.level is None else str(record.level), record.level or 0),
                 _Cell(translate(f"status.{record.status.value}"), record.status.value),
                 _Cell(f"{record.start_hp_pct}%", record.start_hp_pct),

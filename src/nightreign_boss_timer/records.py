@@ -246,6 +246,27 @@ class RecordStore:
             _write_rows(self.path, kept)
         return removed
 
+    def set_character(self, records: list[FightRecord], character: str) -> int:
+        """Write this character into these records. Returns how many of them were found.
+
+        The text is written as given, and an empty one takes the character away. Records are
+        matched like in :meth:`remove`. Raises PermissionError if the file is open in another
+        program. Nothing is changed then.
+        """
+        rows = _read_rows(self.path)
+        wanted = [record.to_row() for record in records]
+        found, differs = 0, False
+        for row in rows:
+            values = _values(row)
+            if values in wanted:
+                wanted.remove(values)
+                found += 1
+                differs = differs or (row.get("character") or "") != character
+                row["character"] = character
+        if differs:
+            _write_rows(self.path, rows)
+        return found
+
     def pending_count(self) -> int:
         return len(_read_rows(self.pending_path))
 
