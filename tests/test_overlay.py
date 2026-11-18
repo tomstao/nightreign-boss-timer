@@ -45,6 +45,33 @@ def test_overlay_is_see_through_as_a_whole(application: "QApplication") -> None:
     assert overlay.hidden_from_capture is False
 
 
+def test_overlay_can_be_put_back_into_captures(
+    application: "QApplication", monkeypatch: pytest.MonkeyPatch
+) -> None:
+    asked: list[bool] = []
+
+    def fake(handle: int, exclude: bool = True) -> bool:
+        asked.append(exclude)
+        return True
+
+    monkeypatch.setattr("nightreign_boss_timer.ui.overlay.exclude_from_capture", fake)
+    overlay = Overlay()
+    assert asked == [True]
+    assert overlay.hidden_from_capture is True
+
+    overlay.set_in_captures(True)
+    assert asked == [True, False]
+    assert overlay.hidden_from_capture is False
+
+    # Making the overlay movable builds a new window, which must be told again.
+    overlay.set_movable(True)
+    assert asked == [True, False, False]
+
+    overlay.set_in_captures(False)
+    assert asked[-1] is True
+    assert overlay.hidden_from_capture is True
+
+
 def test_overlay_grows_to_fit_its_text(application: "QApplication") -> None:
     overlay = Overlay()
     overlay.show_text(OverlayText(("Arena - ready",)))

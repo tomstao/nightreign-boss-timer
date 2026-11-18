@@ -219,9 +219,10 @@ class Controller(QObject):
         self.changed.emit()
 
     def set_option(self, name: str, value: float | bool) -> None:
-        """Change one of the timing options: ``wait_window_s``, ``skip_walk_pasts``,
-        ``fight_rate``. The engine reads them from the settings on its next step."""
-        if name not in ("wait_window_s", "skip_walk_pasts", "fight_rate"):
+        """Change one of the plain options: ``wait_window_s``, ``skip_walk_pasts``,
+        ``fight_rate``, ``overlay_in_captures``. They are read from the settings on the next
+        step."""
+        if name not in ("wait_window_s", "skip_walk_pasts", "fight_rate", "overlay_in_captures"):
             raise ValueError(f"not an option: {name}")
         if getattr(self.settings, name) == value:
             return

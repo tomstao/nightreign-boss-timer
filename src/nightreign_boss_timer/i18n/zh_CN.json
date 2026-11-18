@@ -56,6 +56,8 @@
   "settings.group.overlay": "悬浮窗",
   "settings.overlay_note": "本窗口打开时，悬浮窗会显示边框，可以拖到新的位置。",
   "settings.reset_position": "恢复默认位置",
+  "settings.overlay_in_captures": "在截图和录像中显示悬浮窗",
+  "settings.overlay_in_captures_note": "默认关闭，这样本工具不会把自己的悬浮窗当成游戏画面。开启后，请不要让悬浮窗挡住 Boss 血条和屏幕中央的击败文字。",
   "setup.title": "初次设置",
   "setup.step": "第 {step} 步，共 {total} 步 - {title}",
   "setup.welcome_title": "欢迎",

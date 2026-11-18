@@ -118,6 +118,7 @@ class App:
         self.engine.paused = not self.controller.tracking
         self.overlay.set_enabled(self.controller.overlay_visible)
         self.overlay.set_position(self.settings.overlay_position)
+        self.overlay.set_in_captures(self.settings.overlay_in_captures)
         self.controller.refresh_hotkeys()  # a table or a shortcut may have changed
         self._step()
 

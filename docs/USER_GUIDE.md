@@ -139,6 +139,12 @@ part of the game. This also means it does not appear in screenshots, recordings 
 with other programs. On Windows 10 older than version 2004 this is not possible: there, keep
 the overlay away from the health bar and the middle of the screen.
 
+To record or stream the game with the overlay in the picture, turn on **Show the overlay in
+screenshots and recordings** on the Settings page. The tool then sees the overlay too, so keep
+it away from the boss health bar and from the middle of the screen, where the defeat text
+appears. Where it starts, at the left edge, is clear of both. Turn the option off again when
+you are done.
+
 | Shows | When |
 |---|---|
 | the active table | while waiting for a fight |
@@ -289,7 +295,7 @@ method, and HDR compensation.
 | The game stutters | Lower **Screen checks per second during a fight** on the Settings page. Choosing another capture method is planned. |
 | New rows do not show in Excel | Excel does not reload an open file. Close and reopen it. |
 | A hotkey does nothing | Open the Hotkeys page. A shortcut marked `(not working)` is held by another program: choose another one. |
-| The overlay is missing from my recording | That is on purpose: see [The overlay](#the-overlay). |
+| The overlay is missing from my recording | It is left out unless you turn on **Show the overlay in screenshots and recordings** on the Settings page: see [The overlay](#the-overlay). |
 
 When reporting a problem, say which game language, resolution and window mode you use and whether
 HDR is on, and attach a screenshot or a short clip, and the log file

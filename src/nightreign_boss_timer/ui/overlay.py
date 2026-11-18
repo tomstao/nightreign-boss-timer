@@ -1,8 +1,9 @@
 """The overlay: a small see-through panel over the game that never takes focus or clicks.
 
 It is see-through as a whole, by window opacity, and not pixel by pixel. Windows only agrees to
-leave a window out of screen captures when it is drawn that way, and the overlay must stay out
-of them: the tool reads the screen, and would otherwise read its own overlay.
+leave a window out of screen captures when it is drawn that way, and the overlay stays out of
+them unless the user asks otherwise: the tool reads the screen, and would otherwise read its own
+overlay.
 
 While the main window is open the overlay can be dragged to a new place. It then shows a frame,
 takes mouse clicks, and stays visible whatever it has to say.
@@ -52,8 +53,10 @@ class Overlay(QWidget):
         self._font = QFont("Segoe UI", 12)
         self._font.setStyleStrategy(QFont.StyleStrategy.PreferAntialias)
         self.move(QPoint(*DEFAULT_POSITION))
+        self._in_captures = False
         # True once Windows has agreed to keep the overlay out of screen captures.
-        self.hidden_from_capture = exclude_from_capture(int(self.winId()))
+        self.hidden_from_capture = False
+        self._apply_capture()
 
     def show_text(self, text: OverlayText) -> None:
         """Replace what the overlay says. Does nothing if it already says that."""
@@ -86,9 +89,24 @@ class Overlay(QWidget):
         # Changing the flags makes Windows build a new window, which is hidden and has
         # forgotten that it was to be left out of captures.
         self.setWindowFlags(flags)
-        self.hidden_from_capture = exclude_from_capture(int(self.winId()))
+        self._apply_capture()
         self.setCursor(Qt.CursorShape.SizeAllCursor if movable else Qt.CursorShape.ArrowCursor)
         self._layout()
+
+    def set_in_captures(self, shown: bool) -> None:
+        """Let screenshots and recordings show the overlay (True), or keep it out of them.
+
+        While it is shown, the tool reads it as part of the game wherever it covers a watched
+        region, so the user must keep it clear of the boss bar and the defeat text.
+        """
+        if shown == self._in_captures:
+            return
+        self._in_captures = shown
+        self._apply_capture()
+
+    def _apply_capture(self) -> None:
+        excluded = exclude_from_capture(int(self.winId()), not self._in_captures)
+        self.hidden_from_capture = excluded and not self._in_captures
 
     def _layout(self) -> None:
         """Size the window for what it shows now, and show or hide it."""

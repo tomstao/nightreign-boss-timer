@@ -29,6 +29,7 @@ _SRCCOPY = 0x00CC0020
 _DIB_RGB_COLORS = 0
 _BI_RGB = 0
 _DPI_PER_MONITOR_AWARE_V2 = -4
+_WDA_NONE = 0x0
 _WDA_EXCLUDEFROMCAPTURE = 0x11
 
 
@@ -113,14 +114,18 @@ def enable_dpi_awareness() -> None:
     _user32.SetProcessDpiAwarenessContext(ctypes.c_void_p(_DPI_PER_MONITOR_AWARE_V2))
 
 
-def exclude_from_capture(handle: int) -> bool:
+def exclude_from_capture(handle: int, exclude: bool = True) -> bool:
     """Ask Windows to leave one of this program's own windows out of every screen capture.
 
     ``handle`` is the window's native handle. Returns False if Windows refuses, which it does
     before Windows 10 version 2004 and for windows drawn with per-pixel transparency. The window
     then also disappears from screenshots and recordings made by other programs.
+
+    With ``exclude`` False the window is put back into captures, and the answer says whether
+    Windows agreed to that.
     """
-    return bool(_user32.SetWindowDisplayAffinity(handle, _WDA_EXCLUDEFROMCAPTURE))
+    affinity = _WDA_EXCLUDEFROMCAPTURE if exclude else _WDA_NONE
+    return bool(_user32.SetWindowDisplayAffinity(handle, affinity))
 
 
 def find_window(title: str) -> Region | None:

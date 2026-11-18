@@ -56,6 +56,8 @@
   "settings.group.overlay": "懸浮視窗",
   "settings.overlay_note": "本視窗開啟時，懸浮視窗會顯示邊框，可以拖曳到新的位置。",
   "settings.reset_position": "還原預設位置",
+  "settings.overlay_in_captures": "在截圖和錄影中顯示懸浮視窗",
+  "settings.overlay_in_captures_note": "預設關閉，這樣本工具不會把自己的懸浮視窗當成遊戲畫面。開啟後，請不要讓懸浮視窗擋住 Boss 血條和螢幕中央的擊敗文字。",
   "setup.title": "初次設定",
   "setup.step": "第 {step} 步，共 {total} 步 - {title}",
   "setup.welcome_title": "歡迎",

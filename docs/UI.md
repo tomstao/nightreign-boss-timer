@@ -59,7 +59,8 @@ needs attention (warning badge: regions missing, game not found, or records file
 
 ## Overlay
 
-Small, transparent, click-through, always on top, excluded from screen capture.
+Small, transparent, click-through, always on top, excluded from screen capture unless the
+user turns that off on the Settings page to record a video of it.
 
 ```
 Idle                      Fight in progress              Just finished (shown ~8 s)

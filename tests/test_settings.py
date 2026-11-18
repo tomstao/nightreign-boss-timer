@@ -146,3 +146,10 @@ def test_next_table_cycles() -> None:
 def test_unknown_table_is_an_error() -> None:
     with pytest.raises(TableError, match="no table named"):
         Settings().set_active_table("Nope")
+
+
+def test_overlay_in_captures_is_off_unless_the_file_says_true() -> None:
+    assert Settings().overlay_in_captures is False
+    assert Settings.from_json({"overlay_in_captures": "yes"}).overlay_in_captures is False
+    kept = Settings.from_json(Settings(overlay_in_captures=True).to_json())
+    assert kept.overlay_in_captures is True

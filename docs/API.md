@@ -117,7 +117,7 @@ Copies small regions of the screen into arrays with GDI. Windows only.
 | Name | What it is |
 |---|---|
 | `enable_dpi_awareness()` | Call once at start, so coordinates mean real pixels. |
-| `exclude_from_capture(handle)` | Ask Windows to leave one of this program's windows out of every screen capture. False if refused. |
+| `exclude_from_capture(handle, exclude=True)` | Ask Windows to leave one of this program's windows out of every screen capture, or with `exclude=False` to put it back. False if refused. |
 | `find_window(title)` | The drawable area of the window with exactly this title, as a `Region`, or `None`. |
 | `Region` | A rectangle in screen pixels. Same fields as `regions.Box`. |
 | `ScreenGrabber(width, height)` | Grabs one fixed-size region, reusing its Windows resources. A context manager. |
@@ -307,7 +307,7 @@ Every action the user can take, shared by the tray, the windows and the hotkeys.
 | `Controller.set_records_folder(folder)` | Save records elsewhere from now on. Empty means the default folder. |
 | `Controller.set_overlay_position(position)` | Remember where the overlay was put. `None` resets it. |
 | `Controller.window_shown` | Signal: the main window was shown (True) or hidden (False). |
-| `Controller.set_option(name, value)` | Change `wait_window_s`, `skip_walk_pasts` or `fight_rate`. |
+| `Controller.set_option(name, value)` | Change `wait_window_s`, `skip_walk_pasts`, `fight_rate` or `overlay_in_captures`. |
 | `Controller.open_records_file()` | Open `records.csv` in the program Windows uses for it. |
 | `Controller.open_records_folder()` | Open the folder that holds it. |
 | `Controller.calibrate(region)` | Ask for the calibration window, at `bar`, `defeat_text` or the first step. |
@@ -344,6 +344,7 @@ The see-through panel over the game. It never takes focus or clicks.
 | `Overlay.set_enabled(enabled)` | Turn it on or off. |
 | `Overlay.set_position(position)` | Put its top-left corner somewhere, or back at `DEFAULT_POSITION` with `None`. |
 | `Overlay.set_movable(movable, hint)` | Let the user drag it, with a frame, or give clicks back to the game. |
+| `Overlay.set_in_captures(shown)` | Let screenshots and recordings show it, or keep it out of them (the start). |
 | `Overlay.moved` | Signal with the new corner after a drag. |
 | `DEFAULT_POSITION` | Where the overlay starts. |
 | `Overlay.hidden_from_capture` | True once Windows has agreed to keep it out of screen captures. |

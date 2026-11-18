@@ -56,6 +56,8 @@
   "settings.group.overlay": "Overlay",
   "settings.overlay_note": "While this window is open the overlay has a frame and can be dragged to a new place.",
   "settings.reset_position": "Reset position",
+  "settings.overlay_in_captures": "Show the overlay in screenshots and recordings",
+  "settings.overlay_in_captures_note": "Off by default, so the tool never reads its own overlay. While this is on, keep the overlay away from the boss health bar and the defeat text in the middle of the screen.",
   "setup.title": "Setup",
   "setup.step": "Step {step} of {total} - {title}",
   "setup.welcome_title": "Welcome",

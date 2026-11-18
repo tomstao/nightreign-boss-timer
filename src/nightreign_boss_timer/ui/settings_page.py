@@ -88,10 +88,18 @@ class SettingsPage(Page):
         self.overlay_note = _note()
         self.reset_position = QPushButton()
         self.reset_position.clicked.connect(lambda: controller.set_overlay_position(None))
+        self.overlay_in_captures = QCheckBox()
+        self.overlay_in_captures.toggled.connect(
+            lambda on: controller.set_option("overlay_in_captures", bool(on))
+        )
+        self.captures_note = _note()
         overlay_row = QHBoxLayout()
         overlay_row.addWidget(self.overlay_note, 1)
         overlay_row.addWidget(self.reset_position)
-        self.overlay_group.setLayout(overlay_row)
+        overlay_box = QVBoxLayout(self.overlay_group)
+        overlay_box.addLayout(overlay_row)
+        overlay_box.addWidget(self.overlay_in_captures)
+        overlay_box.addWidget(self.captures_note)
 
         self.general = QGroupBox()
         self.language_label = QLabel()
@@ -153,16 +161,25 @@ class SettingsPage(Page):
         self.overlay_group.setTitle(translate("settings.group.overlay"))
         self.overlay_note.setText(translate("settings.overlay_note"))
         self.reset_position.setText(translate("settings.reset_position"))
+        self.overlay_in_captures.setText(translate("settings.overlay_in_captures"))
+        self.captures_note.setText(translate("settings.overlay_in_captures_note"))
         self.reset_position.setEnabled(settings.overlay_position is not None)
 
         # Show the values without each of them reporting a change back to the controller.
-        widgets = (self.language, self.wait_window, self.skip_walk_pasts, self.fight_rate)
+        widgets = (
+            self.language,
+            self.wait_window,
+            self.skip_walk_pasts,
+            self.fight_rate,
+            self.overlay_in_captures,
+        )
         for widget in widgets:
             widget.blockSignals(True)
         self.language.setCurrentIndex(self.language.findData(settings.ui_language))
         self.wait_window.setValue(settings.wait_window_s)
         self.skip_walk_pasts.setChecked(settings.skip_walk_pasts)
         self.fight_rate.setValue(settings.fight_rate)
+        self.overlay_in_captures.setChecked(settings.overlay_in_captures)
         for widget in widgets:
             widget.blockSignals(False)
         self.folder.setText(str(controller.store.path.parent))

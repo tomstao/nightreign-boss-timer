@@ -46,3 +46,4 @@ All notable changes are listed here. The format follows
 - First-run setup guide: language, game check and calibration, table, records folder and hotkeys. Shown once, and again on request from the Settings page.
 - A packaged Windows program: `tools/build_exe.py` builds a folder with `nightreign-boss-timer.exe`, its own Python and the text model, and a ZIP of it.
 - A log file at `%LOCALAPPDATA%\nightreign-boss-timer\logs\app.log`.
+- Setting to show the overlay in screenshots and recordings, for making videos of the tool. Off by default.

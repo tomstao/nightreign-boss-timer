@@ -112,6 +112,20 @@ def test_timing_options_are_saved_as_they_change(
     assert page.wait_window.value() == 15  # the redraw after a change keeps what was typed
 
 
+def test_showing_the_overlay_in_recordings_is_off_until_chosen(
+    application: "QApplication", tmp_path: Path
+) -> None:
+    harness = Harness(tmp_path)
+    page = harness.page
+    assert not page.overlay_in_captures.isChecked()
+    assert page.captures_note.text()
+
+    QTest.mouseClick(page.overlay_in_captures, LEFT)
+
+    assert harness.saved().overlay_in_captures is True
+    assert page.overlay_in_captures.isChecked()
+
+
 def test_out_of_range_values_cannot_be_entered(application: "QApplication", tmp_path: Path) -> None:
     page = Harness(tmp_path).page
     page.wait_window.setValue(500)

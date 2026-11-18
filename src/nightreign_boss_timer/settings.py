@@ -77,6 +77,8 @@ class Settings:
     calibrated_size: tuple[int, int] | None = None
     # Top-left corner of the overlay on the desktop. None until the user moves it.
     overlay_position: tuple[int, int] | None = None
+    # True lets screenshots and recordings show the overlay. The tool then reads it too.
+    overlay_in_captures: bool = False
     hotkeys: dict[str, str] = field(default_factory=lambda: dict(DEFAULT_HOTKEYS))
 
     # --- tables -----------------------------------------------------------------------------
@@ -153,6 +155,7 @@ class Settings:
             "defeat_text_region": fractions(self.defeat_text_region),
             "calibrated_size": list(self.calibrated_size) if self.calibrated_size else None,
             "overlay_position": list(self.overlay_position) if self.overlay_position else None,
+            "overlay_in_captures": self.overlay_in_captures,
             "hotkeys": dict(self.hotkeys),
         }
 
@@ -202,6 +205,8 @@ class Settings:
         ):
             # A second monitor can be to the left or above, so negative values are fine.
             settings.overlay_position = (position[0], position[1])
+
+        settings.overlay_in_captures = data.get("overlay_in_captures") is True
 
         hotkeys = data.get("hotkeys")
         if isinstance(hotkeys, dict):
