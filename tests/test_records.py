@@ -306,3 +306,52 @@ def test_file_from_before_the_character_column_gets_it_left_empty(tmp_path: Path
     assert all(line.count(",") == len(records.COLUMNS) - 1 for line in lines)
     assert store.read_all() == [make_record(level=7), make_record(boss="New", character="Wylder")]
     assert store.remove([make_record(level=7)]) == 1
+
+
+def test_set_character_writes_it_into_the_given_records_only(tmp_path: Path) -> None:
+    store = RecordStore(tmp_path / "records.csv")
+    first, second, third = (make_record(boss=name) for name in ("One", "Two", "Three"))
+    for record in (first, second, third):
+        store.append(record)
+
+    assert store.set_character([first, third], "追踪者") == 2
+
+    assert [record.character for record in store.read_all()] == ["追踪者", "", "追踪者"]
+    assert store.read_all()[1] == second
+    # The records as they are now are the ones to name next time. An empty text clears.
+    changed = store.read_all()[0]
+    assert store.set_character([first], "Raider") == 0  # no row looks like that any more
+    assert store.set_character([changed], "") == 1
+    assert store.read_all()[0] == first
+
+
+def test_set_character_works_on_a_file_from_before_the_column(tmp_path: Path) -> None:
+    path = tmp_path / "records.csv"
+    old_header = ",".join(records.COLUMNS[:-1])
+    old_row = ",".join(make_record().to_row()[:-1])
+    path.write_text(f"{old_header}\n{old_row}\n", encoding="utf-8-sig")
+    store = RecordStore(path)
+
+    assert store.set_character(store.read_all(), "Wylder") == 1
+
+    assert path.read_text(encoding="utf-8-sig").splitlines()[0] == ",".join(records.COLUMNS)
+    assert store.read_all() == [make_record(character="Wylder")]
+
+
+def test_set_character_changes_nothing_when_the_file_is_locked(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    store = RecordStore(tmp_path / "records.csv")
+    store.append(make_record())
+    before = store.path.read_bytes()
+
+    def locked(self: Path, target: Path) -> None:
+        raise PermissionError("file is open in another program")
+
+    monkeypatch.setattr(Path, "replace", locked)
+    with pytest.raises(PermissionError):
+        store.set_character([make_record()], "Wylder")
+    assert store.path.read_bytes() == before
+    assert list(tmp_path.iterdir()) == [store.path]  # no half-written file is left
+    # Naming the character a record already has does not write at all.
+    assert store.set_character([make_record()], "") == 1

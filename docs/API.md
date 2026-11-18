@@ -199,6 +199,7 @@ Fight records and the CSV file they are stored in.
 | `RecordStore.flush_pending()` | Try to write held rows. |
 | `RecordStore.remove_last()` | Take the most recent record out and return it. Raises `PermissionError` if the file is locked. |
 | `RecordStore.remove(records)` | Take these records out of the file. Returns how many were removed. Raises `PermissionError` if the file is locked. |
+| `RecordStore.set_character(records, character)` | Write this text into the `character` of these records. Returns how many were found. Raises `PermissionError` if the file is locked. |
 | `RecordStore.pending_count()` | How many rows are held. |
 | `RecordStore.set_path(path)` | Save to another file from now on. |
 | `RecordStore.ensure_file()` | Create the file with its header row if it is missing. |
@@ -211,7 +212,7 @@ Chooses which records to show and sums them up. No drawing.
 
 | Name | What it is |
 |---|---|
-| `filter_records(records, table, boss, status, search)` | The records that pass every filter, newest first. |
+| `filter_records(records, table, boss, status, search)` | The records that pass every filter, newest first. `search` looks at the boss, the character, the table and the date. |
 | `summarise(records)` | A `Summary` of a set of fights. |
 | `Summary` | `attempts`, `completes`, `best_s`, `average_s`. The times count only complete fights that began at full health. |
 | `names_in(records)` | The table names and boss keys that appear, each sorted. |
@@ -219,6 +220,7 @@ Chooses which records to show and sums them up. No drawing.
 | `boss_key(record)`, `key_of(name)` | What a boss is grouped under: its English name if known, else the name as read. |
 | `boss_label(record, language)` | The boss in a UI language, or as it was read. |
 | `label_of(name, language)` | The same for a bare name, as the overlay has during a fight. |
+| `character_names(record)` | The character of a record as saved and in every language it has a name in, for searching. |
 | `ALL` | The filter value that lets everything through. |
 
 ### `nightreign_boss_timer.settings`
@@ -360,6 +362,7 @@ Every action the user can take, shared by the tray, the windows and the hotkeys.
 | `Controller.set_option(name, value)` | Change `wait_window_s`, `skip_walk_pasts`, `fight_rate` or `overlay_in_captures`. |
 | `Controller.set_name_language(language, on)` | Start or stop saving the boss name in a language. |
 | `Controller.delete_records(records)` | Delete these records for good. Returns an error message, or `""`. |
+| `Controller.set_character(records, character)` | Give these records a character, by its English name, written in the UI language. Empty takes it away. Returns an error message, or `""`. |
 | `Controller.open_records_file()` | Open `records.csv` in the program Windows uses for it. |
 | `Controller.open_records_folder()` | Open the folder that holds it. |
 | `Controller.calibrate(region)` | Ask for the calibration window, at `bar`, `defeat_text` or the first step. |
@@ -469,6 +472,7 @@ The Records page: every saved fight with filters, sorting and a per-boss summary
 | `RecordsPage` | The page. Reads the records file on `refresh()`. |
 | `RecordsPage.shown_records()` | The records that pass the filters as they are set now. |
 | `RecordsPage.selected_records()` | The records of the selected rows. |
+| `RecordsPage.set_character(character)` | Give the selected records a character, by its English name. Empty takes it away. The `character_button` and the right-click menu both open the list that calls this. |
 | `RecordsPage.delete_selected()` | Delete the selected records, after asking. `ask` in the constructor replaces the question window. |
 | `COLUMNS` | The table's columns, in order. |
 
