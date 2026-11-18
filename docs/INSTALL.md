@@ -86,6 +86,12 @@ This works today and is the only way to run the tool until there is a release.
    It prints each finished fight and appends it to
    `Documents\nightreign-boss-timer\records.csv`. Stop it with Ctrl+C.
 
+   Or run the version with the overlay and tray icon, and quit it from the tray icon:
+
+   ```powershell
+   uv run python -m nightreign_boss_timer.ui.app
+   ```
+
 | Option | Meaning | Default |
 |---|---|---|
 | `--table NAME` | table to save fights under | `Arena` |

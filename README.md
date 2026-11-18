@@ -62,6 +62,17 @@ uv run ruff format --check .
 uv run pytest
 ```
 
+## Try the overlay version
+
+```powershell
+uv run python tools/fetch_model.py
+uv run python -m nightreign_boss_timer.ui.app
+```
+
+A small overlay shows the active table, then the boss, timer and boss HP during a fight, then
+the result. A tray icon lets you pause tracking, hide the overlay, and quit. There is no settings
+window or region calibration yet.
+
 ## Try the command-line version
 
 An early version without overlay or settings window. It uses default regions for a 16:9 game

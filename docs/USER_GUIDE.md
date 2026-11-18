@@ -5,8 +5,8 @@
 > updated with every change that affects users. Where the program and this guide disagree once a
 > release exists, that is a bug: please report it.
 >
-> **What works today** is the command-line version described in
-> [INSTALL.md](INSTALL.md#running-from-source). It follows the recording rules under
+> **What works today** is the overlay with a tray icon (pause, hide overlay, quit) and the
+> command-line version, both described in [INSTALL.md](INSTALL.md#running-from-source). It follows the recording rules under
 > [Everyday use](#everyday-use) and writes the file described under [Your records](#your-records).
 > Setup, the overlay, tables beyond one name, hotkeys and settings are not built yet.
 

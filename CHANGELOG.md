@@ -24,3 +24,4 @@ All notable changes are listed here. The format follows
 - Settings file with tables, regions, hotkeys and timing options.
 - Translation files for English, Simplified Chinese and Traditional Chinese.
 - The command-line version now reads the settings file (tables, regions, timing options).
+- Overlay showing table, boss, timer and boss HP, with a tray icon to pause, hide and quit.
