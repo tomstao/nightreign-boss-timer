@@ -67,7 +67,7 @@ def test_every_documented_name_exists() -> None:
                 # Fields of a dataclass with slots are found on the class; plain instance
                 # attributes set in __init__ are not, so look for them in the source.
                 source = Path(module.__file__).read_text(encoding="utf-8")
-                if f"self.{name.split('.')[-1]} " not in source:
+                if not re.search(rf"self\.{name.split('.')[-1]}\b\s*[:=]", source):
                     missing.append(f"{module_name}: {name}")
     assert missing == []
 

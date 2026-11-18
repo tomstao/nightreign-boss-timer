@@ -14,7 +14,7 @@ from pathlib import Path
 from PySide6.QtCore import QObject, Signal
 
 from nightreign_boss_timer import settings as settings_file
-from nightreign_boss_timer.engine import State, records_path
+from nightreign_boss_timer.engine import Probe, State, records_path
 from nightreign_boss_timer.i18n import LANGUAGES, Translator
 from nightreign_boss_timer.records import RecordStore
 from nightreign_boss_timer.settings import Settings, TableError
@@ -31,8 +31,8 @@ class Controller(QObject):
     notice = Signal(str)
     # A fight was saved, or records were changed by hand: lists of records are out of date.
     records_changed = Signal()
-    # The user asked for the calibration window.
-    calibration_requested = Signal()
+    # The user asked for the calibration window, starting at this region (empty: the first).
+    calibration_requested = Signal(str)
     # The user asked for the main window, at the page with this key (empty: the page it is on).
     window_requested = Signal(str)
     # What the engine is doing changed, for example the game window was found.
@@ -54,6 +54,9 @@ class Controller(QObject):
         self.tracking = True
         self.overlay_visible = True
         self.state = State.IDLE
+        # Set by the app: reads both regions from the screen once, or returns None if the game
+        # is not found. Left empty when there is no screen to read, as in tests.
+        self.probe: Callable[[], Probe | None] | None = None
         self._settings_path = settings_path
         self._opener = opener
 
@@ -188,5 +191,6 @@ class Controller(QObject):
 
     # --- calibration ----------------------------------------------------------------------------
 
-    def calibrate(self) -> None:
-        self.calibration_requested.emit()
+    def calibrate(self, region: str = "") -> None:
+        """Open the calibration window. ``region`` is ``bar``, ``defeat_text`` or empty."""
+        self.calibration_requested.emit(region)

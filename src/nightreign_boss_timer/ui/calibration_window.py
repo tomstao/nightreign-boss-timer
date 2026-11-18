@@ -92,9 +92,11 @@ class CalibrationWindow(QWidget):
 
     # --- opening and screenshots ----------------------------------------------------------------
 
-    def start(self) -> None:
-        """Take a screenshot and open at the first step."""
-        self._step = 0
+    def start(self, region: str = "") -> None:
+        """Take a screenshot and open at the first step, or at the step for ``region``
+        (``bar`` or ``defeat_text``)."""
+        kinds = [kind.value for kind in STEPS]
+        self._step = kinds.index(region) if region in kinds else 0
         self._picture = None  # so the box left over from last time is not carried in
         self.retake()
 

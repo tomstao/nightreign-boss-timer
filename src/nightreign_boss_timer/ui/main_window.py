@@ -19,6 +19,7 @@ from nightreign_boss_timer.engine import State
 from nightreign_boss_timer.ui.controller import Controller
 from nightreign_boss_timer.ui.pages import AboutPage, Page
 from nightreign_boss_timer.ui.records_page import RecordsPage
+from nightreign_boss_timer.ui.regions_page import RegionsPage
 from nightreign_boss_timer.ui.settings_page import SettingsPage
 from nightreign_boss_timer.ui.tables_page import TablesPage
 
@@ -28,6 +29,7 @@ def default_pages(controller: Controller) -> list[Page]:
     return [
         RecordsPage(controller),
         TablesPage(controller),
+        RegionsPage(controller),
         SettingsPage(controller),
         AboutPage(controller),
     ]

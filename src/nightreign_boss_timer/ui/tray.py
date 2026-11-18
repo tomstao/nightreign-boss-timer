@@ -109,7 +109,7 @@ class Tray:
         menu.addAction(translate("tray.open_records"), lambda: controller.show_window("records"))
         menu.addAction(translate("tray.open_records_file"), controller.open_records_file)
         menu.addSeparator()
-        menu.addAction(translate("tray.calibrate"), controller.calibrate)
+        menu.addAction(translate("tray.calibrate"), lambda: controller.calibrate())
         menu.addAction(translate("tray.settings"), lambda: controller.show_window("settings"))
         menu.addAction(translate("tray.open_window"), controller.show_window)
         menu.addSeparator()

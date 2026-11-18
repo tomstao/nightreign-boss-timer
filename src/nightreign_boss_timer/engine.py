@@ -21,8 +21,8 @@ from typing import Protocol
 import numpy as np
 from numpy.typing import NDArray
 
-from nightreign_boss_timer.defeat_text import measure_defeat_text
-from nightreign_boss_timer.detector import measure_bar
+from nightreign_boss_timer.defeat_text import DefeatReading, measure_defeat_text
+from nightreign_boss_timer.detector import BarReading, measure_bar
 from nightreign_boss_timer.names import UNKNOWN, NameVote, language_of
 from nightreign_boss_timer.ocr import TextReading
 from nightreign_boss_timer.records import FightRecord, RecordStore
@@ -83,6 +83,20 @@ class StepResult:
     saved: bool
     # How long the caller should wait before the next step.
     delay_s: float
+
+
+@dataclass(frozen=True, slots=True)
+class Probe:
+    """One look at both watched regions, for showing the user what the tool sees."""
+
+    # Size of the game image, to compare with the size at calibration.
+    window: tuple[int, int]
+    bar_image: NDArray[np.uint8]
+    bar: BarReading
+    text_image: NDArray[np.uint8]
+    defeat: DefeatReading
+    # The boss name as read just now. Empty if there is no bar, no reader, or nothing legible.
+    name: str
 
 
 def default_records_folder() -> Path:
@@ -187,6 +201,34 @@ class Engine:
             record=record,
             saved=saved,
             now=now,
+        )
+
+    def probe(self) -> Probe | None:
+        """Read both regions once, outside the watch loop. None if the game window is not found.
+
+        This is for the Regions page. It does not touch the tracker, so it can run during a fight.
+        """
+        window = self._screen.find_window(self._title)
+        if window is None or window.width < MIN_WINDOW or window.height < MIN_WINDOW:
+            return None
+        settings = self.settings
+        bar_fractions = settings.bar_region or DEFAULT_BAR
+        bar_image = self._screen.grab(bar_region(window, bar_fractions))
+        bar = measure_bar(bar_image)
+        text_image = self._screen.grab(
+            defeat_text_region(window, settings.defeat_text_region or DEFAULT_DEFEAT_TEXT)
+        )
+        name = ""
+        if self._reader and bar.present:
+            reading = self._reader.read(self._screen.grab(name_region(window, bar_fractions)))
+            name = reading.text.strip()
+        return Probe(
+            (window.width, window.height),
+            bar_image,
+            bar,
+            text_image,
+            measure_defeat_text(text_image),
+            name,
         )
 
     def _result(

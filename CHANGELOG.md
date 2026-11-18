@@ -31,3 +31,4 @@ All notable changes are listed here. The format follows
 - Records page: all fights with filters, search, sorting and a per-boss summary.
 - Tables page: add, rename and delete tables and choose the active one.
 - Settings page: UI language (switches at once), records folder, wait time, walk-past skipping and detection rate.
+- Regions page: calibration status for each region and a live preview of what the tool reads there.

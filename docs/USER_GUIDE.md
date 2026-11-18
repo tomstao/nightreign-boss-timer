@@ -73,11 +73,23 @@ will not have to catch the text live.
 
 If the defeat text area is wrong, every fight is recorded as `incomplete`.
 
+### Checking a calibration
+
+The **Regions** page of the main window shows, for each of the two regions, whether it is
+calibrated, with a button to calibrate just that one. Below that is what the tool sees right
+now, re-read once a second: the pixels of the health bar region with `Bar detected: yes`, the
+boss HP and the boss name as read, and the pixels of the defeat text region.
+
+Use it with the game on screen and a boss bar showing. The main window is part of the screen
+too, so keep it off the health bar and the middle of the game image while you check: on one
+monitor, make the window small and move it to a corner.
+
 ### When to calibrate again
 
 Calibrate again after changing the game's resolution, moving it to a monitor with a different
-resolution, or changing Windows display scaling. The tool tells you when the game window no
-longer matches the saved calibration, and pauses until you redo it.
+resolution, or changing Windows display scaling. The **Regions** page tells you when the game image
+no longer has the size it had at calibration. Regions are saved as fractions of the game image,
+so the same shape at another resolution usually still works: check the live preview.
 
 ## Everyday use
 
@@ -108,8 +120,8 @@ stop the tool: it keeps running in the tray, and **Quit** in the tray menu ends 
 The bar at the bottom shows whether tracking is on, the active table, whether the game was
 found and whether the regions are calibrated. Click **Tracking on** to pause or resume.
 
-So far the window has the **Records**, **Tables**, **Settings** and **About** pages. Hotkeys
-and Regions are being added.
+So far the window has the **Records**, **Tables**, **Regions**, **Settings** and **About**
+pages. Hotkeys are being added.
 
 ## The overlay
 

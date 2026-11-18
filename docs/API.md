@@ -215,6 +215,8 @@ Joins capture, detectors, tracker, name reading and the record store, one step a
 | `Engine(settings, screen, store, reader)` | The watch loop logic. `title`, `clock` and `wall_clock` can be replaced for tests. |
 | `Engine.step()` | Look at the screen once. Returns a `StepResult`. |
 | `Engine.paused` | Set to `True` to stop looking. |
+| `Engine.probe()` | Read both regions once, outside the watch loop. Returns a `Probe`, or `None` if the game is not found. |
+| `Probe` | `window` size, `bar_image`, `bar`, `text_image`, `defeat`, `name`. |
 | `StepResult` | `snapshot`, `record` (set when a fight just ended), `saved`, `delay_s` (how long to wait before the next step). |
 | `Snapshot` | What to show now: `state`, `table`, `boss`, `hp`, `elapsed_s`. |
 | `State` | `PAUSED`, `NO_GAME`, `IDLE`, `FIGHT`. |
@@ -266,7 +268,8 @@ Every action the user can take, shared by the tray, the windows and the hotkeys.
 | `Controller.set_option(name, value)` | Change `wait_window_s`, `skip_walk_pasts` or `fight_rate`. |
 | `Controller.open_records_file()` | Open `records.csv` in the program Windows uses for it. |
 | `Controller.open_records_folder()` | Open the folder that holds it. |
-| `Controller.calibrate()` | Ask for the calibration window. |
+| `Controller.calibrate(region)` | Ask for the calibration window, at `bar`, `defeat_text` or the first step. |
+| `Controller.probe` | Set by the app to `Engine.probe`. `None` when there is no screen to read. |
 | `Controller.show_window(page)` | Ask for the main window, optionally at a page key such as `records`. |
 | `Controller.window_requested` | Signal carrying that page key. |
 | `Controller.set_state(state)` | Told by the app after every engine step. Emits `state_changed` when it differs. |
@@ -340,6 +343,16 @@ The Records page: every saved fight with filters, sorting and a per-boss summary
 | `RecordsPage.shown_records()` | The records that pass the filters as they are set now. |
 | `COLUMNS` | The table's columns, in order. |
 
+### `nightreign_boss_timer.ui.regions_page`
+
+The Regions page: calibration status, and a live preview of both regions.
+
+| Name | What it is |
+|---|---|
+| `RegionsPage` | The page. Reads the screen once a second, only while it is shown. |
+| `RegionsPage.update_preview()` | Read both regions now and show them with what was read. |
+| `PREVIEW_MS` | Time between two readings. |
+
 ### `nightreign_boss_timer.ui.settings_page`
 
 The Settings page. Every change is applied and saved at once.
@@ -381,7 +394,7 @@ The two-step calibration window.
 | Name | What it is |
 |---|---|
 | `CalibrationWindow(settings, translate, take_picture, on_saved)` | `take_picture` returns the game image or `None`. `on_saved` runs after each region is written into the settings. |
-| `CalibrationWindow.start()` | Take a screenshot and open at the first step. |
+| `CalibrationWindow.start(region)` | Take a screenshot and open at the first step, or at the step for `bar` or `defeat_text`. |
 | `CalibrationWindow.retake()` | Hide, take a new screenshot, come back. |
 | `CalibrationWindow.load_picture()` | Take the screenshot now and show the window. |
 | `CalibrationWindow.save()` | Write the current box into the settings and move on. |

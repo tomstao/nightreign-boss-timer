@@ -170,11 +170,11 @@ def test_clicking_the_icon_or_the_menu_entry_asks_for_the_main_window(
 
 def test_calibrate_and_quit(application: "QApplication", tmp_path: Path) -> None:
     harness = Harness(tmp_path)
-    asked: list[bool] = []
-    harness.controller.calibration_requested.connect(lambda: asked.append(True))
+    asked: list[str] = []
+    harness.controller.calibration_requested.connect(asked.append)
     harness.entry("Calibrate regions...").trigger()
     harness.entry("Quit").trigger()
-    assert asked == [True]
+    assert asked == [""]
     assert harness.quits == 1
 
 

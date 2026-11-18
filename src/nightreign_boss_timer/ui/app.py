@@ -56,6 +56,7 @@ class App:
             self.settings, self.translate, self._take_picture, self.controller.save
         )
 
+        self.controller.probe = self.engine.probe
         self.overlay = Overlay()
         self.result: FightRecord | None = None
         self.result_at = 0.0
