@@ -248,3 +248,30 @@ is 2560x1440. The levels in them are 2, 7, 8 and 15, read by eye.
 - Run through the whole engine, six clips gave the right level in their record: 2, 7, 7, 8, 15
   at 1920x1080 and 15 at 2560x1440. The level is read at the start of a fight until three
   readings agree, eight have been made, or 50 looks found no digits.
+
+## Boss names in three languages
+
+Collected 2026-11-18.
+
+- `src/nightreign_boss_timer/boss_names.json` lists 210 names, each in English, Simplified
+  Chinese and Traditional Chinese. They are the non-empty entries of the game's own name text
+  (`NpcName` and `NpcName_dlc01`, for the base game and The Forsaken Hollows) for the three
+  languages, joined by entry number, with player characters and merchants left out. The copy
+  used is the one in the MIT-licensed project
+  <https://github.com/alfizari/Elden-Ring-Nightreign-Save-Editor> (`src/Resources/Text`), as it
+  was on 2026-01-15. No name was translated or converted by hand.
+- Checked against other sources: the eight Simplified names read from footage are all in the
+  list as written, and Steam's achievement text has the same eight Nightlord names in all three
+  languages.
+- **Not every entry is a boss with a health bar.** The list is every name the game has for a
+  non-player character, so some entries may never appear above a boss bar. That does no harm:
+  the list is only used to recognise a name that was read.
+- **Punctuation differs by language.** A Nightlord's title is in curly quotes in Simplified
+  (“黑夜野兽”格拉狄乌斯) and in corner brackets in Traditional (「黑夜野獸」格拉狄烏斯). The lookup
+  ignores punctuation, spaces and case, because the text model often drops them.
+- **20 names are written the same in both kinds of Chinese** (王室幽魂, for one). Such a name
+  cannot tell which Chinese the game is in.
+- **A few names are not one to one.** "Omen" is both 恶兆之子 and 恶兆之子们, and 黑夜猎人 is both
+  "Night Hunter" and "Night Huntsman". The lookup then leaves that translation empty.
+- Names added to the game after January 2026 are missing. A name that is not in the list is
+  recorded as it was read.

@@ -67,6 +67,19 @@ The recording rules as a state machine. Fed one sample at a time, it says when a
 | `FightOutcome` | `status`, `started_at`, `duration_s`, `start_hp_pct`, `end_hp_pct`, and `level` (`None` if unread). |
 | `FULL_HP` | A reading at or above this is written as 100%. |
 
+### `nightreign_boss_timer.boss_names`
+
+The boss names the game uses, in English, Simplified Chinese and Traditional Chinese, and a
+lookup that finds a reading in them.
+
+| Name | What it is |
+|---|---|
+| `load()` | The `BossNames` list packed with the program (`boss_names.json`). |
+| `BossNames(rows)` | A list built from `[English, Simplified, Traditional]` rows. |
+| `BossNames.lookup(text)` | The `BossMatch` a reading stands for, or `None`. Ignores case, spaces and punctuation, and repairs one wrong character in names of 4 or more, two in names of 8 or more. |
+| `BossMatch` | `name` (as the game writes it), `language`, `en`, `zh_cn`, `zh_tw`. A translation is empty when the list has more than one. |
+| `LANGUAGES`, `CHINESE` | The values of `BossMatch.language`: `en`, `zh_CN`, `zh_TW`, and `zh` for a name written the same in both kinds of Chinese. |
+
 ### `nightreign_boss_timer.level`
 
 Finds the player's level digits in the emblem at the top left, and settles on a level from
