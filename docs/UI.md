@@ -271,7 +271,7 @@ A short sequence shown once, skippable at every step:
 | Tables page | built. Names are typed into a field on the page instead of a dialog. Renaming does not rename existing rows yet. Table hotkeys are set on the Hotkeys page |
 | Hotkeys page | built for the keyboard. The shortcut is pressed into a field below the list instead of into the cell. Not built: the Controller column |
 | Regions page | built, with both regions previewed at once instead of a Preview button per row. A changed window size is pointed out but does not pause tracking |
-| Settings page | language, records folder, wait time, walk-past skipping, detection rate, overlay position. Not built: start with Windows, start minimised, time format, overlay opacity and scale, capture method, game window picker, HDR compensation, saving unknown name images, logging level |
+| Settings page | language, records folder, the languages boss names are saved in, the character new records get, wait time, walk-past skipping, detection rate, overlay position. Not built: start with Windows, start minimised, time format, overlay opacity and scale, capture method, game window picker, HDR compensation, saving unknown name images, logging level |
 | About page | built. Not built: Export diagnostics |
 | Region calibration | built with the detector's reading shown as the box moves. Not built: the example image, and picking a saved screenshot or a recent frame for the defeat text |
 | First-run setup | built as three steps instead of five: welcome, game and regions, basics |

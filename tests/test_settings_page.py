@@ -221,3 +221,65 @@ def test_main_window_says_when_it_is_shown_and_hidden(
     harness.window.show_page()
     harness.window.close()
     assert seen == [True, False]
+
+
+def choose_character(page: "SettingsPage", key: str) -> None:
+    page.character.setCurrentIndex(page.character.findData(key))
+    page.character.activated.emit(page.character.currentIndex())
+
+
+def test_default_character_is_chosen_from_a_list(
+    application: "QApplication", tmp_path: Path
+) -> None:
+    harness = Harness(tmp_path)
+    page = harness.page
+    names = [page.character.itemText(i) for i in range(page.character.count())]
+    assert names[0] == "Not set"
+    assert names[1:] == [
+        "Wylder",
+        "Guardian",
+        "Ironeye",
+        "Duchess",
+        "Raider",
+        "Revenant",
+        "Recluse",
+        "Executor",
+        "Scholar",
+        "Undertaker",
+    ]
+    assert page.character.currentData() == ""
+    assert not harness.recorder.settings_path.exists()  # showing it changed nothing
+
+    choose_character(page, "Duchess")
+
+    assert harness.saved().default_character == "Duchess"
+    assert page.character.currentText() == "Duchess"
+    choose_character(page, "")
+    assert harness.saved().default_character == ""
+    assert page.character.currentText() == "Not set"
+
+
+def test_default_character_is_listed_in_the_language_of_the_program(
+    application: "QApplication", tmp_path: Path
+) -> None:
+    harness = Harness(tmp_path, "zh_TW")
+    page = harness.page
+    choose_character(page, "Wylder")
+    assert page.character_label.text() == "角色："
+    assert page.character.itemText(0) == "未設定"
+    assert page.character.currentText() == "追蹤者"
+
+    harness.controller.set_language("zh_CN")
+    application.processEvents()
+
+    assert page.character.currentText() == "追踪者"  # the choice holds, its name follows
+    assert harness.saved().default_character == "Wylder"
+
+
+def test_a_character_the_game_does_not_have_is_refused(
+    application: "QApplication", tmp_path: Path
+) -> None:
+    harness = Harness(tmp_path)
+    harness.controller.set_default_character("Priestess")
+    assert harness.recorder.settings.default_character == ""
+    assert harness.recorder.changes == 0

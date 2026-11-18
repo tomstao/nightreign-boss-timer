@@ -19,6 +19,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from nightreign_boss_timer import characters
 from nightreign_boss_timer.i18n import LANGUAGES
 from nightreign_boss_timer.settings import MAX_NAMES, NAME_LANGUAGES
 from nightreign_boss_timer.ui.controller import Controller
@@ -73,6 +74,13 @@ class SettingsPage(Page):
             box = QCheckBox(controller.translate(f"language.{code}"))
             box.toggled.connect(lambda on, code=code: controller.set_name_language(code, bool(on)))
             self.name_languages[code] = box
+
+        self.character_label = QLabel()
+        self.character_note = _note()
+        self.character = QComboBox()
+        self.character.activated.connect(
+            lambda _index: controller.set_default_character(self.character.currentData())
+        )
 
         self.wait_window = QDoubleSpinBox()
         self.wait_window.setRange(1.0, 120.0)
@@ -135,6 +143,12 @@ class SettingsPage(Page):
         names_row.addStretch(1)
         records.addLayout(names_row)
         records.addWidget(self.names_note)
+        character_row = QHBoxLayout()
+        character_row.addWidget(self.character_label)
+        character_row.addWidget(self.character)
+        character_row.addStretch(1)
+        records.addLayout(character_row)
+        records.addWidget(self.character_note)
 
         self.detection = QGroupBox()
         self.wait_label = QLabel()
@@ -179,6 +193,14 @@ class SettingsPage(Page):
             # The last one cannot be unticked, and a full set cannot grow.
             only_one = chosen == [code]
             box.setEnabled(not only_one and (code in chosen or len(chosen) < MAX_NAMES))
+        self.character_label.setText(translate("settings.default_character"))
+        self.character_note.setText(translate("settings.default_character_note"))
+        # The names follow the language, so the list is filled again every time.
+        self.character.clear()
+        self.character.addItem(translate("settings.default_character_none"), "")
+        for key in characters.all_keys():
+            self.character.addItem(characters.label_of(key, settings.ui_language), key)
+        self.character.setCurrentIndex(self.character.findData(settings.default_character))
         self.wait_label.setText(translate("settings.wait_window"))
         self.wait_note.setText(translate("settings.wait_window_note"))
         self.skip_walk_pasts.setText(translate("settings.skip_walk_pasts"))

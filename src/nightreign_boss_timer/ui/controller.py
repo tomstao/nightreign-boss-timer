@@ -14,6 +14,7 @@ from pathlib import Path
 
 from PySide6.QtCore import QObject, Signal
 
+from nightreign_boss_timer import characters
 from nightreign_boss_timer import settings as settings_file
 from nightreign_boss_timer.engine import Probe, State, records_path
 from nightreign_boss_timer.hotkeys import TABLE_PREFIX, conflict, has_modifier, normalise
@@ -202,6 +203,15 @@ class Controller(QObject):
         if self.settings.set_name_language(language, on):
             self.save()
         self.changed.emit()  # also when refused, so the page shows what really holds
+
+    def set_default_character(self, character: str) -> None:
+        """Choose the character new records get, by its English name. Empty means none."""
+        known = not character or character in characters.all_keys()
+        if not known or character == self.settings.default_character:
+            return
+        self.settings.default_character = character
+        self.save()
+        self.changed.emit()
 
     def set_records_folder(self, folder: str) -> None:
         """Save records in another folder from now on. Empty means the default folder.

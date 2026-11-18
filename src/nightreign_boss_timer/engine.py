@@ -21,7 +21,7 @@ from typing import Protocol
 import numpy as np
 from numpy.typing import NDArray
 
-from nightreign_boss_timer import boss_names
+from nightreign_boss_timer import boss_names, characters
 from nightreign_boss_timer.defeat_text import DefeatReading, measure_defeat_text
 from nightreign_boss_timer.detector import BarReading, measure_bar
 from nightreign_boss_timer.level import LevelVote, find_digits
@@ -119,13 +119,14 @@ def to_record(
     boss: str = UNKNOWN,
     level: int | None = None,
     languages: Sequence[str] = (),
+    character: str = "",
 ) -> FightRecord:
     """Turn a tracker outcome into a row. ``now`` is the tracker's clock at ``wall_now``.
 
     ``boss`` is the name as read. If it is a known boss, the record gets its name in each of
     ``languages``, up to three, in that order. With no languages given it gets the name in the
     language it was read in, as the game writes it. A name that is not a known boss is kept as
-    it was read.
+    it was read. ``character`` is written as given.
     """
     started = wall_now - timedelta(seconds=now - outcome.started_at)
     known = None if boss == UNKNOWN else boss_names.load().lookup(boss)
@@ -150,6 +151,7 @@ def to_record(
         language_2=names[1][1],
         boss_3=names[2][0],
         language_3=names[2][1],
+        character=character,
     )
 
 
@@ -182,6 +184,16 @@ class Engine:
     def end_fight(self) -> None:
         """Ask for the current fight to be ended as incomplete. The next step does it."""
         self._end_requested = True
+
+    def _character(self) -> str:
+        """The character a fight that ends now was played with, as its record will hold it.
+
+        This is the one place where that is decided. Today it is the character the user set as
+        the default, named in the language of the program, or empty if none is set. Reading the
+        character from its icon on screen belongs here later.
+        """
+        settings = self.settings
+        return characters.label_of(settings.default_character, settings.ui_language)
 
     def _new_tracker(self) -> FightTracker:
         return FightTracker(
@@ -243,6 +255,7 @@ class Engine:
                 self._vote.name,
                 self._level.level,
                 self.settings.record_languages(),
+                self._character(),
             )
             saved = self._store.append(record)
 
