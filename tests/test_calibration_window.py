@@ -65,7 +65,7 @@ def test_opens_on_the_bar_step_with_the_usual_position_checked(application: "QAp
     assert window.isVisible()
     assert window.kind is RegionKind.BAR
     assert window.heading.text() == "Step 1 of 2 - Boss health bar"
-    assert window.readout.text() == "Bar found, HP 56%"
+    assert window.readout.text() == "Bar found, HP 57%"
     assert window.save_button.text() == "Save and next"
     assert window.skip_button.isVisible()
 
@@ -81,7 +81,7 @@ def test_readout_follows_the_box_as_it_moves(application: "QApplication") -> Non
     assert window.readout.text() == "No bar found in this box"
     for _ in range(12):
         QTest.keyClick(window.canvas, Qt.Key.Key_Up)
-    assert window.readout.text() == "Bar found, HP 56%"
+    assert window.readout.text() == "Bar found, HP 57%"
 
 
 def test_saving_the_bar_writes_settings_and_moves_to_the_defeat_text(
@@ -169,7 +169,7 @@ def test_without_the_game_nothing_can_be_saved(application: "QApplication") -> N
     harness.picture = game_picture("half")
     window.load_picture()
     assert window.save_button.isEnabled()
-    assert window.readout.text() == "Bar found, HP 56%"
+    assert window.readout.text() == "Bar found, HP 57%"
 
 
 @pytest.mark.parametrize("language", ["zh_CN", "zh_TW"])

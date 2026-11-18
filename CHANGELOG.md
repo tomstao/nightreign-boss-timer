@@ -8,6 +8,7 @@ All notable changes are listed here. The format follows
 
 ### Fixed
 
+- The boss bar is no longer read as empty while a skill popup covers the red part of it at low HP.
 - The overlay is now left out of screen captures, so the tool cannot read its own overlay as part of the game. It no longer appears in screenshots or recordings either.
 
 ### Added

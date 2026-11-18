@@ -164,3 +164,22 @@ ends 0.2 s after the defeat text starts to appear.
   darker and less colourful than what is around it, and the fill when it is clearly darker than
   a red scene. Gaps in this clip went from 34 to 16 and the longest from 0.6 s to 0.3 s. In the
   first clip they went from 7 to 5. The remaining gaps are one or two samples long.
+
+## Twenty clips: the skill popup at low HP
+
+Analysed 2026-11-18: 20 clips at 1920x1080, Simplified Chinese, 19 of them kills.
+
+- **A skill popup made the bar read as empty.** The popup box (血刃 in these clips) is a dark
+  see-through layer over the left end of the bar, on screen for about 1.0 s. When the boss is
+  below about 18%, it covers all of the fill. The fill then shows as dim red, about (49, 26, 30),
+  which failed the fill colour test and passed for empty track. This gave 42 runs of wrong empty
+  readings in the middle of 12 of the clips, 27 of them 0.4 to 1.1 s long.
+- The fill under the popup is still much redder than the scene beside it (red to green about 1.9
+  against 0.95). The empty track is see-through and only ever as red as the scene. The detector
+  now counts a column as fill on that comparison. The runs are gone. What is left is single wrong
+  empty samples: five clips have one, as the bar fades in or in mid-fight.
+- The same change reads the last sliver of fill slightly better: a boss at 0.6% was read as empty
+  0.8 s before its bar really emptied.
+- `hippo_readings.csv` and `tree_sentinel_readings.csv` were made before this change and were
+  not regenerated: decoding the clips again did not give the same pixels as the first time, so
+  a new file would mix that difference with the detector's.

@@ -4,7 +4,8 @@ The detector looks at the calibrated bar box plus some rows above and below it. 
 column is classified as one of:
 
 - fill:  the red part of the bar. Red inside the box, and not red just above and below it, which
-         is what separates a thin bar from a red object in the scene.
+         is what separates a thin bar from a red object in the scene. Under a dark popup the
+         fill is dim, and counts when it is much redder than the scene beside it.
 - track: the empty part of the bar. A see-through dark strip, so it is darker than the scene
          just above and below it.
 - other: anything else, such as a popup or an effect drawn over the bar.
@@ -37,6 +38,14 @@ OUTSIDE_RED_MAX = 0.34
 # ...or, when the scene around the bar is red too, the box is this much darker than the scene.
 # A hit flash turns the whole screen orange-red, and the bar stays a darker strip inside it.
 FILL_CONTRAST_MAX = 0.75
+# A skill popup or a menu draws a dark see-through layer over the bar. The fill under it is too
+# dark and too blue for the colour test above (about (49, 26, 30)), but red still leads the other
+# two channels by this ratio...
+DIM_RED_MIN = 30
+DIM_RED_OVER_OTHERS = 1.4
+# ...and the column is that many times redder than the scene beside it. The empty track never
+# is: it is see-through, so in a red scene it turns as red as the scene and no redder.
+DIM_REDDER_THAN_OUTSIDE = 1.4
 
 # Track: the empty part of the bar is a see-through dark strip. It is darker than its
 # surroundings by this ratio...
@@ -107,6 +116,17 @@ def measure_bar(region: NDArray[np.uint8]) -> BarReading:
     fill = (_red(box).mean(axis=0) >= FILL_ROWS_MIN) & (
         (_red(outside).mean(axis=0) <= OUTSIDE_RED_MAX)
         | (box_brightness < outside_brightness * FILL_CONTRAST_MAX)
+    )
+
+    # Dimmed fill. The comparison with the scene is cross-multiplied so nothing is divided.
+    r, g, b = box[..., 0], box[..., 1], box[..., 2]
+    dim = (r > DIM_RED_MIN) & (r > g * DIM_RED_OVER_OTHERS) & (r > b * DIM_RED_OVER_OTHERS)
+    box_r, box_g, box_b = box.mean(axis=0).T
+    out_r, out_g, out_b = outside.mean(axis=0).T
+    fill |= (
+        (dim.mean(axis=0) >= FILL_ROWS_MIN)
+        & (box_r * out_g > DIM_REDDER_THAN_OUTSIDE * box_g * out_r)
+        & (box_r * out_b > DIM_REDDER_THAN_OUTSIDE * box_b * out_r)
     )
 
     plain = (box_brightness < TRACK_BRIGHTNESS_MAX) & (spread < TRACK_COLOUR_SPREAD_MAX)

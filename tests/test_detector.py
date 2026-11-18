@@ -7,6 +7,7 @@ from nightreign_boss_timer.detector import MARGIN_HEIGHTS, grow_box, measure_bar
 
 FIXTURES = Path(__file__).parent / "fixtures" / "bar_regions.npz"
 FLASH_FIXTURES = Path(__file__).parent / "fixtures" / "bar_flash_regions.npz"
+POPUP_FIXTURES = Path(__file__).parent / "fixtures" / "bar_popup_regions.npz"
 
 # Synthetic colours, taken from docs/observations.md.
 FILL = (110, 53, 24)
@@ -138,6 +139,29 @@ def test_bar_is_read_through_a_hit_flash(
     reading = measure_bar(flashes[name])
     assert reading.present
     assert reading.hp == pytest.approx(expected_hp, abs=0.015)
+
+
+def test_fill_dimmed_by_a_skill_popup_is_still_fill() -> None:
+    """At 18% HP the skill popup covers all of the fill. It used to read as an empty bar."""
+    with np.load(POPUP_FIXTURES) as data:
+        before, covered = (
+            measure_bar(data["before_popup"]),
+            measure_bar(data["popup_over_low_fill"]),
+        )
+    assert before.hp == pytest.approx(0.182, abs=0.01)
+    assert covered.present
+    assert covered.hp == pytest.approx(before.hp, abs=0.01)
+    assert covered.hp_high <= covered.hp + 0.03
+
+
+def test_dark_track_in_a_red_scene_is_not_dimmed_fill() -> None:
+    # The see-through track takes the colour of a red scene. It is no redder than the scene.
+    region = np.full((35, 400, 3), (120, 76, 54), dtype=np.uint8)
+    region[14:21] = (56, 34, 22)
+    region[14:21, :100] = (105, 42, 20)
+    reading = measure_bar(region)
+    assert reading.present
+    assert reading.hp == pytest.approx(0.25, abs=0.01)
 
 
 def test_tinted_track_over_a_bright_flash_is_still_track() -> None:

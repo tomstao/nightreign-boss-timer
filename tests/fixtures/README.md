@@ -74,3 +74,13 @@ Four bar regions from the second clip (大树守卫), the same size as those in 
 | flash_bright | 59.2 s | hit flash: bright orange behind the bar, which tints the empty track |
 | flash_red_scene | 59.5 s | the flash fading: the scene around the bar is red-orange |
 | flash_low_hp | 108.4 s | another flash, about 31% |
+
+## bar_popup_regions.npz
+
+Two bar regions from a third clip (卡利亚禁卫骑士, 1920x1080), the same size as those in
+`bar_regions.npz`. The boss is at 18% in both, read by eye from the frame before the popup.
+
+| Name | Clip time | What it shows |
+|---|---|---|
+| before_popup | 135.4 s | normal frame, about 18% |
+| popup_over_low_fill | 136.0 s | the skill popup's dark box covers the whole fill, which shows through as dim red |
