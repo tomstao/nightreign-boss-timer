@@ -232,6 +232,11 @@ menu with **Open records**.
 - To delete records, select one or more rows (Ctrl or Shift for several) and press **Delete
   selected** or the Delete key, or right-click the selection. The tool asks first. Deleted rows
   are gone from `records.csv` for good, and it cannot be done while the file is open in Excel.
+- **Delete incomplete** removes every `incomplete` record in the list as it is shown, and its
+  button says how many that is. With no filter and an empty search box, that is every
+  incomplete record in the file. With a filter set, for example one table, only that table's
+  incomplete records go and the hidden ones are kept. The tool asks first and names the
+  number. Fights still waiting in `records.pending.csv` are not touched.
 - Choose one boss to see a summary line: attempts, completes, your best time and your average.
   Best and average count only complete fights that began with the boss at full health.
 - `incomplete` fights are shown in a different colour.

@@ -200,9 +200,8 @@ def test_delete_removes_the_selected_rows_after_asking(
     application: "QApplication", tmp_path: Path
 ) -> None:
     recorder, page, asked = make_asking(tmp_path, answer=True)
-    page.table.sortByColumn(
-        at("duration"), Qt.SortOrder.AscendingOrder
-    )  # the rows are not in file order
+    # The rows are not in file order.
+    page.table.sortByColumn(at("duration"), Qt.SortOrder.AscendingOrder)
     page.table.selectRow(0)
     assert page.delete_button.isEnabled()
     (chosen,) = page.selected_records()
@@ -350,3 +349,92 @@ def test_characters_sort_as_one_whatever_language_they_were_saved_in(
     page.refresh()
     page.table.sortByColumn(at("character"), Qt.SortOrder.AscendingOrder)
     assert column(page, "character") == ["", "Duchess", "Duchess", "Wylder", "Wylder"]
+
+
+def test_delete_incomplete_removes_every_incomplete_record_when_nothing_is_filtered(
+    application: "QApplication", tmp_path: Path
+) -> None:
+    recorder, page, asked = make_asking(tmp_path, answer=True)
+    assert page.delete_incomplete_button.text() == "Delete incomplete (2)"
+    assert page.delete_incomplete_button.isEnabled()
+    assert not page.filtered()
+
+    page.delete_incomplete_button.click()
+
+    assert asked == ["Delete all incomplete records (2)? This cannot be undone."]
+    left = recorder.store.read_all()
+    assert len(left) == len(RECORDS) - 2
+    assert all(record.status is Status.COMPLETE for record in left)
+    assert page.table.rowCount() == len(RECORDS) - 2
+    assert page.delete_incomplete_button.text() == "Delete incomplete (0)"
+    assert not page.delete_incomplete_button.isEnabled()
+    page.delete_incomplete()  # nothing left to ask about
+    assert len(asked) == 1
+
+
+def test_delete_incomplete_keeps_what_the_filters_hide(
+    application: "QApplication", tmp_path: Path
+) -> None:
+    recorder, page, asked = make_asking(tmp_path, answer=True)
+    choose(page.table_filter, "Arena")
+    assert page.filtered()
+    assert page.delete_incomplete_button.text() == "Delete incomplete (1)"
+
+    page.delete_incomplete_button.click()
+
+    assert asked == [
+        "Delete the incomplete records in the list shown (1)? "
+        "Records hidden by the filters or the search are kept. This cannot be undone."
+    ]
+    left = recorder.store.read_all()
+    assert len(left) == len(RECORDS) - 1
+    # The incomplete fight in the other table was not on screen, and is still there.
+    assert [r.table for r in left if r.status is Status.INCOMPLETE] == ["No-hit practice"]
+    assert page.table_filter.currentData() == "Arena"  # the filter stays as it was
+
+
+def test_delete_incomplete_follows_the_search_and_the_status_filter(
+    application: "QApplication", tmp_path: Path
+) -> None:
+    recorder, page, asked = make_asking(tmp_path, answer=True)
+    choose(page.status_filter, "complete")
+    assert page.delete_incomplete_button.text() == "Delete incomplete (0)"
+    assert not page.delete_incomplete_button.isEnabled()
+    choose(page.status_filter, "")
+    page.search.setText("no-hit")
+    assert page.filtered()
+    assert page.delete_incomplete_button.text() == "Delete incomplete (1)"
+    page.delete_incomplete()
+    assert "in the list shown" in asked[0]
+    assert [r.table for r in recorder.store.read_all() if r.status is Status.INCOMPLETE] == [
+        "Arena"
+    ]
+
+
+def test_delete_incomplete_can_be_refused_and_reports_a_locked_file(
+    application: "QApplication", tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    recorder, page, asked = make_asking(tmp_path / "no", answer=False)
+    page.delete_incomplete()
+    assert len(asked) == 1
+    assert len(recorder.store.read_all()) == len(RECORDS)
+
+    recorder, page, _ = make_asking(tmp_path / "locked", answer=True)
+
+    def locked(records: object) -> int:
+        raise PermissionError
+
+    monkeypatch.setattr(recorder.store, "remove", locked)
+    page.delete_incomplete()
+    assert page.message.text() == "Records file is open in another program"
+    assert page.table.rowCount() == len(RECORDS)
+
+
+@pytest.mark.parametrize(
+    ("language", "text"), [("zh_CN", "删除未完成（2）"), ("zh_TW", "刪除未完成（2）")]
+)
+def test_delete_incomplete_is_translated(
+    application: "QApplication", tmp_path: Path, language: str, text: str
+) -> None:
+    _, page = make(tmp_path, language)
+    assert page.delete_incomplete_button.text() == text

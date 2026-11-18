@@ -28,6 +28,7 @@ from nightreign_boss_timer.record_view import (
     boss_key,
     boss_label,
     filter_records,
+    incompletes,
     names_in,
     summarise,
 )
@@ -117,6 +118,8 @@ class RecordsPage(Page):
         self.delete_button = QPushButton()
         self.delete_button.setEnabled(False)
         self.delete_button.clicked.connect(self.delete_selected)
+        self.delete_incomplete_button = QPushButton()
+        self.delete_incomplete_button.clicked.connect(self.delete_incomplete)
         # A button that opens the list of characters, for the selected rows.
         self.character_menu = QMenu(self)
         self.character_button = QPushButton()
@@ -133,6 +136,7 @@ class RecordsPage(Page):
         bottom.addWidget(self.message)
         bottom.addStretch(1)
         bottom.addWidget(self.character_button)
+        bottom.addWidget(self.delete_incomplete_button)
         bottom.addWidget(self.delete_button)
         bottom.addWidget(self.open_file)
         bottom.addWidget(self.open_folder)
@@ -174,6 +178,29 @@ class RecordsPage(Page):
         translate = self.controller.translate
         question = translate("records.delete_ask", count=len(records))
         if not self._ask(self, translate("records.delete"), question):
+            return
+        error = self.controller.delete_records(records)
+        self.refresh()
+        self.message.setText(error)
+
+    def filtered(self) -> bool:
+        """True while a filter or the search box hides some records."""
+        boxes = (self.table_filter, self.boss_filter, self.status_filter)
+        return any(box.currentData() for box in boxes) or bool(self.search.text().strip())
+
+    def delete_incomplete(self) -> None:
+        """Delete every incomplete record among those shown, after asking with their number.
+
+        Records the filters hide are kept, so nothing is deleted that cannot be seen.
+        """
+        records = incompletes(self._shown)
+        if not records:
+            return
+        translate = self.controller.translate
+        key = "records.delete_incomplete_ask_shown" if self.filtered() else ""
+        question = translate(key or "records.delete_incomplete_ask", count=len(records))
+        title = translate("records.delete_incomplete", count=len(records))
+        if not self._ask(self, title, question):
             return
         error = self.controller.delete_records(records)
         self.refresh()
@@ -286,6 +313,11 @@ class RecordsPage(Page):
         self.table.sortByColumn(0, Qt.SortOrder.DescendingOrder)
         self.table.resizeColumnsToContents()
         self.count.setText(translate("records.count", count=len(records)))
+        unfinished = len(incompletes(records))
+        self.delete_incomplete_button.setText(
+            translate("records.delete_incomplete", count=unfinished)
+        )
+        self.delete_incomplete_button.setEnabled(unfinished > 0)
 
         # The summary only means something for one boss.
         if self.boss_filter.currentData() and records:

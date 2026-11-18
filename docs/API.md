@@ -213,6 +213,7 @@ Chooses which records to show and sums them up. No drawing.
 | Name | What it is |
 |---|---|
 | `filter_records(records, table, boss, status, search)` | The records that pass every filter, newest first. `search` looks at the boss, the character, the table and the date. |
+| `incompletes(records)` | The records among these with status `incomplete`. |
 | `summarise(records)` | A `Summary` of a set of fights. |
 | `Summary` | `attempts`, `completes`, `best_s`, `average_s`. The times count only complete fights that began at full health. |
 | `names_in(records)` | The table names and boss keys that appear, each sorted. |
@@ -472,6 +473,8 @@ The Records page: every saved fight with filters, sorting and a per-boss summary
 | `RecordsPage` | The page. Reads the records file on `refresh()`. |
 | `RecordsPage.shown_records()` | The records that pass the filters as they are set now. |
 | `RecordsPage.selected_records()` | The records of the selected rows. |
+| `RecordsPage.delete_incomplete()` | Delete every incomplete record among those shown, after asking with their number. |
+| `RecordsPage.filtered()` | True while a filter or the search box hides some records. |
 | `RecordsPage.set_character(character)` | Give the selected records a character, by its English name. Empty takes it away. The `character_button` and the right-click menu both open the list that calls this. |
 | `RecordsPage.delete_selected()` | Delete the selected records, after asking. `ask` in the constructor replaces the question window. |
 | `COLUMNS` | The table's columns, in order. |

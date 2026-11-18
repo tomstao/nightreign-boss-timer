@@ -11,6 +11,7 @@ All notable changes are listed here. The format follows
 - A `character` column in `records.csv` for the character a fight was played with, and the list of the game's ten characters in three languages. A file made by an older version gets the column the next time a fight is saved.
 - A **Character** setting on the Settings page. Every new record is saved with the character chosen there, named in the language of the program. Until one is chosen, the column stays empty.
 - The Records page shows the character of each record in the language of the program, and **Set character** changes it for the selected rows. The search box also finds a character by its name in any of the three languages.
+- **Delete incomplete** on the Records page removes every incomplete record in the list shown, after asking with their number. Records hidden by a filter or the search are kept.
 
 ## 0.1.0 - 2026-11-18
 
