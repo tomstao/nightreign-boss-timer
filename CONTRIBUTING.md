@@ -1,7 +1,11 @@
 # Contributing
 
-Thanks for helping. The project is at the planning stage, so the most useful contributions right
-now are game footage, boss name corrections, and comments on the [plan](docs/PLAN.md).
+Thanks for helping. The most useful contributions right now are game footage, boss name
+corrections, test runs against the real game, and comments on the [plan](docs/PLAN.md).
+
+The [API reference](docs/API.md) says what each module does. If you develop with Claude Code,
+`CLAUDE.md` and the skills under `.claude/skills/` describe the same workflow as this file in
+more detail: shipping a change, adding UI text, checking the UI, and working with footage.
 
 ## Ground rules
 
@@ -48,6 +52,7 @@ CI runs the same commands and must pass.
 - Write the commit subject in the imperative: "Add bar detector", not "Added" or "Adds".
 - Say what changed and why in the pull request description, and how you tested it.
 - Add a line to `CHANGELOG.md` under "Unreleased" for anything a user would notice.
+- Update `docs/API.md` when you add or change a module or a public function. A test checks it.
 
 ## Reporting detection problems
 

@@ -3,9 +3,9 @@
 Records how long each boss fight takes in ELDEN RING NIGHTREIGN by reading the boss health bar
 from the screen. Built to cost no measurable game FPS.
 
-> **Status: early development.** A command-line version records fights with default regions.
-> The overlay, the settings window and region calibration are not built yet.
-> See the [plan](docs/PLAN.md) for milestones.
+> **Status: early development, not yet tested against the real game.** An overlay with a tray
+> icon records fights, switches tables and has region calibration. The main window, hotkeys and
+> a packaged release are not built yet. See the [plan](docs/PLAN.md) for milestones.
 
 ## What it will do
 
@@ -70,8 +70,8 @@ uv run python -m nightreign_boss_timer.ui.app
 ```
 
 A small overlay shows the active table, then the boss, timer and boss HP during a fight, then
-the result. A tray icon lets you pause tracking, hide the overlay, and quit. There is no settings
-window or region calibration yet.
+the result. The tray icon lets you pause tracking, switch the table, open the records file,
+calibrate the regions, hide the overlay, and quit. There is no settings window yet.
 
 ## Try the command-line version
 
@@ -98,6 +98,8 @@ To measure what it costs on your PC, run `uv run python tools/bench_capture.py` 
 - [Plan](docs/PLAN.md): goal, recording rules, design, milestones, open decisions
 - [UI design](docs/UI.md): tray, overlay, main window, calibration, first-run setup
 - [Observations](docs/observations.md): measurements of the boss bar from real screenshots
+- [API reference](docs/API.md): what each module does and its public functions
+- [Contributing](CONTRIBUTING.md): ground rules, setup, code style
 - [Research](docs/research.md): terminology, best practice, notes on existing tools
 - [Contributing](CONTRIBUTING.md)
 - [Changelog](CHANGELOG.md)
