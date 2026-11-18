@@ -103,3 +103,21 @@ def test_a_fresh_notice_takes_over_and_then_goes_away() -> None:
     assert stale.lines[1] == "Tree Sentinel"
     # A notice is shown even with no game to draw over: it answers something the user just did.
     assert overlay_text(Snapshot(State.NO_GAME, "Arena"), EN, notice="Paused").lines == ("Paused",)
+
+
+def test_boss_is_shown_in_the_language_of_the_ui_not_of_the_game() -> None:
+    # The game is in Simplified Chinese and the tool is set to English, or the other way round.
+    fight = Snapshot(State.FIGHT, "Arena", "铃珠猎人", hp=0.43, elapsed_s=25.2)
+    assert overlay_text(fight, EN).lines[1] == "Bell Bearing Hunter"
+    assert overlay_text(fight, Translator("zh_CN")).lines[1] == "铃珠猎人"
+    assert overlay_text(fight, Translator("zh_TW")).lines[1] == "鈴珠獵人"
+    english_game = Snapshot(State.FIGHT, "Arena", "Tree Sentinel", hp=0.43, elapsed_s=25.2)
+    assert overlay_text(english_game, Translator("zh_CN")).lines[1] == "大树守卫"
+
+    # A reading that is slightly off is shown as the boss it stands for.
+    misread = Snapshot(State.FIGHT, "Arena", "铃珠猎入", hp=0.43, elapsed_s=25.2)
+    assert overlay_text(misread, EN).lines[1] == "Bell Bearing Hunter"
+
+    # A name that is not a known boss is shown as it was read.
+    unlisted = Snapshot(State.FIGHT, "Arena", "某个新头目", hp=0.43, elapsed_s=25.2)
+    assert overlay_text(unlisted, EN).lines[1] == "某个新头目"

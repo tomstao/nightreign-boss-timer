@@ -148,7 +148,7 @@ you are done.
 | Shows | When |
 |---|---|
 | the active table | while waiting for a fight |
-| boss name, timer, boss HP % | during a fight |
+| boss name in the language the program is set to, timer, boss HP % | during a fight |
 | `COMPLETE` or `INCOMPLETE`, the time, your best time | for a few seconds after a fight |
 | a warning such as `Regions not set` or `Paused` | when the tool cannot record |
 

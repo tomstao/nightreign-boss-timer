@@ -206,6 +206,7 @@ Chooses which records to show and sums them up. No drawing.
 | `translations(record)` | The boss in English, Simplified and Traditional Chinese: as saved, or looked up for older records. |
 | `boss_key(record)`, `key_of(name)` | What a boss is grouped under: its English name if known, else the name as read. |
 | `boss_label(record, language)` | The boss in a UI language, or as it was read. |
+| `label_of(name, language)` | The same for a bare name, as the overlay has during a fight. |
 | `ALL` | The filter value that lets everything through. |
 
 ### `nightreign_boss_timer.settings`

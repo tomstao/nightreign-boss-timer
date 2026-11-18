@@ -48,6 +48,14 @@ def key_of(name: str) -> str:
     return known.en if known and known.en else name
 
 
+def label_of(name: str, language: str) -> str:
+    """A boss name in a UI language (``en``, ``zh_CN``, ``zh_TW``) if it is known, else as given."""
+    known = _known(name)
+    if known is None:
+        return name
+    return {"en": known.en, "zh_CN": known.zh_cn, "zh_TW": known.zh_tw}.get(language) or name
+
+
 def boss_key(record: FightRecord) -> str:
     """What a record's boss is grouped under, so one boss is one group in every game language."""
     return translations(record)[0] or record.boss

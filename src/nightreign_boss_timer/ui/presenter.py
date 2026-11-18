@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from nightreign_boss_timer.engine import Snapshot, State
 from nightreign_boss_timer.i18n import Translator
 from nightreign_boss_timer.names import UNKNOWN
-from nightreign_boss_timer.record_view import boss_key, key_of
+from nightreign_boss_timer.record_view import boss_key, key_of, label_of
 from nightreign_boss_timer.records import FightRecord, Status, format_duration
 
 # How long the result of a fight stays on the overlay.
@@ -44,7 +44,10 @@ def best_time(records: Iterable[FightRecord], boss: str, table: str) -> float | 
 
 
 def _boss(name: str, translate: Translator) -> str:
-    return translate("records.unknown_boss") if name == UNKNOWN else name
+    """The boss in the language of the UI if it is a known boss, else the name as it was read."""
+    if name == UNKNOWN:
+        return translate("records.unknown_boss")
+    return label_of(name, translate.language)
 
 
 def overlay_text(
