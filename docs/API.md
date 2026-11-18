@@ -308,6 +308,8 @@ Every action the user can take, shared by the tray, the windows and the hotkeys.
 | `Controller.open_records_folder()` | Open the folder that holds it. |
 | `Controller.calibrate(region)` | Ask for the calibration window, at `bar`, `defeat_text` or the first step. |
 | `Controller.probe` | Set by the app to `Engine.probe`. `None` when there is no screen to read. |
+| `Controller.show_setup()` | Ask for the first-run setup guide. Emits `setup_requested`. |
+| `Controller.finish_setup()` | Remember that setup was finished or skipped. |
 | `Controller.show_window(page)` | Ask for the main window, optionally at a page key such as `records`. |
 | `Controller.window_requested` | Signal carrying that page key. |
 | `Controller.set_state(state)` | Told by the app after every engine step. Emits `state_changed` when it differs. |
@@ -428,6 +430,20 @@ The Settings page. Every change is applied and saved at once.
 | Name | What it is |
 |---|---|
 | `SettingsPage(controller, choose_folder)` | The page. `choose_folder` shows the folder dialog and can be replaced for tests. |
+
+### `nightreign_boss_timer.ui.setup_window`
+
+First-run setup: welcome and language, game and regions, basics. Shown once.
+
+| Name | What it is |
+|---|---|
+| `SetupWindow(controller, choose_folder)` | The guide. `choose_folder` shows the folder dialog and can be replaced for tests. |
+| `SetupWindow.start()` | Open at the first step. |
+| `SetupWindow.go_to(step)` | Show a step, counted from zero. |
+| `SetupWindow.check_game()` | Look for the game window now and say what was found. |
+| `SetupWindow.finish()` | Close and remember, for Finish and for Skip setup. |
+| `SetupWindow.refresh()` | Redraw every text in the current language. |
+| `STEPS` | The number of steps. |
 
 ### `nightreign_boss_timer.ui.tables_page`
 

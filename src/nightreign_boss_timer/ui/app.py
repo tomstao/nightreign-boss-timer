@@ -37,6 +37,7 @@ from nightreign_boss_timer.ui.global_hotkeys import GlobalHotkeys
 from nightreign_boss_timer.ui.main_window import MainWindow
 from nightreign_boss_timer.ui.overlay import Overlay
 from nightreign_boss_timer.ui.presenter import best_time, overlay_text
+from nightreign_boss_timer.ui.setup_window import SetupWindow
 from nightreign_boss_timer.ui.tray import IconState, Tray
 
 
@@ -72,6 +73,8 @@ class App:
 
         self.window = MainWindow(self.controller)
         self.controller.window_requested.connect(self.window.show_page)
+        self.setup = SetupWindow(self.controller)
+        self.controller.setup_requested.connect(self.setup.start)
         self.tray = Tray(self.controller, application.quit)
         self.tray.icon.show()
         self.hotkeys = GlobalHotkeys()
@@ -89,6 +92,8 @@ class App:
         self.timer.timeout.connect(self._step)
         application.aboutToQuit.connect(self.close)
         self._step()
+        if not self.settings.setup_done:
+            self.setup.start()
 
     def _apply(self) -> None:
         """Bring the engine and the overlay in line with what the user chose."""
@@ -169,6 +174,7 @@ class App:
         self.timer.stop()
         self.hotkeys.close()
         self.calibration.close()
+        self.setup.close()
         self.window.close()
         self.screen.close()
         self.tray.icon.hide()

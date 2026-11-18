@@ -86,7 +86,8 @@ This works today and is the only way to run the tool until there is a release.
    It prints each finished fight and appends it to
    `Documents\nightreign-boss-timer\records.csv`. Stop it with Ctrl+C.
 
-   Or run the version with the overlay and tray icon. Its tray menu switches the table, opens the records
+   Or run the version with the overlay and tray icon. The first time, a short setup guide
+   opens. Its tray menu switches the table, opens the records
    file, has **Calibrate regions** (see the [user guide](USER_GUIDE.md#first-run-setup)) and
    **Quit**:
 

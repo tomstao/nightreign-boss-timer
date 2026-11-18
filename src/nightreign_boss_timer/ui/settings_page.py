@@ -95,8 +95,11 @@ class SettingsPage(Page):
 
         self.general = QGroupBox()
         self.language_label = QLabel()
+        self.setup_button = QPushButton()
+        self.setup_button.clicked.connect(controller.show_setup)
         general = QFormLayout(self.general)
         general.addRow(self.language_label, self.language)
+        general.addRow(self.setup_button)
 
         self.records = QGroupBox()
         self.folder_label = QLabel()
@@ -136,6 +139,7 @@ class SettingsPage(Page):
         self.records.setTitle(translate("settings.group.records"))
         self.detection.setTitle(translate("settings.group.detection"))
         self.language_label.setText(translate("settings.language"))
+        self.setup_button.setText(translate("setup.again"))
         self.folder_label.setText(translate("settings.records_folder"))
         self.browse.setText(translate("settings.browse"))
         self.default_folder.setText(translate("settings.default_folder"))

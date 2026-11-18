@@ -38,6 +38,8 @@ class Controller(QObject):
     records_changed = Signal()
     # The user asked for the calibration window, starting at this region (empty: the first).
     calibration_requested = Signal(str)
+    # The user asked for the first-run setup guide.
+    setup_requested = Signal()
     # The main window was shown (True) or hidden (False).
     window_shown = Signal(bool)
     # A shortcut is being typed in: hotkeys must not fire (True), or may again (False).
@@ -328,6 +330,16 @@ class Controller(QObject):
         self._opener(self.store.path.parent)
 
     # --- windows and status ---------------------------------------------------------------------
+
+    def show_setup(self) -> None:
+        """Open the first-run setup guide."""
+        self.setup_requested.emit()
+
+    def finish_setup(self) -> None:
+        """Remember that setup was finished or skipped, so it is not shown again by itself."""
+        if not self.settings.setup_done:
+            self.settings.setup_done = True
+            self.save()
 
     def show_window(self, page: str = "") -> None:
         self.window_requested.emit(page)

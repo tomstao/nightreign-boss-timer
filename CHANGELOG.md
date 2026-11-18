@@ -40,3 +40,4 @@ All notable changes are listed here. The format follows
 - Two more hotkey actions, not set by default: end the current fight now, and discard the last record (press again to undo).
 - Hotkeys page: change any shortcut by pressing the keys, with conflict checks and a mark on shortcuts Windows refuses.
 - The overlay can be dragged to a new place while the main window is open. The place is remembered.
+- First-run setup guide: language, game check and calibration, table, records folder and hotkeys. Shown once, and again on request from the Settings page.

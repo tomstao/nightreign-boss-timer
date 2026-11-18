@@ -11,8 +11,7 @@
 > [Everyday use](#everyday-use) and writes the file described under [Your records](#your-records).
 > Region calibration works as described under [First-run setup](#first-run-setup), from the tray
 > menu or with `Ctrl+Alt+C`. Until you calibrate, the tool uses the usual positions for a 16:9
-> game image. Picking a recent frame for the defeat text and first-run setup are not built
-> yet.
+> game image. Picking a recent frame for the defeat text is not built yet.
 
 To install the tool, see [INSTALL.md](INSTALL.md).
 
@@ -32,8 +31,21 @@ It only looks at the screen. It does not touch the game.
 
 ## First-run setup
 
+The first time the tool starts, a short guide opens. It has three steps, and **Skip setup** at
+any step closes it for good without changing anything:
+
+1. **Welcome**: what the tool does, and the language of the program.
+2. **Game and regions**: whether the game window is found (**Check again** after starting the
+   game), and **Calibrate regions**, described below.
+3. **Basics**: the table your fights are saved under, the folder for `records.csv`, and the
+   hotkeys that are set.
+
+Everything in it can be changed later in the main window. To see the guide again, choose
+**Show the setup guide again** on the Settings page.
+
 The tool cannot find the health bar by itself yet, because its position depends on your
-resolution. You mark two areas once.
+resolution. It starts with the usual positions for a 16:9 game image. To set them exactly, you
+mark two areas once.
 
 ### 1. Health bar
 

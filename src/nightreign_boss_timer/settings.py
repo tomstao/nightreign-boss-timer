@@ -61,6 +61,8 @@ def default_tables() -> list[Table]:
 @dataclass(slots=True)
 class Settings:
     ui_language: str = "en"
+    # False until the first-run setup has been finished or skipped.
+    setup_done: bool = False
     tables: list[Table] = field(default_factory=default_tables)
     active_table: str = "Arena"
     # Empty means the default folder under Documents.
@@ -137,6 +139,7 @@ class Settings:
         return {
             "version": FILE_VERSION,
             "ui_language": self.ui_language,
+            "setup_done": self.setup_done,
             "tables": [
                 {"name": t.name, "builtin": t.builtin, "hotkey": t.hotkey} for t in self.tables
             ],
@@ -162,6 +165,8 @@ class Settings:
 
         if data.get("ui_language") in UI_LANGUAGES:
             settings.ui_language = data["ui_language"]
+
+        settings.setup_done = data.get("setup_done") is True
 
         tables = _read_tables(data.get("tables"))
         if tables:
