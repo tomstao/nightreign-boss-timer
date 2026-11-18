@@ -172,8 +172,8 @@ Excel or any spreadsheet program, or choose **Open records file in Excel** from 
 |---|---|
 | `started_at` | date and time the fight began |
 | `table` | the table that was active (see below) |
-| `boss` | boss name as shown in game, or `unknown` if it could not be read |
-| `language` | language the name was read in: `en`, or `zh` for Chinese. Simplified and Traditional are not told apart yet. |
+| `boss` | boss name as shown in game, or `unknown` if it could not be read. A reading one or two characters off a known name is corrected to it. |
+| `language` | language the name was read in: `en`, `zh_CN` (Simplified) or `zh_TW` (Traditional). It is `zh` when the name is written the same in both kinds of Chinese, or is not in the list of known names. |
 | `status` | `complete` or `incomplete` |
 | `duration` | fight time as minutes:seconds |
 | `duration_s` | the same in seconds, for sorting and charts |
@@ -181,8 +181,17 @@ Excel or any spreadsheet program, or choose **Open records file in Excel** from 
 | `end_hp_pct` | boss HP when the fight ended; 0 for a kill |
 | `level` | your level when the fight began, read from the emblem at the top left; empty if it could not be read |
 
-The `level` column is new. A `records.csv` made by an older version gets it the next time a
-fight is saved, with the level left empty for the fights already in it.
+| `boss_en` | the same boss in English, if the name is in the list of known names |
+| `boss_zh_cn` | the same boss in Simplified Chinese |
+| `boss_zh_tw` | the same boss in Traditional Chinese |
+
+The tool knows the names of the game's bosses in all three languages. When the name it reads is
+one of them, the record carries all three, whatever language your game is in. When it is not,
+for example a boss added by a later update, `boss` holds the text as it was read and the three
+translation columns stay empty.
+
+The `level` and `boss_...` columns are new. A `records.csv` made by an older version gets them
+the next time a fight is saved, left empty for the fights already in it.
 
 **If the file is open in Excel when a fight ends**, Excel blocks other programs from writing to
 it. The tool keeps the new rows in `records.pending.csv` next to it and adds them, in order, the
@@ -194,6 +203,10 @@ menu with **Open records**.
 - Filter by table, boss and status, or type in the search box to match a boss, a table or a
   date.
 - Click a column heading to sort by it.
+- A known boss is shown under its name in the language the program is set to, also for older
+  records and for fights recorded with the game in another language. They count as one boss in
+  the filter, the summary and the best time. Searching finds a boss by its name in any of the
+  three languages.
 - To delete records, select one or more rows (Ctrl or Shift for several) and press **Delete
   selected** or the Delete key, or right-click the selection. The tool asks first. Deleted rows
   are gone from `records.csv` for good, and it cannot be done while the file is open in Excel.

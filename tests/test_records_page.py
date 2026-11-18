@@ -65,7 +65,8 @@ def test_filter_boxes_offer_what_exists(application: "QApplication", tmp_path: P
     # Tables from the settings first, then the one only the records know.
     assert tables == ["All", "Arena", "Normal", "No-hit practice"]
     bosses = [page.boss_filter.itemText(i) for i in range(page.boss_filter.count())]
-    assert bosses == ["All", "Tree Sentinel", "unknown", "黄金河马"]
+    # 黄金河马 is a known boss, so the English UI lists it under its English name.
+    assert bosses == ["All", "Golden Hippopotamus", "Tree Sentinel", "unknown"]
     statuses = [page.status_filter.itemText(i) for i in range(page.status_filter.count())]
     assert statuses == ["All", "Complete", "Incomplete"]
 
@@ -85,7 +86,7 @@ def test_choosing_a_boss_filters_and_sums_up(application: "QApplication", tmp_pa
 def test_search_narrows_as_you_type(application: "QApplication", tmp_path: Path) -> None:
     _, page = make(tmp_path)
     QTest.keyClicks(page.search, "normal")
-    assert column(page, 2) == ["黄金河马"]
+    assert column(page, 2) == ["Golden Hippopotamus"]  # saved as 黄金河马, shown in English
     page.search.clear()
     assert page.table.rowCount() == 6
 
@@ -141,6 +142,9 @@ def test_page_is_translated(application: "QApplication", tmp_path: Path, languag
     _, other = make(tmp_path / language, language)
     assert column(other, 4) != column(english, 4)
     assert column(other, 2)[0] != "unknown"
+    # A boss saved under its English name is shown in the language of the UI.
+    assert ("大树守卫" if language == "zh_CN" else "大樹守衛") in column(other, 2)
+    assert "Tree Sentinel" not in column(other, 2)
     assert other.count.text() != english.count.text()
     assert other.open_file.text() != english.open_file.text()
     assert other.search.placeholderText() != english.search.placeholderText()

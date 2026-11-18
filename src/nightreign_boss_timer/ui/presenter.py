@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from nightreign_boss_timer.engine import Snapshot, State
 from nightreign_boss_timer.i18n import Translator
 from nightreign_boss_timer.names import UNKNOWN
+from nightreign_boss_timer.record_view import boss_key, key_of
 from nightreign_boss_timer.records import FightRecord, Status, format_duration
 
 # How long the result of a fight stays on the overlay.
@@ -27,12 +28,14 @@ class OverlayText:
 def best_time(records: Iterable[FightRecord], boss: str, table: str) -> float | None:
     """Fastest complete fight against this boss in this table that started from full health.
 
-    A fight resumed against a damaged boss is not comparable, so it does not count.
+    A fight resumed against a damaged boss is not comparable, so it does not count. The boss
+    is the same boss whatever language its name was read in.
     """
+    key = key_of(boss)
     times = [
         r.duration_s
         for r in records
-        if r.boss == boss
+        if boss_key(r) == key
         and r.table == table
         and r.status is Status.COMPLETE
         and r.start_hp_pct == 100

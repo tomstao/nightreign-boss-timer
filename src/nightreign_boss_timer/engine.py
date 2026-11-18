@@ -21,6 +21,7 @@ from typing import Protocol
 import numpy as np
 from numpy.typing import NDArray
 
+from nightreign_boss_timer import boss_names
 from nightreign_boss_timer.defeat_text import DefeatReading, measure_defeat_text
 from nightreign_boss_timer.detector import BarReading, measure_bar
 from nightreign_boss_timer.level import LevelVote, find_digits
@@ -118,13 +119,22 @@ def to_record(
     boss: str = UNKNOWN,
     level: int | None = None,
 ) -> FightRecord:
-    """Turn a tracker outcome into a row. ``now`` is the tracker's clock at ``wall_now``."""
+    """Turn a tracker outcome into a row. ``now`` is the tracker's clock at ``wall_now``.
+
+    ``boss`` is the name as read. If it is in the list of known names, the record gets the name
+    as the game writes it and the same boss in the other languages. If not, it keeps the text
+    that was read.
+    """
     started = wall_now - timedelta(seconds=now - outcome.started_at)
+    known = None if boss == UNKNOWN else boss_names.load().lookup(boss)
     return FightRecord(
         started_at=started.replace(microsecond=0),
         table=table,
-        boss=boss,
-        language=language_of(boss),
+        boss=known.name if known else boss,
+        language=known.language if known else language_of(boss),
+        boss_en=known.en if known else "",
+        boss_zh_cn=known.zh_cn if known else "",
+        boss_zh_tw=known.zh_tw if known else "",
         status=outcome.status,
         duration_s=round(outcome.duration_s, 1),
         start_hp_pct=outcome.start_hp_pct,

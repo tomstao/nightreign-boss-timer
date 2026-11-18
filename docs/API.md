@@ -64,7 +64,7 @@ The recording rules as a state machine. Fed one sample at a time, it says when a
 | `FightTracker.started_at` | The tracker-clock time the current fight began. |
 | `FightTracker.hp` | The current smoothed HP, or `None`. |
 | `FightTracker.watching_for_defeat` | True while the defeat text region needs to be read. |
-| `FightOutcome` | `status`, `started_at`, `duration_s`, `start_hp_pct`, `end_hp_pct`, and `level` (`None` if unread). |
+| `FightOutcome` | `status`, `started_at`, `duration_s`, `start_hp_pct`, `end_hp_pct`, `level` (`None` if unread), and `boss_en`, `boss_zh_cn`, `boss_zh_tw` (empty if the boss is not a known one). |
 | `FULL_HP` | A reading at or above this is written as 100%. |
 
 ### `nightreign_boss_timer.boss_names`
@@ -202,7 +202,10 @@ Chooses which records to show and sums them up. No drawing.
 | `filter_records(records, table, boss, status, search)` | The records that pass every filter, newest first. |
 | `summarise(records)` | A `Summary` of a set of fights. |
 | `Summary` | `attempts`, `completes`, `best_s`, `average_s`. The times count only complete fights that began at full health. |
-| `names_in(records)` | The table names and boss names that appear, each sorted. |
+| `names_in(records)` | The table names and boss keys that appear, each sorted. |
+| `translations(record)` | The boss in English, Simplified and Traditional Chinese: as saved, or looked up for older records. |
+| `boss_key(record)`, `key_of(name)` | What a boss is grouped under: its English name if known, else the name as read. |
+| `boss_label(record, language)` | The boss in a UI language, or as it was read. |
 | `ALL` | The filter value that lets everything through. |
 
 ### `nightreign_boss_timer.settings`
@@ -279,7 +282,7 @@ Joins capture, detectors, tracker, name reading and the record store, one step a
 | `Screen` | The interface the engine needs from the screen: `find_window(title)` and `grab(box)`. |
 | `NameSource` | The interface for reading a name: `read(region)`. |
 | `records_path(settings)` | Where `records.csv` is for these settings. |
-| `to_record(outcome, table, now, wall_now, boss, level)` | Turn a tracker outcome into a `FightRecord`. |
+| `to_record(outcome, table, now, wall_now, boss, level)` | Turn a tracker outcome into a `FightRecord`. A known boss gets its name as the game writes it and its translations; any other keeps the text as read. |
 | `GAME_TITLE` | The game window title looked for by default. |
 
 ### `nightreign_boss_timer.__main__`

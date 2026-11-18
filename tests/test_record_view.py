@@ -1,6 +1,14 @@
 from datetime import datetime
 
-from nightreign_boss_timer.record_view import filter_records, names_in, summarise
+from nightreign_boss_timer.record_view import (
+    boss_key,
+    boss_label,
+    filter_records,
+    key_of,
+    names_in,
+    summarise,
+    translations,
+)
 from nightreign_boss_timer.records import FightRecord, Status
 
 
@@ -77,6 +85,33 @@ def test_summary_without_a_comparable_fight() -> None:
 
 
 def test_names_are_sorted_without_regard_to_case() -> None:
-    tables, bosses = names_in([*RECORDS, fight(40, boss="ancient Dragon", table="arena 2")])
+    tables, bosses = names_in([*RECORDS, fight(40, boss="some new Boss", table="arena 2")])
     assert tables == ["Arena", "arena 2", "No-hit practice", "Normal"]
-    assert bosses == ["ancient Dragon", "Tree Sentinel", "unknown", "黄金河马"]
+    # A known boss is listed once, under its English name, whatever language it was read in.
+    assert bosses == ["Golden Hippopotamus", "some new Boss", "Tree Sentinel", "unknown"]
+
+
+def test_one_boss_is_one_group_in_every_game_language() -> None:
+    english, simplified, traditional = (
+        fight(1, boss="Tree Sentinel"),
+        fight(2, boss="大树守卫"),
+        fight(3, boss="大樹守衛"),
+    )
+    assert {boss_key(r) for r in (english, simplified, traditional)} == {"Tree Sentinel"}
+    assert key_of("大树守卫") == "Tree Sentinel"
+    assert len(filter_records([english, simplified, traditional], boss="Tree Sentinel")) == 3
+    # Searching finds a boss by its name in any language.
+    assert len(filter_records([english, simplified, traditional], search="大树")) == 3
+    assert len(filter_records([english, simplified, traditional], search="sentinel")) == 3
+
+
+def test_boss_is_shown_in_the_ui_language_or_as_read() -> None:
+    old_row = fight(1, boss="大树守卫")  # saved before translations were kept
+    assert translations(old_row) == ("Tree Sentinel", "大树守卫", "大樹守衛")
+    assert boss_label(old_row, "en") == "Tree Sentinel"
+    assert boss_label(old_row, "zh_TW") == "大樹守衛"
+
+    unlisted = fight(2, boss="某个新头目")
+    assert translations(unlisted) == ("", "", "")
+    assert boss_key(unlisted) == key_of("某个新头目") == "某个新头目"
+    assert boss_label(unlisted, "en") == "某个新头目"

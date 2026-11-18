@@ -22,7 +22,14 @@ from PySide6.QtWidgets import (
 )
 
 from nightreign_boss_timer.names import UNKNOWN
-from nightreign_boss_timer.record_view import ALL, filter_records, names_in, summarise
+from nightreign_boss_timer.record_view import (
+    ALL,
+    boss_key,
+    boss_label,
+    filter_records,
+    names_in,
+    summarise,
+)
 from nightreign_boss_timer.records import FightRecord, Status, format_duration
 from nightreign_boss_timer.ui.controller import Controller
 from nightreign_boss_timer.ui.pages import Page
@@ -152,8 +159,11 @@ class RecordsPage(Page):
         self.refresh()
         self.message.setText(error)
 
-    def _boss_name(self, name: str) -> str:
-        return self.controller.translate("records.unknown_boss") if name == UNKNOWN else name
+    def _boss_name(self, record: FightRecord) -> str:
+        """The boss of a record in the UI language if it is a known boss, else as it was read."""
+        if record.boss == UNKNOWN:
+            return self.controller.translate("records.unknown_boss")
+        return boss_label(record, self.controller.settings.ui_language)
 
     def _fill(self, box: QComboBox, values: list[tuple[str, str]]) -> None:
         """Put (text, value) choices in a filter box, keeping the current choice if it survives."""
@@ -175,7 +185,8 @@ class RecordsPage(Page):
         known = controller.settings.table_names()
         tables = known + [name for name in tables if name not in known]
         self._fill(self.table_filter, [(name, name) for name in tables])
-        self._fill(self.boss_filter, [(self._boss_name(name), name) for name in bosses])
+        labels = {boss_key(record): self._boss_name(record) for record in self._records}
+        self._fill(self.boss_filter, [(labels[key], key) for key in bosses])
         self._fill(
             self.status_filter,
             [(translate(f"status.{status.value}"), status.value) for status in Status],
@@ -212,7 +223,7 @@ class RecordsPage(Page):
             cells = (
                 _Cell(f"{record.started_at:%Y-%m-%d %H:%M:%S}", record.started_at),
                 _Cell(record.table, record.table.casefold()),
-                _Cell(self._boss_name(record.boss), record.boss.casefold()),
+                _Cell(self._boss_name(record), boss_key(record).casefold()),
                 _Cell("" if record.level is None else str(record.level), record.level or 0),
                 _Cell(translate(f"status.{record.status.value}"), record.status.value),
                 _Cell(f"{record.start_hp_pct}%", record.start_hp_pct),

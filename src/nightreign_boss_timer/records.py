@@ -24,6 +24,9 @@ COLUMNS = (
     "start_hp_pct",
     "end_hp_pct",
     "level",
+    "boss_en",
+    "boss_zh_cn",
+    "boss_zh_tw",
 )
 
 _TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
@@ -57,6 +60,11 @@ class FightRecord:
     end_hp_pct: int
     # The player's level when the fight began. None if it could not be read.
     level: int | None = None
+    # The same boss in each language, when the name is in the list of known names. Empty
+    # otherwise, and ``boss`` is then all there is: the text as it was read.
+    boss_en: str = ""
+    boss_zh_cn: str = ""
+    boss_zh_tw: str = ""
 
     def to_row(self) -> list[str]:
         return [
@@ -70,6 +78,9 @@ class FightRecord:
             str(self.start_hp_pct),
             str(self.end_hp_pct),
             "" if self.level is None else str(self.level),
+            self.boss_en,
+            self.boss_zh_cn,
+            self.boss_zh_tw,
         ]
 
     @classmethod
@@ -85,6 +96,9 @@ class FightRecord:
             end_hp_pct=int(row["end_hp_pct"]),
             # Files written before the level was recorded have no such column.
             level=int(level) if (level := row.get("level") or "").isdecimal() else None,
+            boss_en=row.get("boss_en") or "",
+            boss_zh_cn=row.get("boss_zh_cn") or "",
+            boss_zh_tw=row.get("boss_zh_tw") or "",
         )
 
 

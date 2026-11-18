@@ -60,7 +60,26 @@ def test_describe_is_one_readable_line() -> None:
 def test_record_carries_the_boss_name_and_its_language() -> None:
     outcome = FightOutcome(1000.0, 60.0, Status.COMPLETE, 100, 0)
     record = to_record(outcome, "Arena", 1067.0, datetime(2026, 11, 17, 21, 5, 40), "黄金河马")
-    assert (record.boss, record.language) == ("黄金河马", "zh")
+    assert (record.boss, record.language) == ("黄金河马", "zh_CN")
+    assert (record.boss_en, record.boss_zh_cn, record.boss_zh_tw) == (
+        "Golden Hippopotamus",
+        "黄金河马",
+        "黃金河馬",
+    )
+
+
+def test_misread_name_is_repaired_and_an_unlisted_name_is_kept_as_read() -> None:
+    outcome = FightOutcome(1000.0, 60.0, Status.COMPLETE, 100, 0)
+    when = datetime(2026, 11, 17, 21, 5, 40)
+    repaired = to_record(outcome, "Arena", 1067.0, when, "卡利亚禁卫骑土")
+    assert (repaired.boss, repaired.boss_en) == ("卡利亚禁卫骑士", "Royal Carian Knight")
+
+    unlisted = to_record(outcome, "Arena", 1067.0, when, "某个新头目")
+    assert (unlisted.boss, unlisted.language) == ("某个新头目", "zh")
+    assert (unlisted.boss_en, unlisted.boss_zh_cn, unlisted.boss_zh_tw) == ("", "", "")
+
+    same_in_both = to_record(outcome, "Arena", 1067.0, when, "王室幽魂")
+    assert (same_in_both.language, same_in_both.boss_en) == ("zh", "Royal Revenant")
 
 
 def test_name_region_covers_the_measured_name_at_1440p() -> None:

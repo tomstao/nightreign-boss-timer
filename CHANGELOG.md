@@ -50,3 +50,5 @@ All notable changes are listed here. The format follows
 - Setting to show the overlay in screenshots and recordings, for making videos of the tool. Off by default.
 - Records can be deleted on the Records page: select rows, then **Delete selected**, the Delete key or the right-click menu. It asks first.
 - Records now carry the player's level, read from the emblem at the top left when a fight begins. It is a new `level` column in `records.csv` and on the Records page. Older files get the column on the next save.
+- Records now carry the boss name in English, Simplified Chinese and Traditional Chinese (`boss_en`, `boss_zh_cn`, `boss_zh_tw`) when the boss is one of the 210 the tool knows. A name read slightly wrong is corrected. An unknown name is kept as read.
+- The Records page shows each known boss in the language the program is set to, and counts it as one boss whatever language the game was in.

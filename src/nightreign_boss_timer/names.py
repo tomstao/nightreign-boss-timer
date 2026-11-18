@@ -21,8 +21,8 @@ UNKNOWN = "unknown"
 def language_of(name: str) -> str:
     """``en`` for a name in Latin letters, ``zh`` for one in Chinese characters, else empty.
 
-    Telling Simplified from Traditional Chinese needs the list of known names, which does not
-    exist yet, so both are reported as ``zh`` for now.
+    This is the fallback for a name that is not in the list of known names. Without the list,
+    Simplified cannot be told from Traditional Chinese, so both are ``zh``.
     """
     if not name or name == UNKNOWN:
         return ""

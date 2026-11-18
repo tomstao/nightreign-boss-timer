@@ -215,16 +215,29 @@ def test_level_is_saved_and_read_back(tmp_path: Path) -> None:
     store.append(with_level)
     store.append(without)
     lines = store.path.read_text(encoding="utf-8-sig").splitlines()
-    assert lines[0].endswith(",end_hp_pct,level")
-    assert lines[1].endswith(",62,15")
-    assert lines[2].endswith(",62,")
+    assert ",end_hp_pct,level," in lines[0]
+    assert ",62,15," in lines[1]
+    assert ",62,," in lines[2]
     assert store.read_all() == [with_level, without]
 
 
-def test_file_from_before_the_level_column_gets_it_on_the_next_save(tmp_path: Path) -> None:
+def test_translations_are_saved_and_read_back(tmp_path: Path) -> None:
+    store = RecordStore(tmp_path / "records.csv")
+    record = make_record(
+        boss="黄金河马", boss_en="Golden Hippopotamus", boss_zh_cn="黄金河马", boss_zh_tw="黃金河馬"
+    )
+    store.append(record)
+    lines = store.path.read_text(encoding="utf-8-sig").splitlines()
+    assert lines[0].endswith(",level,boss_en,boss_zh_cn,boss_zh_tw")
+    assert lines[1].endswith(",Golden Hippopotamus,黄金河马,黃金河馬")
+    assert store.read_all() == [record]
+
+
+def test_file_from_before_the_newer_columns_gets_them_on_the_next_save(tmp_path: Path) -> None:
     path = tmp_path / "records.csv"
-    old_header = ",".join(records.COLUMNS[:-1])
-    old_row = ",".join(make_record().to_row()[:-1])
+    old = records.COLUMNS.index("level")  # the first column an old file does not have
+    old_header = ",".join(records.COLUMNS[:old])
+    old_row = ",".join(make_record().to_row()[:old])
     path.write_text(f"{old_header}\n{old_row}\n", encoding="utf-8-sig")
     store = RecordStore(path)
     assert store.read_all() == [make_record()]  # readable as it is, with no level

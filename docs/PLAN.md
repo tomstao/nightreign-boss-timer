@@ -92,6 +92,7 @@ use the user marks two regions by hand, and the tool does not start tracking unt
 | status | `complete` / `incomplete` | |
 | duration | 02:41.3 | bar first seen to HP zero, or to bar last seen if `incomplete` (rule 8) |
 | start_hp_pct | 100 | boss HP % when the bar appeared; below 100 means the boss was already damaged (rules 3 and 10) |
+| boss_en, boss_zh_cn, boss_zh_tw | Tree Sentinel, 大树守卫, 大樹守衛 | the same boss in each language, from the list of known names; empty when the name read is not in it, and `boss` is then the text as read (asked for by the project owner on 2026-11-18) |
 | level | 7 | the player's level when the fight began, read from the emblem at the top left; empty if unreadable (asked for by the project owner on 2026-11-18) |
 | end_hp_pct | 0 | HP % left when the bar was last seen |
 
