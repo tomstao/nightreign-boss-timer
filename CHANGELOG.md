@@ -26,3 +26,4 @@ All notable changes are listed here. The format follows
 - The command-line version now reads the settings file (tables, regions, timing options).
 - Overlay showing table, boss, timer and boss HP, with a tray icon to pause, hide and quit.
 - Region calibration window, opened from the tray menu: mark the health bar and the defeat text on a screenshot of the game, with the detector's reading shown as the box moves.
+- Tray menu: switch the active table, open the records file, and an icon that shows tracking, fight, paused or needs attention.

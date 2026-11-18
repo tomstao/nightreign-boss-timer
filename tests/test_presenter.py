@@ -93,3 +93,13 @@ def test_best_time_counts_only_comparable_fights() -> None:
     ]
     assert best_time(history, "Tree Sentinel", "Arena") == 130.9
     assert best_time(history, "Nobody", "Arena") is None
+
+
+def test_a_fresh_notice_takes_over_and_then_goes_away() -> None:
+    snapshot = Snapshot(State.FIGHT, "Arena", "Tree Sentinel", hp=0.62, elapsed_s=83.4)
+    fresh = overlay_text(snapshot, EN, notice="Table: Normal", notice_age_s=1.0)
+    assert fresh.lines == ("Table: Normal",)
+    stale = overlay_text(snapshot, EN, notice="Table: Normal", notice_age_s=3.5)
+    assert stale.lines[1] == "Tree Sentinel"
+    # A notice is shown even with no game to draw over: it answers something the user just did.
+    assert overlay_text(Snapshot(State.NO_GAME, "Arena"), EN, notice="Paused").lines == ("Paused",)

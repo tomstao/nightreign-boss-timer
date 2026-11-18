@@ -5,8 +5,8 @@
 > updated with every change that affects users. Where the program and this guide disagree once a
 > release exists, that is a bug: please report it.
 >
-> **What works today** is the overlay with a tray icon (pause, hide overlay, calibrate regions,
-> quit) and the command-line version, both described in
+> **What works today** is the overlay with a tray icon (pause, switch table, hide overlay, open
+> the records file, calibrate regions, quit) and the command-line version, both described in
 > [INSTALL.md](INSTALL.md#running-from-source). It follows the recording rules under
 > [Everyday use](#everyday-use) and writes the file described under [Your records](#your-records).
 > Region calibration works as described under [First-run setup](#first-run-setup), from the tray
@@ -111,13 +111,17 @@ A small see-through panel over the game. Mouse clicks pass through it.
 | `COMPLETE` or `INCOMPLETE`, the time, your best time | for a few seconds after a fight |
 | a warning such as `Regions not set` or `Paused` | when the tool cannot record |
 
+The tray icon shows the same at a glance: a red bar while the tool is watching, gold during a
+fight, grey when paused, and a gold dot when something needs your attention (the game was not
+found, or finished fights are waiting because the records file is open in Excel).
+
 Open the main window to drag the overlay somewhere else. It can also be hidden completely:
 recording works without it.
 
 ## Your records
 
 Records are saved in `records.csv`, by default in `Documents\nightreign-boss-timer\`. Open it with
-Excel or any spreadsheet program.
+Excel or any spreadsheet program, or choose **Open records file in Excel** from the tray icon.
 
 | Column | Meaning |
 |---|---|
@@ -145,7 +149,9 @@ A table is a name you give to a group of records, so that practice and real runs
 - Add your own under **Tables** in the main window, for example `No-hit practice`.
 - One table is active at a time. Every fight is saved with the table that was active when it
   began.
-- Switch tables from the tray menu or with a hotkey. The overlay always shows the active one.
+- Switch tables from the tray menu (**Table**) or with a hotkey. The overlay always shows the
+  active one, and confirms a switch for a few seconds. A switch during a fight applies from the
+  next fight on.
 
 All tables are saved in the same file. Use the `table` column to filter in Excel.
 

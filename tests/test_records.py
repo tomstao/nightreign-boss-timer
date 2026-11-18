@@ -135,3 +135,11 @@ def test_pending_records_are_written_first_once_unlocked(
 
 def test_read_all_on_missing_file_is_empty(tmp_path: Path) -> None:
     assert RecordStore(tmp_path / "records.csv").read_all() == []
+
+
+def test_ensure_file_writes_the_header_once(tmp_path: Path) -> None:
+    store = RecordStore(tmp_path / "new folder" / "records.csv")
+    store.ensure_file()
+    store.ensure_file()
+    assert store.path.read_text(encoding="utf-8-sig").splitlines() == [",".join(records.COLUMNS)]
+    assert store.read_all() == []

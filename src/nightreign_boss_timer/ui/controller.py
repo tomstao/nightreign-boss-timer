@@ -1,0 +1,109 @@
+"""What the user can do, in one place.
+
+The tray menu, the main window and the hotkeys all call the same methods here, so each action
+behaves the same wherever it is started from. The controller changes the settings, saves them,
+and announces the change. It draws nothing itself.
+"""
+
+from __future__ import annotations
+
+import os
+from collections.abc import Callable
+from pathlib import Path
+
+from PySide6.QtCore import QObject, Signal
+
+from nightreign_boss_timer import settings as settings_file
+from nightreign_boss_timer.i18n import Translator
+from nightreign_boss_timer.records import RecordStore
+from nightreign_boss_timer.settings import Settings
+
+
+def _open_with_windows(path: Path) -> None:
+    os.startfile(path)  # the program Windows has for this kind of file, Excel for a CSV
+
+
+class Controller(QObject):
+    # Something shown in a menu or a window is now different: redraw from the settings.
+    changed = Signal()
+    # A short message for the overlay, such as the table just switched to.
+    notice = Signal(str)
+    # The user asked for the calibration window.
+    calibration_requested = Signal()
+
+    def __init__(
+        self,
+        settings: Settings,
+        translate: Translator,
+        store: RecordStore,
+        *,
+        settings_path: Path | None = None,
+        opener: Callable[[Path], None] = _open_with_windows,
+    ) -> None:
+        super().__init__()
+        self.settings = settings
+        self.translate = translate
+        self.store = store
+        self.tracking = True
+        self.overlay_visible = True
+        self._settings_path = settings_path
+        self._opener = opener
+
+    def save(self) -> None:
+        settings_file.save(self.settings, self._settings_path)
+
+    # --- tracking and overlay -------------------------------------------------------------------
+
+    def set_tracking(self, on: bool) -> None:
+        if on == self.tracking:
+            return
+        self.tracking = on
+        self.notice.emit(self.translate("overlay.tracking" if on else "overlay.paused"))
+        self.changed.emit()
+
+    def toggle_tracking(self) -> None:
+        self.set_tracking(not self.tracking)
+
+    def set_overlay_visible(self, on: bool) -> None:
+        if on == self.overlay_visible:
+            return
+        self.overlay_visible = on
+        self.changed.emit()
+
+    def toggle_overlay(self) -> None:
+        self.set_overlay_visible(not self.overlay_visible)
+
+    # --- tables ---------------------------------------------------------------------------------
+
+    def set_table(self, name: str) -> None:
+        """Make a table the active one. Fights that start from now on are saved under it."""
+        if name == self.settings.active_table:
+            return
+        self.settings.set_active_table(name)
+        self._table_switched()
+
+    def next_table(self) -> None:
+        if len(self.settings.tables) > 1:
+            self.settings.next_table()
+            self._table_switched()
+
+    def _table_switched(self) -> None:
+        self.save()
+        self.notice.emit(self.translate("overlay.table_switched", table=self.settings.active_table))
+        self.changed.emit()
+
+    # --- records --------------------------------------------------------------------------------
+
+    def open_records_file(self) -> None:
+        """Open the records file in the program Windows uses for CSV files, normally Excel."""
+        self.store.ensure_file()
+        self._opener(self.store.path)
+
+    def open_records_folder(self) -> None:
+        self.store.path.parent.mkdir(parents=True, exist_ok=True)
+        self._opener(self.store.path.parent)
+
+    # --- calibration ----------------------------------------------------------------------------
+
+    def calibrate(self) -> None:
+        self.calibration_requested.emit()

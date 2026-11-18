@@ -22,6 +22,7 @@
   "overlay.hp": "血量 {percent}%",
   "overlay.best": "最佳 {time}",
   "overlay.paused": "已暂停",
+  "overlay.tracking": "记录中",
   "overlay.regions_not_set": "尚未标定区域",
   "overlay.game_not_found": "未找到游戏",
   "overlay.window_changed": "窗口已变化 - 请重新标定",

@@ -22,6 +22,7 @@
   "overlay.hp": "HP {percent}%",
   "overlay.best": "best {time}",
   "overlay.paused": "Paused",
+  "overlay.tracking": "Tracking",
   "overlay.regions_not_set": "Regions not set",
   "overlay.game_not_found": "Game not found",
   "overlay.window_changed": "Window changed - recalibrate",

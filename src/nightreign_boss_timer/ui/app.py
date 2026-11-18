@@ -16,8 +16,7 @@ from pathlib import Path
 import numpy as np
 from numpy.typing import NDArray
 from PySide6.QtCore import QTimer
-from PySide6.QtGui import QAction, QColor, QIcon, QPainter, QPixmap
-from PySide6.QtWidgets import QApplication, QMenu, QSystemTrayIcon
+from PySide6.QtWidgets import QApplication
 
 from nightreign_boss_timer import settings as settings_file
 from nightreign_boss_timer.capture import ScreenGrabber, WindowsScreen, enable_dpi_awareness
@@ -25,6 +24,7 @@ from nightreign_boss_timer.engine import (
     GAME_TITLE,
     MIN_WINDOW,
     Engine,
+    State,
     StepResult,
     records_path,
 )
@@ -32,19 +32,10 @@ from nightreign_boss_timer.i18n import Translator
 from nightreign_boss_timer.ocr import NameReader
 from nightreign_boss_timer.records import FightRecord, RecordStore
 from nightreign_boss_timer.ui.calibration_window import CalibrationWindow
+from nightreign_boss_timer.ui.controller import Controller
 from nightreign_boss_timer.ui.overlay import Overlay
 from nightreign_boss_timer.ui.presenter import best_time, overlay_text
-
-
-def _icon() -> QIcon:
-    """A plain red bar on a dark square, drawn here so no image file is needed."""
-    pixmap = QPixmap(64, 64)
-    pixmap.fill(QColor(20, 22, 28))
-    painter = QPainter(pixmap)
-    painter.fillRect(8, 27, 48, 10, QColor(60, 60, 60))
-    painter.fillRect(8, 27, 30, 10, QColor(190, 60, 40))
-    painter.end()
-    return QIcon(pixmap)
+from nightreign_boss_timer.ui.tray import IconState, Tray
 
 
 class App:
@@ -59,33 +50,25 @@ class App:
             reader = None  # fights are still timed, and the boss is recorded as unknown
         self.title = title
         self.engine = Engine(self.settings, self.screen, self.store, reader, title=title)
+        self.controller = Controller(self.settings, self.translate, self.store)
         self.calibration = CalibrationWindow(
-            self.settings, self.translate, self._take_picture, self._save_settings
+            self.settings, self.translate, self._take_picture, self.controller.save
         )
 
         self.overlay = Overlay()
         self.result: FightRecord | None = None
         self.result_at = 0.0
         self.best: float | None = None
+        self.notice = ""
+        self.notice_at = 0.0
+        # True while finished fights are waiting because the records file is open elsewhere.
+        self.rows_held = False
 
-        self.tray = QSystemTrayIcon(_icon())
-        self.tray.setToolTip(self.translate("app.name"))
-        menu = QMenu()
-        self.tracking = QAction(self.translate("tray.tracking"), menu, checkable=True)
-        self.tracking.setChecked(True)
-        self.tracking.toggled.connect(self._set_tracking)
-        menu.addAction(self.tracking)
-        show = QAction(self.translate("tray.show_overlay"), menu, checkable=True)
-        show.setChecked(True)
-        show.toggled.connect(self.overlay.set_enabled)
-        menu.addAction(show)
-        menu.addSeparator()
-        menu.addAction(self.translate("tray.calibrate"), self.calibration.start)
-        menu.addSeparator()
-        menu.addAction(self.translate("tray.quit"), application.quit)
-        self._menu = menu  # keep it alive: the tray icon does not own it
-        self.tray.setContextMenu(menu)
-        self.tray.show()
+        self.tray = Tray(self.controller, application.quit)
+        self.tray.icon.show()
+        self.controller.changed.connect(self._apply)
+        self.controller.notice.connect(self._show_notice)
+        self.controller.calibration_requested.connect(self.calibration.start)
 
         self.timer = QTimer()
         self.timer.setSingleShot(True)
@@ -93,8 +76,14 @@ class App:
         application.aboutToQuit.connect(self.close)
         self._step()
 
-    def _set_tracking(self, on: bool) -> None:
-        self.engine.paused = not on
+    def _apply(self) -> None:
+        """Bring the engine and the overlay in line with what the user chose."""
+        self.engine.paused = not self.controller.tracking
+        self.overlay.set_enabled(self.controller.overlay_visible)
+        self._step()
+
+    def _show_notice(self, text: str) -> None:
+        self.notice, self.notice_at = text, time.monotonic()
 
     def _take_picture(self) -> NDArray[np.uint8] | None:
         """The whole game image for calibration, or None if the game window is not found."""
@@ -105,11 +94,6 @@ class App:
         # engine's grabbers are kept for the small regions it reads all the time.
         with ScreenGrabber(window.width, window.height) as grabber:
             return grabber.grab(window.left, window.top)
-
-    def _save_settings(self) -> None:
-        # The engine reads the regions from these same settings on every step, so a new
-        # calibration is in use at once.
-        settings_file.save(self.settings)
 
     def _step(self) -> None:
         result = self.engine.step()
@@ -122,21 +106,33 @@ class App:
             earlier = [r for r in self.store.read_all() if r != result.record]
             self.best = best_time(earlier, result.record.boss, result.record.table)
             self.result, self.result_at = result.record, time.monotonic()
+            self.rows_held = not result.saved
+        now = time.monotonic()
         self.overlay.show_text(
             overlay_text(
                 result.snapshot,
                 self.translate,
                 result=self.result,
-                result_age_s=time.monotonic() - self.result_at,
+                result_age_s=now - self.result_at,
                 best_s=self.best,
+                notice=self.notice,
+                notice_age_s=now - self.notice_at,
             )
         )
+        self.tray.set_state(self._icon_state(result.snapshot.state))
+
+    def _icon_state(self, state: State) -> IconState:
+        if state is State.PAUSED:
+            return IconState.PAUSED
+        if state is State.NO_GAME or self.rows_held:
+            return IconState.ATTENTION
+        return IconState.FIGHT if state is State.FIGHT else IconState.TRACKING
 
     def close(self) -> None:
         self.timer.stop()
         self.calibration.close()
         self.screen.close()
-        self.tray.hide()
+        self.tray.icon.hide()
 
 
 def main() -> int:

@@ -136,6 +136,12 @@ class RecordStore:
         self.pending_path.unlink()
         return True
 
+    def ensure_file(self) -> None:
+        """Create the file with its header row if it is not there yet, so it can be opened."""
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        if not self.path.exists():
+            _append_rows(self.path, [])
+
     def pending_count(self) -> int:
         return len(_read_rows(self.pending_path))
 

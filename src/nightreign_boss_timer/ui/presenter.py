@@ -12,6 +12,8 @@ from nightreign_boss_timer.records import FightRecord, Status, format_duration
 
 # How long the result of a fight stays on the overlay.
 RESULT_SECONDS = 8.0
+# How long a short message, such as the table just switched to, stays.
+NOTICE_SECONDS = 3.0
 
 
 @dataclass(frozen=True, slots=True)
@@ -49,8 +51,15 @@ def overlay_text(
     result: FightRecord | None = None,
     result_age_s: float = 0.0,
     best_s: float | None = None,
+    notice: str = "",
+    notice_age_s: float = 0.0,
 ) -> OverlayText:
-    """What to show for the current state. ``result`` is the last finished fight, if any."""
+    """What to show for the current state. ``result`` is the last finished fight, if any.
+
+    ``notice`` is a short message that takes the place of everything else while it is fresh.
+    """
+    if notice and notice_age_s < NOTICE_SECONDS:
+        return OverlayText((notice,))
     if snapshot.state is State.PAUSED:
         return OverlayText((translate("overlay.paused"),), warning=True)
     if snapshot.state is State.NO_GAME:
