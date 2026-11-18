@@ -68,7 +68,12 @@ uv run python -m nightreign_boss_timer.ui.app --title "NBT stand-in"
 ```
 
 Use a full-frame game screenshot with a boss bar on it. To check a whole fight, play a recorded
-clip in a media player window and pass that window's exact title to `--title`.
+clip in a borderless window of the clip's own size and pass that window's exact title to
+`--title`. With ffmpeg installed:
+
+```powershell
+ffplay -an -noborder -left 0 -top 0 -x 1920 -y 1080 -window_title "NBT stand-in" -autoexit clip.mp4
+```
 
 What this covers: finding the window, real screen capture, the calibration screenshot, the
 overlay over a "game". What it does not cover: the real game's window title, borderless mode,
@@ -76,6 +81,10 @@ and the frame rate cost. Say so in the pull request.
 
 ## Things that have gone wrong before
 
+- A whole-fight check against a clip recorded 5 seconds instead of 60. On a first start the
+  setup guide opens in the middle of the screen, on top of the stand-in's health bar, and the
+  tool read the guide. Close this program's own windows, or move them off the stand-in,
+  before such a run.
 - Tests passed and the run still failed with a crash, on exit or in the middle of a later
   test, and only on one Python version. Windows left open by a test keep getting events, and
   windows that outlive the Qt application crash Python as it shuts down. `tests/conftest.py`

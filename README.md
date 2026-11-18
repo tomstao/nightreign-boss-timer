@@ -3,9 +3,11 @@
 Records how long each boss fight takes in ELDEN RING NIGHTREIGN by reading the boss health bar
 from the screen. Built to cost no measurable game FPS.
 
-> **Status: early development, not yet tested against the real game.** An overlay with a tray
-> icon records fights, switches tables and has region calibration. The main window, hotkeys and
-> a packaged release are not built yet. See the [plan](docs/PLAN.md) for milestones.
+> **Status: feature-complete for a first version, not yet tested against the real game.**
+> Recording, the overlay, the tray menu, the main window, region calibration, global hotkeys and
+> first-run setup all work when run from source, in English, 简体中文 and 繁體中文. They have been
+> checked against recorded fights played back in a window. Still to do: a test session with the
+> game itself, and a packaged release. See the [plan](docs/PLAN.md) for milestones.
 
 ## What it will do
 
@@ -70,8 +72,8 @@ uv run python -m nightreign_boss_timer.ui.app
 ```
 
 A small overlay shows the active table, then the boss, timer and boss HP during a fight, then
-the result. The tray icon lets you pause tracking, switch the table, open the records file,
-calibrate the regions, hide the overlay, and quit. There is no settings window yet.
+the result. Click the tray icon for the main window: records with filters, tables, hotkeys,
+regions with a live preview, and settings. A short setup guide opens the first time.
 
 ## Try the command-line version
 

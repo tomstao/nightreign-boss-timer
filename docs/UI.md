@@ -1,7 +1,8 @@
 # UI design
 
-Status: design only, 2026-11-17. Nothing here is built yet. Wireframes show layout and content,
-not final styling.
+Status, 2026-11-18: this is the design. All five surfaces are built. The wireframes show layout
+and content, not final styling, and the last section lists where the program differs from them.
+The [user guide](USER_GUIDE.md) describes the program as it is.
 
 ## Overview
 
@@ -254,3 +255,22 @@ A short sequence shown once, skippable at every step:
    The design assumes yes, since a fight resumed at 62% is not comparable.
 3. Whether the Records page needs charts (time per attempt for one boss) in the first release.
    The design leaves them out, because the CSV opens in Excel.
+
+## Built so far, and where it differs
+
+| Part of this design | State |
+|---|---|
+| Tray menu and icon states | built as designed, plus **Open main window**; a left click on the icon opens the main window |
+| Overlay | built. See-through as a whole instead of pixel by pixel, with square corners, because Windows only then agrees to leave it out of screen captures |
+| Overlay options | show or hide, and position by dragging. Not built: only during fights, opacity, scale, show HP, show best time |
+| Overlay over a calibrated region | not prevented. It is left out of captures instead, on Windows 10 version 2004 and later |
+| Main window, status bar | built as designed |
+| Records page | filters, search, sorting, summary, open in Excel and folder. Not built: row actions (move, correct the boss name, delete), and the saved image of an unknown name |
+| Tables page | built. Names are typed into a field on the page instead of a dialog. Renaming does not rename existing rows yet. Table hotkeys are set on the Hotkeys page |
+| Hotkeys page | built for the keyboard. The shortcut is pressed into a field below the list instead of into the cell. Not built: the Controller column |
+| Regions page | built, with both regions previewed at once instead of a Preview button per row. A changed window size is pointed out but does not pause tracking |
+| Settings page | language, records folder, wait time, walk-past skipping, detection rate, overlay position. Not built: start with Windows, start minimised, time format, overlay opacity and scale, capture method, game window picker, HDR compensation, saving unknown name images, logging level |
+| About page | built. Not built: Export diagnostics |
+| Region calibration | built with the detector's reading shown as the box moves. Not built: the example image, and picking a saved screenshot or a recent frame for the defeat text |
+| First-run setup | built as three steps instead of five: welcome, game and regions, basics |
+| Notifications | fight recorded, table switched, paused and resumed, record discarded. Not built: the records-file-locked message with its count (the tray icon shows a dot instead) |

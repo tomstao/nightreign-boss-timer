@@ -1,17 +1,11 @@
 # User guide
 
-> **The program described here is not released yet.** This guide is written ahead of the first
-> release from the agreed design, so the behaviour can be checked before it is built. It is
-> updated with every change that affects users. Where the program and this guide disagree once a
-> release exists, that is a bug: please report it.
->
-> **What works today** is the overlay with a tray icon (pause, switch table, hide overlay, open
-> the records file, calibrate regions, quit) and the command-line version, both described in
-> [INSTALL.md](INSTALL.md#running-from-source). It follows the recording rules under
-> [Everyday use](#everyday-use) and writes the file described under [Your records](#your-records).
-> Region calibration works as described under [First-run setup](#first-run-setup), from the tray
-> menu or with `Ctrl+Alt+C`. Until you calibrate, the tool uses the usual positions for a 16:9
-> game image. Picking a recent frame for the defeat text is not built yet.
+> **There is no packaged release yet, and the tool has not been run against the real game.**
+> Everything in this guide works today when the tool is run from source (see
+> [INSTALL.md](INSTALL.md#running-from-source)), except what is marked as planned. It has been
+> checked against recorded fights played back in a window, not against the game itself: the
+> game window's title, borderless mode and the cost in frame rate are still to be confirmed.
+> Where the program and this guide disagree, that is a bug: please report it.
 
 To install the tool, see [INSTALL.md](INSTALL.md).
 
@@ -287,15 +281,18 @@ method, and HDR compensation.
 | Problem | What to try |
 |---|---|
 | Fights are not recorded | Check the overlay for a warning. Open **Regions** and look at the live preview: it should show the bar and say `Bar detected: yes` during a fight. |
-| Every fight is `incomplete` | The defeat text area is not set, or its box is too small. Recalibrate it. |
-| One fight became two records | The bar was hidden for longer than the wait window, for example by a long look at the map. Raise the wait window in Settings. |
-| Boss name is `unknown` | The name was covered when the bar appeared, or the boss is not in the name list yet. The fight is still timed. Correct the name on the Records page. |
+| Every fight is `incomplete` | The defeat text area is in the wrong place, or its box is too small. Recalibrate it, and check it on the Regions page. |
+| One fight became two records | The bar was hidden for longer than the wait, for example by a long look at the map. Raise **Seconds to wait after the bar disappears** on the Settings page. |
+| Boss name is `unknown` | The name was covered when the bar appeared, or the text model was not downloaded (see [INSTALL.md](INSTALL.md#running-from-source)). The fight is still timed. Correcting a name in the program is planned; for now edit `records.csv`. |
 | Times look a few seconds long or short | Recalibrate the health bar so the box covers the bar exactly, edge to edge. |
-| The game stutters | Lower the detection rate, or try another capture method under Settings, Capture. |
+| The game stutters | Lower **Screen checks per second during a fight** on the Settings page. Choosing another capture method is planned. |
 | New rows do not show in Excel | Excel does not reload an open file. Close and reopen it. |
+| A hotkey does nothing | Open the Hotkeys page. A shortcut marked `(not working)` is held by another program: choose another one. |
+| The overlay is missing from my recording | That is on purpose: see [The overlay](#the-overlay). |
 
-When reporting a problem, use **About, Export diagnostics** and attach the ZIP. Detection problems
-can only be fixed with the frames that caused them.
+When reporting a problem, say which game language, resolution and window mode you use and whether
+HDR is on, and attach a screenshot or a short clip. Detection problems can only be fixed with
+the frames that caused them. An **Export diagnostics** button on the About page is planned.
 
 ## What it does not do
 
@@ -303,3 +300,4 @@ can only be fixed with the frames that caused them.
 - It does not work in exclusive fullscreen.
 - It does not join a returning fight to the earlier one.
 - It records one boss bar. Fights with two bars on screen at once are not handled yet.
+- It has no controller bindings yet. Hotkeys are keyboard shortcuts.

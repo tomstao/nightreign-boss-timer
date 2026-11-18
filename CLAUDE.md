@@ -41,8 +41,9 @@ uv run python -m nightreign_boss_timer           # command-line version
 - Detection is tested by replaying recorded pixels, not by playing the game. Follow the
   `detector-footage` skill.
 - UI is tested in memory and then looked at. Follow the `check-ui` skill.
-- Logic lives outside Qt where it can: `calibration.py`, `ui/presenter.py` and `ui/controller.py`
-  hold decisions, and widgets only draw and forward input.
+- Logic lives outside Qt where it can: `calibration.py`, `record_view.py`, `hotkeys.py`,
+  `ui/presenter.py` and `ui/controller.py` hold decisions, and widgets only draw and forward
+  input. Every user action is a method of the controller. Follow the `add-ui-page` skill.
 - Plain words in comments and docs. Line length 100. Source files stay ASCII where possible.
 
 ## Skills
@@ -53,5 +54,6 @@ Project skills are in `.claude/skills/`:
 |---|---|
 | `ship-change` | turning finished work into a pull request, or merging a stack of them |
 | `add-ui-text` | adding or changing any text the user sees |
+| `add-ui-page` | adding a page to the main window, a tray entry, or an action a hotkey can trigger |
 | `check-ui` | building or changing a window, the overlay or the tray menu |
 | `detector-footage` | changing detection, or adding test pixels from new footage |

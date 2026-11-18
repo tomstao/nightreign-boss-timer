@@ -5,7 +5,8 @@ corrections, test runs against the real game, and comments on the [plan](docs/PL
 
 The [API reference](docs/API.md) says what each module does. If you develop with Claude Code,
 `CLAUDE.md` and the skills under `.claude/skills/` describe the same workflow as this file in
-more detail: shipping a change, adding UI text, checking the UI, and working with footage.
+more detail: shipping a change, adding UI text, adding a page or an action, checking the UI, and
+working with footage.
 
 ## Ground rules
 

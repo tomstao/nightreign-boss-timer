@@ -1,9 +1,9 @@
 # Installation
 
-> **There is no release to install yet.** The tool is still being built. A command-line version
-> can be run from source today (see "Running from source"). The packaged program with overlay
-> and settings window does not exist yet, and the sections marked *planned* describe how
-> installing it will work.
+> **There is no release to install yet.** The whole program, with overlay, tray icon, main
+> window and hotkeys, can be run from source today (see "Running from source"). It has not been
+> run against the real game yet. The sections marked *planned* describe how installing a
+> packaged release will work.
 
 ## Requirements
 
@@ -57,7 +57,8 @@ The tool installs no drivers and no services, and writes nothing to the game's f
 
 ## Running from source
 
-This works today and is the only way to run the tool until there is a release.
+This works today and is the only way to run the tool until there is a release. Settings are
+kept in `%APPDATA%\nightreign-boss-timer\settings.json`.
 
 1. Install [Git](https://git-scm.com/) and [uv](https://docs.astral.sh/uv/).
 2. Get the code and its dependencies:

@@ -1,6 +1,9 @@
 # Plan
 
-Status: draft, 2026-11-17. Nothing is implemented yet.
+Status, 2026-11-18: milestones M2 to M4 are done on recorded footage, and M5 is built except
+for its two measurements against the running game. M0 (more footage), the rest of M1 (frame
+rate cost) and M6 (packaging) are open. See the status note under each milestone, and
+"Not yet verified" at the end.
 
 ## Goal
 
@@ -294,6 +297,17 @@ Done when: every boss in the clips is identified correctly in all three language
 
 Done when: a play session produces correct records with no manual input and the budget holds.
 
+Status, 2026-11-18: everything in the list above is built, except the last point. The whole
+program was run against a recorded kill played back in a window: saved as `complete`, 59.9 s
+against 60.5 s measured by hand, with the boss name read. It has not been run against the game.
+Built differently from this plan, pending the owner's decision:
+
+- The tool tracks from the first start with the measured 16:9 positions, instead of waiting
+  until both regions are calibrated.
+- A changed window size is pointed out on the Regions page, and tracking is not paused.
+- The check in the calibration window runs on the screenshot. The continuously updated
+  preview is on the Regions page.
+
 ### M6 Packaging
 
 - PyInstaller build, settings in the user data folder, diagnostics export, README with the
@@ -341,3 +355,20 @@ what a user sees or does updates them in the same pull request.
 | OCR misreads stylised Chinese names | closed lexicon, vote over several frames, save unknown crops |
 | Game patch moves the HUD or adds bosses | regions and lexicon are data files, not code |
 | Capture backend costs FPS on some setups | backend is switchable, benchmark decides the default |
+
+## Not yet verified
+
+Nothing has been run against the real game. These are assumptions until someone tests them:
+
+| Assumption | Where it matters |
+|---|---|
+| The game window's title is `ELDEN RING NIGHTREIGN` | finding the game; `--title` overrides it |
+| GDI capture returns the game image in borderless mode | everything |
+| The capture costs no measurable frame rate | the performance budget |
+| Global hotkeys fire while the game has the keyboard | hotkeys |
+| The overlay stays on top of the game in borderless mode | the overlay |
+| Boss names are read in English and Traditional Chinese | records (both clips are Simplified Chinese) |
+| A Nightlord's defeat text looks like any other boss's | `complete` for Nightlords (open decision 10) |
+
+Also open: two health bars at once (open decision 5), and a review of the Chinese UI texts by a
+native speaker.
