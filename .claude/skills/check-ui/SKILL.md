@@ -84,4 +84,7 @@ and the frame rate cost. Say so in the pull request.
 - Clearing a menu from inside one of its own entries crashes. `Tray.rebuild` is connected with a
   queued connection.
 - The calibration window covers the game, so it hides itself before taking a screenshot.
-- The overlay is visible to screen capture on some PCs. Keep it away from the watched regions.
+- Every window on the desktop is in a screen capture, this program's own included. The overlay
+  is kept out with `capture.exclude_from_capture`, which Windows refuses for a window drawn
+  with per-pixel transparency (`WA_TranslucentBackground`). Use window opacity instead. The
+  main window and the calibration window are captured like anything else.

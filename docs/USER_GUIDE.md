@@ -127,6 +127,11 @@ The window has six pages: **Records**, **Tables**, **Hotkeys**, **Regions**, **S
 
 A small see-through panel over the game. Mouse clicks pass through it.
 
+The overlay is left out of screen captures, so that the tool never reads its own overlay as
+part of the game. This also means it does not appear in screenshots, recordings or streams made
+with other programs. On Windows 10 older than version 2004 this is not possible: there, keep
+the overlay away from the health bar and the middle of the screen.
+
 | Shows | When |
 |---|---|
 | the active table | while waiting for a fight |

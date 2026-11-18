@@ -4,8 +4,9 @@ This uses GDI through ctypes, so it needs no extra dependency and never touches 
 it reads the desktop image that Windows has already composed. Only the requested rectangle is
 copied, which is what keeps the cost low.
 
-Layered windows, such as this tool's own overlay, are left out of the copy, so the overlay can
-never be mistaken for part of the game.
+Everything on the desktop is in that image, other programs' windows and this tool's own included.
+The overlay asks Windows to leave it out with :func:`exclude_from_capture`, so that it can never
+be mistaken for part of the game.
 """
 
 from __future__ import annotations
@@ -28,6 +29,7 @@ _SRCCOPY = 0x00CC0020
 _DIB_RGB_COLORS = 0
 _BI_RGB = 0
 _DPI_PER_MONITOR_AWARE_V2 = -4
+_WDA_EXCLUDEFROMCAPTURE = 0x11
 
 
 class _BitmapInfoHeader(ctypes.Structure):
@@ -55,6 +57,8 @@ _user32.FindWindowW.argtypes = (wintypes.LPCWSTR, wintypes.LPCWSTR)
 _user32.FindWindowW.restype = wintypes.HWND
 _user32.GetClientRect.argtypes = (wintypes.HWND, ctypes.POINTER(wintypes.RECT))
 _user32.ClientToScreen.argtypes = (wintypes.HWND, ctypes.POINTER(wintypes.POINT))
+_user32.SetWindowDisplayAffinity.argtypes = (wintypes.HWND, wintypes.DWORD)
+_user32.SetWindowDisplayAffinity.restype = wintypes.BOOL
 _gdi32.CreateCompatibleDC.argtypes = (wintypes.HDC,)
 _gdi32.CreateCompatibleDC.restype = wintypes.HDC
 _gdi32.CreateCompatibleBitmap.argtypes = (wintypes.HDC, ctypes.c_int, ctypes.c_int)
@@ -107,6 +111,16 @@ def enable_dpi_awareness() -> None:
     It fails harmlessly if awareness was already set for the process.
     """
     _user32.SetProcessDpiAwarenessContext(ctypes.c_void_p(_DPI_PER_MONITOR_AWARE_V2))
+
+
+def exclude_from_capture(handle: int) -> bool:
+    """Ask Windows to leave one of this program's own windows out of every screen capture.
+
+    ``handle`` is the window's native handle. Returns False if Windows refuses, which it does
+    before Windows 10 version 2004 and for windows drawn with per-pixel transparency. The window
+    then also disappears from screenshots and recordings made by other programs.
+    """
+    return bool(_user32.SetWindowDisplayAffinity(handle, _WDA_EXCLUDEFROMCAPTURE))
 
 
 def find_window(title: str) -> Region | None:

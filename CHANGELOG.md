@@ -6,6 +6,10 @@ All notable changes are listed here. The format follows
 
 ## Unreleased
 
+### Fixed
+
+- The overlay is now left out of screen captures, so the tool cannot read its own overlay as part of the game. It no longer appears in screenshots or recordings either.
+
 ### Added
 
 - Project plan, research notes, and recording rules.

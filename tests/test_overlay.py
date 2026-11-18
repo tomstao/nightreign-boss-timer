@@ -30,6 +30,16 @@ def test_overlay_never_takes_clicks_or_focus(application: "QApplication") -> Non
     assert flags & Qt.WindowType.FramelessWindowHint
 
 
+def test_overlay_is_see_through_as_a_whole(application: "QApplication") -> None:
+    overlay = Overlay()
+    # Window opacity, not per-pixel transparency: Windows only keeps a window out of screen
+    # captures when it is drawn this way.
+    assert 0.5 < overlay.windowOpacity() < 1.0
+    assert not overlay.testAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+    # Drawn into memory there is no real window to exclude, so the answer here is no.
+    assert overlay.hidden_from_capture is False
+
+
 def test_overlay_grows_to_fit_its_text(application: "QApplication") -> None:
     overlay = Overlay()
     overlay.show_text(OverlayText(("Arena - ready",)))

@@ -116,6 +116,7 @@ Copies small regions of the screen into arrays with GDI. Windows only.
 | Name | What it is |
 |---|---|
 | `enable_dpi_awareness()` | Call once at start, so coordinates mean real pixels. |
+| `exclude_from_capture(handle)` | Ask Windows to leave one of this program's windows out of every screen capture. False if refused. |
 | `find_window(title)` | The drawable area of the window with exactly this title, as a `Region`, or `None`. |
 | `Region` | A rectangle in screen pixels. Same fields as `regions.Box`. |
 | `ScreenGrabber(width, height)` | Grabs one fixed-size region, reusing its Windows resources. A context manager. |
@@ -333,6 +334,7 @@ The see-through panel over the game. It never takes focus or clicks.
 | `Overlay` | The window. |
 | `Overlay.show_text(text)` | Replace what it says with an `OverlayText`. |
 | `Overlay.set_enabled(enabled)` | Turn it on or off. |
+| `Overlay.hidden_from_capture` | True once Windows has agreed to keep it out of screen captures. |
 
 ### `nightreign_boss_timer.ui.tray`
 
