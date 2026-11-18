@@ -14,6 +14,7 @@ from pathlib import Path
 from PySide6.QtCore import QObject, Signal
 
 from nightreign_boss_timer import settings as settings_file
+from nightreign_boss_timer.engine import State
 from nightreign_boss_timer.i18n import Translator
 from nightreign_boss_timer.records import RecordStore
 from nightreign_boss_timer.settings import Settings
@@ -30,6 +31,10 @@ class Controller(QObject):
     notice = Signal(str)
     # The user asked for the calibration window.
     calibration_requested = Signal()
+    # The user asked for the main window, at the page with this key (empty: the page it is on).
+    window_requested = Signal(str)
+    # What the engine is doing changed, for example the game window was found.
+    state_changed = Signal()
 
     def __init__(
         self,
@@ -46,6 +51,7 @@ class Controller(QObject):
         self.store = store
         self.tracking = True
         self.overlay_visible = True
+        self.state = State.IDLE
         self._settings_path = settings_path
         self._opener = opener
 
@@ -102,6 +108,21 @@ class Controller(QObject):
     def open_records_folder(self) -> None:
         self.store.path.parent.mkdir(parents=True, exist_ok=True)
         self._opener(self.store.path.parent)
+
+    # --- windows and status ---------------------------------------------------------------------
+
+    def show_window(self, page: str = "") -> None:
+        self.window_requested.emit(page)
+
+    def set_state(self, state: State) -> None:
+        """Called by whoever drives the engine, after every step."""
+        if state is not self.state:
+            self.state = state
+            self.state_changed.emit()
+
+    @property
+    def calibrated(self) -> bool:
+        return self.settings.bar_region is not None
 
     # --- calibration ----------------------------------------------------------------------------
 

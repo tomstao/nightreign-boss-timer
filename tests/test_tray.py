@@ -11,7 +11,7 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 if sys.platform == "win32":
     from PySide6.QtGui import QAction
-    from PySide6.QtWidgets import QApplication
+    from PySide6.QtWidgets import QApplication, QSystemTrayIcon
 
     from nightreign_boss_timer import settings as settings_file
     from nightreign_boss_timer.i18n import Translator
@@ -70,6 +70,7 @@ def test_menu_lists_everything_in_order(application: "QApplication", tmp_path: P
         "Show overlay",
         "Open records file in Excel",
         "Calibrate regions...",
+        "Open main window",
         "Quit",
     ]
     assert harness.entry("Tracking").isChecked()
@@ -148,6 +149,18 @@ def test_open_records_file_creates_it_with_its_header(
     assert path.read_text(encoding="utf-8-sig").strip() == ",".join(COLUMNS)
     harness.controller.open_records_folder()
     assert harness.opened[-1] == path.parent
+
+
+def test_clicking_the_icon_or_the_menu_entry_asks_for_the_main_window(
+    application: "QApplication", tmp_path: Path
+) -> None:
+    harness = Harness(tmp_path)
+    asked: list[str] = []
+    harness.controller.window_requested.connect(asked.append)
+    harness.entry("Open main window").trigger()
+    harness.tray.icon.activated.emit(QSystemTrayIcon.ActivationReason.Trigger)
+    harness.tray.icon.activated.emit(QSystemTrayIcon.ActivationReason.Context)  # a right click
+    assert asked == ["", ""]
 
 
 def test_calibrate_and_quit(application: "QApplication", tmp_path: Path) -> None:

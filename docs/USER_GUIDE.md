@@ -100,6 +100,17 @@ time are all `incomplete`.
 If you come back to a boss you damaged earlier, that is a new record. Its **start HP** column
 shows how much health the boss had when you returned.
 
+## The main window
+
+Click the tray icon, or choose **Open main window** from its menu. Closing the window does not
+stop the tool: it keeps running in the tray, and **Quit** in the tray menu ends it.
+
+The bar at the bottom shows whether tracking is on, the active table, whether the game was
+found and whether the regions are calibrated. Click **Tracking on** to pause or resume.
+
+So far the window has only the **About** page. Records, Tables, Hotkeys, Regions and Settings
+are being added.
+
 ## The overlay
 
 A small see-through panel over the game. Mouse clicks pass through it.

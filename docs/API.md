@@ -249,6 +249,11 @@ Every action the user can take, shared by the tray, the windows and the hotkeys.
 | `Controller.open_records_file()` | Open `records.csv` in the program Windows uses for it. |
 | `Controller.open_records_folder()` | Open the folder that holds it. |
 | `Controller.calibrate()` | Ask for the calibration window. |
+| `Controller.show_window(page)` | Ask for the main window, optionally at a page key such as `records`. |
+| `Controller.window_requested` | Signal carrying that page key. |
+| `Controller.set_state(state)` | Told by the app after every engine step. Emits `state_changed` when it differs. |
+| `Controller.state` | The engine's last `State`. |
+| `Controller.calibrated` | True once the health bar region has been saved. |
 | `Controller.save()` | Write the settings file. |
 
 ### `nightreign_boss_timer.ui.presenter`
@@ -284,6 +289,28 @@ The tray icon and its menu.
 | `Tray.rebuild()` | Rebuild the menu from the settings. |
 | `IconState` | `TRACKING`, `FIGHT`, `PAUSED`, `ATTENTION`. |
 | `make_icon(state)` | The icon picture for a state. |
+
+### `nightreign_boss_timer.ui.main_window`
+
+The main window: sidebar, pages, status bar. Closing it only hides it.
+
+| Name | What it is |
+|---|---|
+| `MainWindow(controller, pages)` | The window. Without `pages` it uses `default_pages`. |
+| `MainWindow.show_page(key)` | Bring the window up, on the page with this key if there is one. |
+| `MainWindow.refresh()` | Redraw every text from the settings, in the current language. |
+| `default_pages(controller)` | The pages in sidebar order. Add a new page here. |
+
+### `nightreign_boss_timer.ui.pages`
+
+What every page has in common, and the About page.
+
+| Name | What it is |
+|---|---|
+| `Page` | Base class. Set `key` (the sidebar text is the translation of `page.<key>`) and write `refresh()`. |
+| `Page.refresh()` | Redraw from the settings. Called when the page is shown and on every controller change. |
+| `AboutPage` | Version, licence, repository link and the safety statement. |
+| `REPOSITORY_URL` | Where the project lives. |
 
 ### `nightreign_boss_timer.ui.region_canvas`
 

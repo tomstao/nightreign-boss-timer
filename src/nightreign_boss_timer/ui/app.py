@@ -33,6 +33,7 @@ from nightreign_boss_timer.ocr import NameReader
 from nightreign_boss_timer.records import FightRecord, RecordStore
 from nightreign_boss_timer.ui.calibration_window import CalibrationWindow
 from nightreign_boss_timer.ui.controller import Controller
+from nightreign_boss_timer.ui.main_window import MainWindow
 from nightreign_boss_timer.ui.overlay import Overlay
 from nightreign_boss_timer.ui.presenter import best_time, overlay_text
 from nightreign_boss_timer.ui.tray import IconState, Tray
@@ -64,6 +65,8 @@ class App:
         # True while finished fights are waiting because the records file is open elsewhere.
         self.rows_held = False
 
+        self.window = MainWindow(self.controller)
+        self.controller.window_requested.connect(self.window.show_page)
         self.tray = Tray(self.controller, application.quit)
         self.tray.icon.show()
         self.controller.changed.connect(self._apply)
@@ -120,6 +123,7 @@ class App:
             )
         )
         self.tray.set_state(self._icon_state(result.snapshot.state))
+        self.controller.set_state(result.snapshot.state)
 
     def _icon_state(self, state: State) -> IconState:
         if state is State.PAUSED:
@@ -131,6 +135,7 @@ class App:
     def close(self) -> None:
         self.timer.stop()
         self.calibration.close()
+        self.window.close()
         self.screen.close()
         self.tray.icon.hide()
 

@@ -76,6 +76,9 @@ and the frame rate cost. Say so in the pull request.
 
 ## Things that have gone wrong before
 
+- Tests passed and the run still failed with a crash on exit. Windows that outlive the Qt
+  application crash Python as it shuts down. `tests/conftest.py` destroys every window at the
+  end of the run, so check the exit code of `uv run pytest`, not only its last line.
 - A Qt window cannot be shown larger than about two thirds of the screen unless its size is
   fixed. The stand-in uses `setFixedSize` for that reason.
 - Clearing a menu from inside one of its own entries crashes. `Tray.rebuild` is connected with a

@@ -55,10 +55,19 @@ class Tray:
         self.icon = QSystemTrayIcon(make_icon(self._state))
         self.menu = QMenu()  # kept here: the tray icon does not own its menu
         self.icon.setContextMenu(self.menu)
+        self.icon.activated.connect(self._activated)
         # Queued: a change usually comes from one of this menu's own entries, and the menu must
         # not be torn down while that entry is still being handled.
         controller.changed.connect(self.rebuild, Qt.ConnectionType.QueuedConnection)
         self.rebuild()
+
+    def _activated(self, reason: QSystemTrayIcon.ActivationReason) -> None:
+        # A left click or a double click on the icon opens the main window.
+        if reason in (
+            QSystemTrayIcon.ActivationReason.Trigger,
+            QSystemTrayIcon.ActivationReason.DoubleClick,
+        ):
+            self._controller.show_window()
 
     def set_state(self, state: IconState) -> None:
         if state is not self._state:
@@ -98,5 +107,6 @@ class Tray:
         menu.addAction(translate("tray.open_records_file"), controller.open_records_file)
         menu.addSeparator()
         menu.addAction(translate("tray.calibrate"), controller.calibrate)
+        menu.addAction(translate("tray.open_window"), controller.show_window)
         menu.addSeparator()
         menu.addAction(translate("tray.quit"), self._quit)
