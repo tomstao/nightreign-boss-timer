@@ -316,6 +316,13 @@ Built differently from this plan, pending the owner's decision:
   every step in them is followed once on a clean Windows account, and the "planned" markers are
   removed.
 
+Status, 2026-11-18: the build exists (`tools/build_exe.py`, and the Build workflow in CI): a
+folder with the program, its own Python and the text model, about 170 MB, 75 MB as a ZIP. The
+built program recorded a played-back fight correctly. Settings are in the user data folder and
+the README has the install guide. Open: diagnostics export, a run on a PC that never had
+Python, the first published release, and code signing (without it Windows shows a SmartScreen
+warning). Memory use was about 200 MB, at the edge of the budget.
+
 The two documents exist from the start and are written ahead of the code. Any change that alters
 what a user sees or does updates them in the same pull request.
 

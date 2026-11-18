@@ -1,11 +1,11 @@
 # User guide
 
-> **There is no packaged release yet, and the tool has not been run against the real game.**
-> Everything in this guide works today when the tool is run from source (see
-> [INSTALL.md](INSTALL.md#running-from-source)), except what is marked as planned. It has been
-> checked against recorded fights played back in a window, not against the game itself: the
-> game window's title, borderless mode and the cost in frame rate are still to be confirmed.
-> Where the program and this guide disagree, that is a bug: please report it.
+> **No release has been published yet, and the tool has not been run against the real game.**
+> Everything in this guide works today, in a program you build yourself or run from source (see
+> [INSTALL.md](INSTALL.md)), except what is marked as planned. It has been checked against
+> recorded fights played back in a window, not against the game itself: the game window's
+> title, borderless mode and the cost in frame rate are still to be confirmed. Where the program
+> and this guide disagree, that is a bug: please report it.
 
 To install the tool, see [INSTALL.md](INSTALL.md).
 
@@ -291,7 +291,8 @@ method, and HDR compensation.
 | The overlay is missing from my recording | That is on purpose: see [The overlay](#the-overlay). |
 
 When reporting a problem, say which game language, resolution and window mode you use and whether
-HDR is on, and attach a screenshot or a short clip. Detection problems can only be fixed with
+HDR is on, and attach a screenshot or a short clip, and the log file
+`%LOCALAPPDATA%\nightreign-boss-timer\logs\app.log`. Detection problems can only be fixed with
 the frames that caused them. An **Export diagnostics** button on the About page is planned.
 
 ## What it does not do
