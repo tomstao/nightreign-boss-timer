@@ -2,7 +2,7 @@
 
 ## Supported versions
 
-Only the latest release receives fixes. There is no release yet.
+Only the latest release receives fixes.
 
 ## Reporting a vulnerability
 

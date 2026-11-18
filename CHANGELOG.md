@@ -6,6 +6,10 @@ All notable changes are listed here. The format follows
 
 ## Unreleased
 
+## 0.1.0 - 2026-11-18
+
+The first release.
+
 ### Fixed
 
 - The overlay now shows a known boss in the language the program is set to, not in the language of the game.

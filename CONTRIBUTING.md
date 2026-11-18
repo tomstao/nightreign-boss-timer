@@ -85,6 +85,12 @@ runs it again after changing it.
 Workflow actions are pinned to an exact commit, with the version in a comment. Dependabot
 proposes the updates.
 
+## The README in other languages
+
+`README.zh-CN.md` and `README.zh-TW.md` are shorter translations of `README.md`, which is the
+reference. A change to what the English page tells users should be made in all three. If you
+cannot write one of the languages, say so in the pull request and someone else will.
+
 ## Making a release
 
 For maintainers. A release is a ZIP of the packaged program, built by CI.
