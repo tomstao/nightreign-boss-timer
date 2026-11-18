@@ -13,16 +13,25 @@ import sys
 import time
 from pathlib import Path
 
+import numpy as np
+from numpy.typing import NDArray
 from PySide6.QtCore import QTimer
 from PySide6.QtGui import QAction, QColor, QIcon, QPainter, QPixmap
 from PySide6.QtWidgets import QApplication, QMenu, QSystemTrayIcon
 
 from nightreign_boss_timer import settings as settings_file
-from nightreign_boss_timer.capture import WindowsScreen, enable_dpi_awareness
-from nightreign_boss_timer.engine import GAME_TITLE, Engine, StepResult, records_path
+from nightreign_boss_timer.capture import ScreenGrabber, WindowsScreen, enable_dpi_awareness
+from nightreign_boss_timer.engine import (
+    GAME_TITLE,
+    MIN_WINDOW,
+    Engine,
+    StepResult,
+    records_path,
+)
 from nightreign_boss_timer.i18n import Translator
 from nightreign_boss_timer.ocr import NameReader
 from nightreign_boss_timer.records import FightRecord, RecordStore
+from nightreign_boss_timer.ui.calibration_window import CalibrationWindow
 from nightreign_boss_timer.ui.overlay import Overlay
 from nightreign_boss_timer.ui.presenter import best_time, overlay_text
 
@@ -48,7 +57,11 @@ class App:
             reader = NameReader()
         except FileNotFoundError:
             reader = None  # fights are still timed, and the boss is recorded as unknown
+        self.title = title
         self.engine = Engine(self.settings, self.screen, self.store, reader, title=title)
+        self.calibration = CalibrationWindow(
+            self.settings, self.translate, self._take_picture, self._save_settings
+        )
 
         self.overlay = Overlay()
         self.result: FightRecord | None = None
@@ -67,6 +80,8 @@ class App:
         show.toggled.connect(self.overlay.set_enabled)
         menu.addAction(show)
         menu.addSeparator()
+        menu.addAction(self.translate("tray.calibrate"), self.calibration.start)
+        menu.addSeparator()
         menu.addAction(self.translate("tray.quit"), application.quit)
         self._menu = menu  # keep it alive: the tray icon does not own it
         self.tray.setContextMenu(menu)
@@ -80,6 +95,21 @@ class App:
 
     def _set_tracking(self, on: bool) -> None:
         self.engine.paused = not on
+
+    def _take_picture(self) -> NDArray[np.uint8] | None:
+        """The whole game image for calibration, or None if the game window is not found."""
+        window = self.screen.find_window(self.title)
+        if window is None or window.width < MIN_WINDOW or window.height < MIN_WINDOW:
+            return None
+        # A grabber of its own, released straight away: a full picture is large, and the
+        # engine's grabbers are kept for the small regions it reads all the time.
+        with ScreenGrabber(window.width, window.height) as grabber:
+            return grabber.grab(window.left, window.top)
+
+    def _save_settings(self) -> None:
+        # The engine reads the regions from these same settings on every step, so a new
+        # calibration is in use at once.
+        settings_file.save(self.settings)
 
     def _step(self) -> None:
         result = self.engine.step()
@@ -104,6 +134,7 @@ class App:
 
     def close(self) -> None:
         self.timer.stop()
+        self.calibration.close()
         self.screen.close()
         self.tray.hide()
 

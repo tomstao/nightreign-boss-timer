@@ -5,10 +5,14 @@
 > updated with every change that affects users. Where the program and this guide disagree once a
 > release exists, that is a bug: please report it.
 >
-> **What works today** is the overlay with a tray icon (pause, hide overlay, quit) and the
-> command-line version, both described in [INSTALL.md](INSTALL.md#running-from-source). It follows the recording rules under
+> **What works today** is the overlay with a tray icon (pause, hide overlay, calibrate regions,
+> quit) and the command-line version, both described in
+> [INSTALL.md](INSTALL.md#running-from-source). It follows the recording rules under
 > [Everyday use](#everyday-use) and writes the file described under [Your records](#your-records).
-> Setup, the overlay, tables beyond one name, hotkeys and settings are not built yet.
+> Region calibration works as described under [First-run setup](#first-run-setup), from the tray
+> menu. Until you calibrate, the tool uses the usual positions for a 16:9 game image. The
+> calibration hotkey, picking a recent frame, the main window, tables beyond one name, hotkeys
+> and settings are not built yet.
 
 To install the tool, see [INSTALL.md](INSTALL.md).
 
@@ -34,12 +38,20 @@ resolution. You mark two areas once.
 ### 1. Health bar
 
 1. Start a fight so that a boss health bar is on screen.
-2. Press the calibration hotkey (default `Ctrl+Alt+C`), or choose **Calibrate regions** from the
-   tray icon. The screen freezes as a screenshot.
-3. Drag a box around the **whole bar, from its left end to its right end**, just the bar itself
-   without the boss name above it. Use the corner handles or the arrow keys to adjust.
-4. Choose **Save**. The tool reports what it sees, for example `Bar found, HP 100%`.
-   If it says `No bar found in this box`, adjust the box and save again.
+2. Choose **Calibrate regions** from the tray icon (a hotkey, default `Ctrl+Alt+C`, is planned).
+   A window opens with a screenshot of the game, taken at that moment.
+3. A box is already drawn where the bar sits on a 16:9 game image. If it is not exactly on the
+   bar, drag a box around the **whole bar, from its left end to its right end**, just the bar
+   itself without the boss name above it. Drag a corner to resize the box, drag inside it to
+   move it, or drag anywhere else to draw a new one. The arrow keys move the box one pixel at a
+   time, and Shift with an arrow key resizes it one pixel at a time.
+4. Watch the line at the bottom. It shows what the tool reads in the box as you move it, for
+   example `Bar found, HP 100%`. If it says `No bar found in this box`, keep adjusting.
+5. Choose **Save and next**.
+
+If the screenshot was taken at a bad moment, choose **Retake screenshot**. The window steps
+aside, takes a new screenshot of the game and comes back with your box unchanged. **Skip** goes
+to the defeat text without changing the saved bar, and **Cancel** or Esc closes the window.
 
 The boss name does not need its own box. The tool finds it from the position of the bar.
 
@@ -48,12 +60,18 @@ The boss name does not need its own box. The tool finds it from the position of 
 This is the gold text across the middle of the screen when a boss dies. It is on screen only
 briefly, so you do not have to catch it live:
 
-1. Kill any boss with the tool running.
-2. Open calibration and choose **Pick a recent frame**. Select a frame where the gold text is
-   fully visible. A saved screenshot works too.
-3. Drag a box around the text with a little room on each side, and choose **Save**.
+The second step of the calibration window starts with a box where the text appears on a 16:9
+game image.
 
-Until the defeat text area is set, every fight is recorded as `incomplete`.
+- If your game image is 16:9, you can choose **Save** straight away.
+- Otherwise open calibration while the text is on screen, or use **Retake screenshot** at that
+  moment, and drag a box around the text with a little room on each side. The line at the
+  bottom says `Defeat text found` when the box is right.
+
+Picking a frame from the last few seconds, or from a saved screenshot, is planned, so that you
+will not have to catch the text live.
+
+If the defeat text area is wrong, every fight is recorded as `incomplete`.
 
 ### When to calibrate again
 

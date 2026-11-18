@@ -75,6 +75,16 @@
   "regions.bar_not_found": "框選範圍內找不到血條",
   "regions.bar_hint": "拖曳滑鼠框選整條血條，從最左端到最右端。",
   "regions.defeat_hint": "拖曳滑鼠框選金色的擊敗文字，兩側各留一點空隙。",
+  "regions.defeat_found": "已找到擊敗文字",
+  "regions.defeat_not_found": "框選範圍內沒有擊敗文字",
+
+  "calibration.title": "標定區域",
+  "calibration.step": "第 {step} 步，共 {total} 步 - {region}",
+  "calibration.retake": "重新擷取畫面",
+  "calibration.save_next": "儲存並繼續",
+  "calibration.keys_hint": "方向鍵可將選框移動一個像素，按住 Shift 再按方向鍵可調整大小。",
+  "calibration.defeat_note": "如果此刻畫面上沒有這行文字，已畫出的選框就是它在 16:9 遊戲畫面中出現的位置，可以直接儲存。",
+  "calibration.no_game": "找不到遊戲視窗。請先啟動遊戲，然後點選「重新擷取畫面」。",
 
   "button.save": "儲存",
   "button.cancel": "取消",

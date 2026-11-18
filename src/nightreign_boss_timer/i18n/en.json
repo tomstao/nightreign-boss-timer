@@ -75,6 +75,16 @@
   "regions.bar_not_found": "No bar found in this box",
   "regions.bar_hint": "Drag a box around the whole bar, edge to edge.",
   "regions.defeat_hint": "Drag a box around the gold defeat text, with a little room on each side.",
+  "regions.defeat_found": "Defeat text found",
+  "regions.defeat_not_found": "No defeat text in this box",
+
+  "calibration.title": "Calibrate regions",
+  "calibration.step": "Step {step} of {total} - {region}",
+  "calibration.retake": "Retake screenshot",
+  "calibration.save_next": "Save and next",
+  "calibration.keys_hint": "Arrow keys move the box by one pixel. Shift with an arrow key resizes it.",
+  "calibration.defeat_note": "If the text is not on screen right now, the box already drawn is where it appears on a 16:9 game image, and can be saved as it is.",
+  "calibration.no_game": "Game window not found. Start the game, then choose Retake screenshot.",
 
   "button.save": "Save",
   "button.cancel": "Cancel",

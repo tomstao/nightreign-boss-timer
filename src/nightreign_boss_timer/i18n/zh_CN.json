@@ -75,6 +75,16 @@
   "regions.bar_not_found": "框选范围内没有找到血条",
   "regions.bar_hint": "拖动鼠标框选整条血条，从最左端到最右端。",
   "regions.defeat_hint": "拖动鼠标框选金色的击败文字，两侧各留一点空隙。",
+  "regions.defeat_found": "已找到击败文字",
+  "regions.defeat_not_found": "框选范围内没有击败文字",
+
+  "calibration.title": "标定区域",
+  "calibration.step": "第 {step} 步，共 {total} 步 - {region}",
+  "calibration.retake": "重新截图",
+  "calibration.save_next": "保存并继续",
+  "calibration.keys_hint": "方向键可将选框移动一个像素，按住 Shift 再按方向键可调整大小。",
+  "calibration.defeat_note": "如果此刻画面上没有这行文字，已画出的选框就是它在 16:9 游戏画面中出现的位置，可以直接保存。",
+  "calibration.no_game": "未找到游戏窗口。请先启动游戏，然后点击“重新截图”。",
 
   "button.save": "保存",
   "button.cancel": "取消",
